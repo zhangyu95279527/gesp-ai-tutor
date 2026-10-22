@@ -1,0 +1,20 @@
+id: PBI-0020
+type: user-story
+feature_id: FEAT-006
+status: draft
+owner_role: ""
+title: "盲评抽样导出与结果录入"
+value: "金标准之二'教练盲评均分 ≥3.5/5'的执行工具（O4），同时支撑变式题难度校准（BR-VAR-2）"
+user_story:
+  as_a: "产品负责人"
+  i_want: "按分层抽样规则导出讲解会话给教练盲评，并录入评分结果"
+  so_that: "用人工金标准校准 AI 讲解质量"
+acceptance_criteria:
+  - "可按 BR-EVA 规则抽样导出：每次重大迭代后抽 30 个已完成会话，按级别段（1-4 / 5-8）× 模块（讲题 / 诊断）分层、每层至少 6 个（证据：导出清单核对）"
+  - "导出内容包含评分所需完整上下文：阶梯解锁留痕、变式题与首次作答记录、所报级别（证据：导出字段检查）"
+  - "盲评结果可录入：评分按「变式题质量」与「引导效果」两个维度独立计分（避免题目质量问题与讲解效果互相污染归因），2 名教练独立评分取均值、单维度分差大于 1 分进入仲裁，并进入效果度量日报（BR-EVA-4）（证据：录入数据与日报核对）"
+  - "导出数据仅含学习行为必要字段，导出文件访问受控（未成年人数据保护）（证据：字段审计 + 访问权限检查）"
+dependencies: [PBI-0008]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-OPS-02)"
+  - "docs/product/prd/04-business-rules.md (BR-EVA, BR-VAR-2)"

@@ -1,0 +1,21 @@
+id: PBI-0001
+type: user-story
+feature_id: FEAT-001
+status: draft
+owner_role: ""
+title: "邮箱验证码注册/登录"
+value: "学生以最低成本获得账号与 30 天登录态，是邀请制内测与正式使用的统一入口"
+user_story:
+  as_a: "备考 GESP 的学生"
+  i_want: "用邮箱接收验证码完成注册并登录"
+  so_that: "无需记忆密码即可开始使用产品，且登录态可保持 30 天"
+acceptance_criteria:
+  - "输入有效邮箱并请求发送验证码后，可收到 6 位数字验证码，验证码 5 分钟内有效，过期验证失败（证据：测试邮箱收件记录 + 过期用例验证）"
+  - "重发验证码间隔 60 秒，间隔内重复请求被拒绝并提示剩余等待时间（证据：接口响应断言）"
+  - "同一邮箱验证码连续错误 5 次后锁定 10 分钟，锁定期内验证请求被拒绝并提示（证据：接口响应断言）"
+  - "验证码通过后：新邮箱自动完成注册并登录；已注册邮箱直接登录（证据：注册/登录两条路径的流程测试）"
+  - "登录态 30 天内免登录，第 31 天访问被要求重新验证（证据：登录态过期测试）"
+dependencies: []
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-ACC-01)"
+  - "docs/product/prd/02-user-journeys.md (J0)"

@@ -1,0 +1,19 @@
+id: PBI-0013
+type: user-story
+feature_id: FEAT-001
+status: draft
+owner_role: ""
+title: "体验转注册引导"
+value: "把体验产生的价值感知转化为注册，体验→注册转化率是获客漏斗的核心度量"
+user_story:
+  as_a: "刚完成体验会话的访客"
+  i_want: "在结果页看到注册能解锁什么，并一键进入注册"
+  so_that: "顺理成章地成为正式用户"
+acceptance_criteria:
+  - "体验会话结果页（变式题反馈 + 讲解回顾）内嵌注册引导，文案锚定“注册解锁每日 15 次额度 + 错因诊断 + 错题本”（FR-ACC-07）（证据：UI 检查）"
+  - "从结果页进入并完成注册的用户，当日即可按正式 15 次额度使用（证据：流程测试）"
+  - "体验转化漏斗（体验发起→体验完成→注册）各环节计数可统计、可分日查询（证据：埋点数据检查）"
+dependencies: [PBI-0012, PBI-0001]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-ACC-07)"
+  - "docs/product/prd/02-user-journeys.md (J0)"

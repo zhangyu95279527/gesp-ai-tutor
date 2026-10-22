@@ -1,0 +1,22 @@
+id: PBI-0007
+type: user-story
+feature_id: FEAT-002
+status: draft
+owner_role: ""
+title: "题目识别与回显确认"
+value: "让学生在进入讲解前确认题目、考点与级别判定无误，避免'讲错题'级别的体验事故（R2/R3 缓解）"
+user_story:
+  as_a: "发起讲题的学生"
+  i_want: "看到 AI 识别出的题目文本、考点和级别，确认或纠正后再进入讲解"
+  so_that: "讲解内容确实针对我上传的这道题"
+acceptance_criteria:
+  - "识别结果回显包含题目文本、判定考点、判定级别，三项均可编辑纠正，确认后才进入讲解（证据：UI 流转测试）"
+  - "用户的纠正信息被记录（原判定值、纠正值、会话）（证据：数据记录检查）"
+  - "同会话内纠正后重新识别 1 次不计入日限额（BR-LMT-3）（证据：计数测试）"
+  - "判定题目超出 GESP C++ 1-8 级考纲时，先提示“该题超出 GESP 考纲范围”；用户确认继续后进入通用讲解模式并在会话页持续标注“通用讲解，不针对考级”（BR-LVL-5）（证据：UI 测试）"
+  - "题目识别 + 首轮讲解的流式输出首字延迟 P75 不超过 5 秒（NFR-PERF-01）（证据：性能埋点统计）"
+dependencies: [PBI-0006]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-TUT-02)"
+  - "docs/product/prd/04-business-rules.md (BR-LVL)"
+  - "docs/product/prd/05-nfr.md (NFR-PERF-01)"

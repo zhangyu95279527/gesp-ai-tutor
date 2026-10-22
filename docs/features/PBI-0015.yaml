@@ -1,0 +1,21 @@
+id: PBI-0015
+type: user-story
+feature_id: FEAT-003
+status: draft
+owner_role: ""
+title: "六类错因定位输出"
+value: "诊断模块的核心交付：让学生知道'错在哪'，且结论有依据、置信可辨"
+user_story:
+  as_a: "提交三件套的学生"
+  i_want: "得到归类明确的错因结论和定位依据"
+  so_that: "知道自己错在哪一类问题上，而不是盲目改代码"
+acceptance_criteria:
+  - "诊断结论归为六类错因之一（算法选择错误 / 复杂度不足 TLE / 边界条件遗漏 / 运行错误 RE / 格式问题 / 实现细节错误），允许多个候选按可能性排序（BR-DIA-1）（证据：输出结构断言）"
+  - "每条结论附定位依据说明；缺乏测试数据支撑时标注“基于静态分析推断”，不出现无依据的确定口吻结论（BR-DIA-2）（证据：输出文案抽检 + 盲评“正确性”维度）"
+  - "识别回显确认复用讲题模块的确认/纠正流程，确认后才输出诊断（FR-DIA-02）（证据：UI 流转测试）"
+  - "发起一次错因诊断（识别 + 首轮诊断）计 1 次日限额（BR-LMT-2）（证据：计数测试）"
+dependencies: [PBI-0014, PBI-0007]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-DIA-02, FR-DIA-03)"
+  - "docs/product/prd/04-business-rules.md (BR-DIA)"
+  - "docs/product/prd/02-user-journeys.md (J2)"

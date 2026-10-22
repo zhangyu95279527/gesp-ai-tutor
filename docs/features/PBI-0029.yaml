@@ -1,0 +1,19 @@
+id: PBI-0029
+type: user-story
+feature_id: FEAT-008
+status: draft
+owner_role: ""
+title: "重练提醒（站内通知 + 每周邮件）"
+value: "Web App 无订阅消息能力下的降级提醒方案（O1），P2 整体可再降级时优先裁撤本项"
+user_story:
+  as_a: "有积压错题的学生"
+  i_want: "收到每周一次的错题重练提醒汇总"
+  so_that: "不会忘记回头重练"
+acceptance_criteria:
+  - "重练提醒通过站内通知与每周邮件汇总两个通道发送，用户可分别关闭（FR-WBK-04）（证据：通知收发测试 + 设置项检查）"
+  - "邮件汇总内容包含本周新归集错题数与重练完成情况（证据：邮件样例核对）"
+dependencies: [PBI-0027]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-WBK-04)"
+  - "docs/product/prd/00-overview.md (O1)"
+  - "docs/product/prd/06-mvp-scope.md (P2 降级预案)"

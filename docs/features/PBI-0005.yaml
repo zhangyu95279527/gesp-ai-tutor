@@ -1,0 +1,22 @@
+id: PBI-0005
+type: user-story
+feature_id: FEAT-005
+status: draft
+owner_role: ""
+title: "日限额计数、用量展示与超限引导"
+value: "O3 成本红线的执行机制：将单用户日 AI 请求约束在 15 次内，同时让用户对额度可感知"
+user_story:
+  as_a: "已注册学生"
+  i_want: "看到当日剩余 AI 使用次数，用完时得到明确提示"
+  so_that: "心里有数地安排使用，不会因突然中断而困惑"
+acceptance_criteria:
+  - "按 BR-LMT 计数口径每用户每日累计：发起讲题会话、发起错因诊断、每次阶梯解锁、每次追问、每次变式题生成与判读、每次模考讲评发起各计 1 次；自然日 0 点重置（证据：计数服务单元测试覆盖全部计次场景）"
+  - "不计入项不产生计数：模考判分、错题本浏览与重练（非 AI 部分）、同会话内 1 次免费重识别（证据：计数服务单元测试）"
+  - "当日第 16 次 AI 请求被拒绝，提示“今日次数已用完，明天再来”并引导至非 AI 功能（浏览错题本、回看历史会话、重练）；已开始的会话可完成当前一轮交互不被中断（证据：超限用例的接口与 UI 测试）"
+  - "会话页常驻显示当日剩余次数（FR-LMT-02）（证据：UI 检查）"
+  - "不提供任何付费加次入口（证据：UI 检查）"
+dependencies: []
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-LMT-01, FR-LMT-02)"
+  - "docs/product/prd/04-business-rules.md (BR-LMT)"
+  - "docs/product/prd/00-overview.md (O3)"

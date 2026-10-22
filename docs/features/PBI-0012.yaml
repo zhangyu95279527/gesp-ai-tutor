@@ -1,0 +1,24 @@
+id: PBI-0012
+type: user-story
+feature_id: FEAT-001
+status: draft
+owner_role: ""
+title: "未登录体验模式（每日 1 次完整讲题）"
+value: "O8 注册策略的核心落点：先证明价值再要身份，降低公域/投放流量的注册漏斗损耗"
+user_story:
+  as_a: "首次到访、尚未注册的访客"
+  i_want: "不注册也能完整体验一次 AI 讲题（含阶梯引导与变式题检验）"
+  so_that: "先确认产品对我有用，再决定是否注册"
+acceptance_criteria:
+  - "未登录用户可直接发起完整讲题体验会话，包含 L1-L3 阶梯引导与变式题检验，与注册用户同流程（FR-ACC-06）（证据：访客全流程测试）"
+  - "体验额度每日 1 次，按设备指纹 + 浏览器标识计数；同一设备更换浏览器分别计数、同一浏览器当日重复访问不重复发放（证据：计数规则测试）"
+  - "体验会话整体计 1 次体验，会话内阶梯解锁、追问、变式题不再单独计次（BR-LMT-4）（证据：计数测试）"
+  - "当日体验额度用尽后展示注册墙，不可再次发起体验（证据：UI 测试）"
+  - "移动端访客可选用内置示例题（1-8 级各 1 道）一键开始体验，同样计 1 次体验额度（证据：移动端 UI 测试）"
+  - "体验会话不计入注册用户日限额；注册成功当日即切换为正式 15 次口径，当日已发生的体验不抵扣正式额度（BR-LMT-4）（证据：跨注册态的计数测试）"
+dependencies: [PBI-0008, PBI-0010, PBI-0005]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-ACC-06)"
+  - "docs/product/prd/00-overview.md (O8)"
+  - "docs/product/prd/04-business-rules.md (BR-LMT-4)"
+  - "docs/product/prd/02-user-journeys.md (J0)"

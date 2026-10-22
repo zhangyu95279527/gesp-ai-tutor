@@ -1,0 +1,20 @@
+id: PBI-0019
+type: user-story
+feature_id: FEAT-006
+status: draft
+owner_role: ""
+title: "效果度量埋点与日报"
+value: "全部成功指标（含金标准）的数据地基；内测上线后每日据此判断假设是否成立"
+user_story:
+  as_a: "产品负责人"
+  i_want: "每天看到核心效果指标的日报"
+  so_that: "用数据判断 H1/H6/H8 是否成立、限额值是否合理"
+acceptance_criteria:
+  - "以下指标可按日产出日报：活跃用户（按天去重）、会话数、阶梯解锁深度分布、变式题首次做对率、听懂标记率、会话轮次分布、限额触顶率、触顶用户次日留存率、体验转化漏斗（体验发起→体验完成→注册）（FR-OPS-01, NFR-REL-02）（证据：日报输出样例核对）"
+  - "埋点数据支持按所报级别段（1-4 / 5-8）× 模块（讲题 / 诊断）交叉查询（BR-EVA 分层抽样需要）（证据：查询示例）"
+  - "解锁留痕、变式首次作答等关键事件带会话标识，可与盲评导出数据对得上（证据：数据一致性抽查）"
+dependencies: []
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-OPS-01)"
+  - "docs/product/prd/05-nfr.md (NFR-REL-02, NFR-DATA-01)"
+  - "docs/product/prd/04-business-rules.md (BR-EVA)"

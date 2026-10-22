@@ -1,0 +1,19 @@
+id: PBI-0011
+type: user-story
+feature_id: FEAT-002
+status: draft
+owner_role: ""
+title: "听懂标记与历史会话"
+value: "提供辅助效果信号（听懂标记率）与学习痕迹回看，支撑复盘与持续追问"
+user_story:
+  as_a: "学生"
+  i_want: "标记听懂的讲解，并能按时间回看历史会话、继续追问"
+  so_that: "学习过程有迹可循，疑问可以接着上次继续"
+acceptance_criteria:
+  - "讲解结束后可点击“听懂了”标记，标记率可按日统计（FR-TUT-06）（证据：UI 测试 + 统计数据）"
+  - "历史会话按时间倒序列表展示，可进入回看完整内容（含阶梯解锁状态与变式题结果）（FR-TUT-08）（证据：UI 测试）"
+  - "历史会话中可继续追问，追问计入当日限额（证据：功能 + 计数测试）"
+dependencies: [PBI-0008]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-TUT-06, FR-TUT-08)"
+  - "docs/product/prd/04-business-rules.md (BR-EVA)"

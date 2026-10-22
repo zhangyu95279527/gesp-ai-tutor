@@ -1,0 +1,19 @@
+id: PBI-0009
+type: user-story
+feature_id: FEAT-002
+status: draft
+owner_role: ""
+title: "会话内追问与级别适配"
+value: "让学生针对不懂的点继续发问且回答不超纲，是引导式讲解闭环的必要组成"
+user_story:
+  as_a: "看讲解时仍有疑问的学生"
+  i_want: "在任意阶梯下就当前题目追问"
+  so_that: "疑问当场解决，讲解深度始终匹配我的级别"
+acceptance_criteria:
+  - "L1/L2/L3 任意阶梯下均可发起追问，回答深度按用户所报级别适配（证据：会话功能测试 + 盲评“级别贴合度”维度）"
+  - "每次追问计 1 次日限额；当日额度用尽时追问被拒绝并提示次日恢复（BR-LMT）（证据：计数与超限用例测试）"
+  - "考纲外会话中追问照常可用，回答遵守不直给完整代码规则并持续标注“通用讲解，不针对考级”（BR-LVL-5）（证据：会话输出检查）"
+dependencies: [PBI-0008, PBI-0005]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-TUT-05)"
+  - "docs/product/prd/04-business-rules.md (BR-LVL, BR-LMT)"

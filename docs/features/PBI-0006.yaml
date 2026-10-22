@@ -1,0 +1,21 @@
+id: PBI-0006
+type: user-story
+feature_id: FEAT-002
+status: draft
+owner_role: ""
+title: "题目统一输入（文本/截图粘贴与上传）"
+value: "让 OJ 刷题场景的学生以一步粘贴完成题目录入，是讲题与诊断两个模块共用的输入地基"
+user_story:
+  as_a: "在 PC 上刷 OJ 的学生"
+  i_want: "Ctrl+V 直接粘贴题目文本或截图到同一个输入区"
+  so_that: "不用离开当前窗口、不用整理文件即可发起讲题"
+acceptance_criteria:
+  - "同一粘贴区支持 Ctrl+V 粘贴题目文本或剪贴板截图，图文自动识别类型、即贴即传（证据：PC 端两类粘贴的 UI 测试）"
+  - "文本上限 10000 字符、图片上限 10MB，超限给出明确提示且不进入识别（证据：边界值测试）"
+  - "支持点击选择图片文件上传、移动端相册选择截图；产品内不出现相机直拍入口（证据：各端 UI 检查）"
+  - "内容明显无效（文本过短、非题目内容、截图模糊）时提示重新输入，不计入日限额（证据：无效输入用例测试 + 计数检查）"
+  - "可随题目附加粘贴代码片段（上限 5000 字符）与疑问点文字描述（FR-TUT-03）（证据：提交数据的接口测试）"
+dependencies: []
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-TUT-01, FR-TUT-03)"
+  - "docs/product/prd/05-nfr.md (NFR-USE-02)"

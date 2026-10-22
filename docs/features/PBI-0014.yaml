@@ -1,0 +1,21 @@
+id: PBI-0014
+type: user-story
+feature_id: FEAT-003
+status: draft
+owner_role: ""
+title: "错因诊断三件套上传"
+value: "让判分后不知错因的学生以最顺手的粘贴方式一次给全诊断输入（进阶段画像 B 的核心场景）"
+user_story:
+  as_a: "在 OJ 判分后看不出错因的学生"
+  i_want: "把题目、评测结果截图和我的代码一次粘贴上传"
+  so_that: "AI 有足够材料定位我的错因"
+acceptance_criteria:
+  - "诊断发起页提供题目、OJ 评测结果截图、学生代码三个上传区；三者齐备才可提交诊断，缺项明确提示（FR-DIA-01）（证据：缺项拦截的 UI 测试）"
+  - "题目与评测结果两个上传区支持 PC Ctrl+V 粘贴剪贴板截图即贴即传，移动端走相册选择（证据：两端 UI 测试）"
+  - "评测结果截图可识别评测状态（WA / TLE / RE / 部分得分等）；无法识别状态时提示用户补传或改用文字描述（BR-DIA-3）（证据：识别用例集测试）"
+  - "学生代码支持粘贴文本（上限 5000 字符）或文件上传（证据：接口测试）"
+dependencies: [PBI-0006]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-DIA-01)"
+  - "docs/product/prd/04-business-rules.md (BR-DIA)"
+  - "docs/product/prd/02-user-journeys.md (J2)"

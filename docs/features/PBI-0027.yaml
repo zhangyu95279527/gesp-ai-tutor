@@ -1,0 +1,21 @@
+id: PBI-0027
+type: user-story
+feature_id: FEAT-008
+status: draft
+owner_role: ""
+title: "错题自动归集与筛选列表"
+value: "错题本的最小可用形态：三源归集 + 可筛选列表，支撑长期指标'错题重练正确率提升'"
+user_story:
+  as_a: "积累了错题的学生"
+  i_want: "错题自动进入错题本，可按考点/级别/来源筛选查看"
+  so_that: "不用手工整理就能找到自己的薄弱点"
+acceptance_criteria:
+  - "三类来源自动归集即时生效：模考判分错题、诊断会话归集动作、讲题会话收藏动作（FR-WBK-01）（证据：三源归集触发测试）"
+  - "列表可按考点、级别、来源筛选（FR-WBK-03）（证据：UI 筛选测试）"
+  - "用户可手动移除已归集错题（证据：UI 测试）"
+  - "错题本浏览与重练（非 AI 部分）不计入日限额（BR-LMT-3）（证据：计数测试）"
+dependencies: [PBI-0024, PBI-0016]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-WBK-01, FR-WBK-03)"
+  - "docs/product/prd/02-user-journeys.md (J4)"
+  - "docs/product/prd/06-mvp-scope.md (P2 降级预案)"

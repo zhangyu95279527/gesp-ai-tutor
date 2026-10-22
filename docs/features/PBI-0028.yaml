@@ -1,0 +1,18 @@
+id: PBI-0028
+type: user-story
+feature_id: FEAT-008
+status: draft
+owner_role: ""
+title: "错题重练与进步对比"
+value: "长期效果指标'重练正确率 vs 首次作答'的数据源，验证错题本是否真正促进提分（H4）"
+user_story:
+  as_a: "在错题本中复习的学生"
+  i_want: "对错题重新作答并看到与首次结果的对比"
+  so_that: "确认自己确实掌握了曾经的薄弱点"
+acceptance_criteria:
+  - "列表中可对错题重新作答：模考来源题由评测机判分，其余来源由 AI 判读正误（FR-WBK-02）（证据：两类来源的重练流程测试）"
+  - "重练结果与首次作答对比展示（最简：正确率对比数字），重练正确率可统计（证据：UI 检查 + 统计数据）"
+dependencies: [PBI-0027, PBI-0025]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-WBK-02)"
+  - "docs/product/prd/02-user-journeys.md (J4)"

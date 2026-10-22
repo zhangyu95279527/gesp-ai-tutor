@@ -1,0 +1,19 @@
+id: PBI-0016
+type: user-story
+feature_id: FEAT-003
+status: draft
+owner_role: ""
+title: "引导式修正与解决状态回填"
+value: "让学生自己修正错误而非抄改后代码，并用解决状态沉淀诊断有效率"
+user_story:
+  as_a: "拿到错因结论的学生"
+  i_want: "在阶梯引导下自己改对代码，回 OJ 验证后回填是否解决"
+  so_that: "真正掌握这类错误的修正思路"
+acceptance_criteria:
+  - "错因定位后进入引导式修正，复用阶梯引导机制；L3 解锁前不展示改后完整代码，L3 解锁后可见修正要点说明（FR-DIA-04）（证据：输出内容断言）"
+  - "用户可将会话标记为“已解决 / 未解决”，解决率可统计；未解决可继续追问并计入日限额（FR-DIA-05）（证据：数据记录 + 计数测试）"
+  - "诊断会话完成后同样触发变式题检验（J2 第 6 步）（证据：会话流转测试）"
+dependencies: [PBI-0015, PBI-0008]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-DIA-04, FR-DIA-05)"
+  - "docs/product/prd/02-user-journeys.md (J2)"

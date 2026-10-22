@@ -1,0 +1,20 @@
+id: PBI-0026
+type: user-story
+feature_id: FEAT-007
+status: draft
+owner_role: ""
+title: "逐题讲评入口"
+value: "把模考丢分点直接接入引导式讲解，让模考不止于判分而转化为学习"
+user_story:
+  as_a: "模考判分后看到丢分题的学生"
+  i_want: "从判分结果一键进入该题的引导式讲解"
+  so_that: "趁热打铁弄懂错题"
+acceptance_criteria:
+  - "判分结果页每题提供讲评入口，进入复用讲题会话框架的引导式讲解（FR-EXA-04）（证据：流程测试）"
+  - "每次讲评发起计 1 次日限额（BR-LMT-2）（证据：计数测试）"
+  - "讲评会话自动携带题目与用户作答上下文，讲解深度按所报级别适配（证据：会话数据检查 + 盲评“级别贴合度”维度）"
+  - "讲评内容展示位带“AI 生成”显式标识（FR-OPS-04）（证据：UI 检查）"
+dependencies: [PBI-0025, PBI-0008]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-EXA-04)"
+  - "docs/product/prd/02-user-journeys.md (J3)"

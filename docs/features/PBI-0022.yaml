@@ -1,0 +1,18 @@
+id: PBI-0022
+type: user-story
+feature_id: FEAT-006
+status: draft
+owner_role: ""
+title: "AI 生成内容显式标识"
+value: "《人工智能生成合成内容标识办法》（2025-09-01 施行）的合规落点"
+user_story:
+  as_a: "产品负责人（合规视角）"
+  i_want: "所有 AI 生成内容展示位带显式标识且不可关闭"
+  so_that: "产品符合生成合成内容标识的法规要求"
+acceptance_criteria:
+  - "全部 AI 生成内容展示位带“AI 生成”显式标识：讲解页、诊断结果、变式题、模考讲评（P1 上线时纳入检查）（FR-OPS-04）（证据：展示位逐页检查清单）"
+  - "标识在展示界面合理位置持续可见，且产品内不存在关闭标识的入口（证据：UI 检查）"
+dependencies: []
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-OPS-04)"
+  - "docs/product/prd/05-nfr.md (NFR-SAFE-04)"

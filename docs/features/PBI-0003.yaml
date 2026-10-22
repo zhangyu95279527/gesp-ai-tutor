@@ -1,0 +1,21 @@
+id: PBI-0003
+type: user-story
+feature_id: FEAT-001
+status: draft
+owner_role: ""
+title: "未成年人年龄分层与协议同意留痕"
+value: "满足未成年人合规底线（14 岁界分层 + 监护人同意 + 协议版本留痕），是任何上线形态的法定前置"
+user_story:
+  as_a: "不满 14 周岁的学生（及其监护人）"
+  i_want: "在注册时看到未成年人保护条款并确认已征得监护人同意"
+  so_that: "产品对未成年人的信息处理合法合规"
+acceptance_criteria:
+  - "按出生年月计算不满 14 周岁的用户，注册流程必须展示《未成年人个人信息保护条款》并勾选“已征得监护人同意”，未勾选无法完成注册（证据：UI 拦截测试）"
+  - "监护人同意勾选动作留痕：账号、勾选时间、条款版本号（证据：数据库记录检查）"
+  - "注册页可见隐私政策与用户协议链接，同意时记录协议版本号；协议更新后版本号随之更新（证据：数据库记录 + 页面检查）"
+  - "收集字段不超过最小集：邮箱、昵称、出生年月、所报级别、学习行为数据（BR-CMP-2）（证据：注册与资料接口字段审计）"
+dependencies: [PBI-0001]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-ACC-03, FR-ACC-04)"
+  - "docs/product/prd/04-business-rules.md (BR-CMP)"
+  - "docs/product/prd/05-nfr.md (NFR-CMP-02, NFR-CMP-03)"

@@ -1,0 +1,21 @@
+id: PBI-0010
+type: user-story
+feature_id: FEAT-002
+status: draft
+owner_role: ""
+title: "变式题检验"
+value: "金标准指标'变式题首次做对率 ≥50%'的数据源，用于验证讲解是否真的让学生学会（O4）"
+user_story:
+  as_a: "听完讲解的学生"
+  i_want: "做一道同考点的变式小题并得到正误反馈"
+  so_that: "确认自己真的会了，而不只是看懂了"
+acceptance_criteria:
+  - "每道变式题下发前须通过自动校验：参考解在构造测试数据上运行通过，未通过校验的题目不允许推送给学生（BR-VAR-3 质量防线）（证据：校验流水线记录）"
+  - "每个讲解会话（含诊断会话）结束后推送 1 道变式小题：与原题同考点、难度相当，题面自明、答案可 AI 判读（BR-VAR-1/3）（证据：会话流转测试 + 盲评难度校准记录）"
+  - "学生作答后 AI 判读正误并反馈；首次作答结果计入“变式题首次做对率”统计（证据：埋点数据检查）"
+  - "变式题生成与判读合计计 1 次日限额（BR-LMT-2）（证据：计数测试）"
+  - "变式题不进入真题题库、不标注为真题、不承诺 OJ 判分（BR-VAR-4, BR-CPY-4）（证据：题库数据与页面文案检查）"
+dependencies: [PBI-0008, PBI-0005]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-TUT-07)"
+  - "docs/product/prd/04-business-rules.md (BR-VAR, BR-EVA)"

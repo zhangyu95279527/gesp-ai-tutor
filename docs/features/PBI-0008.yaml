@@ -1,0 +1,23 @@
+id: PBI-0008
+type: user-story
+feature_id: FEAT-002
+status: draft
+owner_role: ""
+title: "阶梯式引导引擎（L1/L2/L3 手动解锁）"
+value: "产品核心价值'H1：引导优于直给答案'的机制落点，被讲题、诊断修正、模考讲评三处复用"
+user_story:
+  as_a: "做题遇阻的学生"
+  i_want: "先看到思路提示，确实想不通再逐级解锁关键步骤和完整讲解"
+  so_that: "我是自己想明白的，而不是抄会答案的"
+acceptance_criteria:
+  - "新会话默认仅输出 L1 思路提示：只含思考方向与相关概念提示，不含实现步骤与完整代码（证据：会话输出内容断言）"
+  - "L2 输出分步解题框架（伪代码或步骤描述）不含完整代码；完整参考代码与复杂度分析仅 L3 可见（BR-GUD-1/2）（证据：输出内容断言）"
+  - "L2、L3 仅由用户手动点击解锁，系统不自动升级；每次解锁留痕（会话、时间、解锁后级别）（BR-GUD-3）（证据：数据记录检查）"
+  - "用户可在会话页查看自己的解锁历史（BR-GUD-4）（证据：UI 测试）"
+  - "讲解内容仅使用用户所报级别考纲内知识点；超纲解法仅允许在 L3 末尾以“拓展视野”形式出现，标注“超出本级别考纲，考试不要求”（BR-LVL-1/2）（证据：输出抽检 + 盲评“级别贴合度”维度）"
+  - "发起讲题会话（题目识别 + 首轮讲解）计 1 次日限额；每次阶梯解锁各计 1 次（BR-LMT-2）（证据：计数测试）"
+dependencies: [PBI-0007, PBI-0005]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-TUT-04)"
+  - "docs/product/prd/04-business-rules.md (BR-GUD, BR-LVL)"
+  - "docs/product/prd/02-user-journeys.md (J1)"

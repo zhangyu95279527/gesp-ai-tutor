@@ -1,0 +1,20 @@
+id: PBI-0021
+type: user-story
+feature_id: FEAT-006
+status: draft
+owner_role: ""
+title: "AI 内容安全过滤"
+value: "未成年人产品的内容安全底线：输入输出双向拦截，是所有 AI 会话上线的前置"
+user_story:
+  as_a: "产品负责人（合规视角）"
+  i_want: "AI 输入输出经内容安全检测，违规内容被拦截并留痕"
+  so_that: "未成年人不会在产品中接触不当内容，且拦截可追溯"
+acceptance_criteria:
+  - "AI 输入与输出双向经内容安全检测，涉政、涉黄、暴力、欺凌内容被拦截（BR-CMP-3, NFR-SAFE-01）（证据：测试用例集的拦截验证）"
+  - "拦截事件全部记录日志：时间、账号（访客记设备标识）、内容类型、命中类别（证据：日志记录检查）"
+  - "被拦截用户可见邮件申诉入口（FR-OPS-03）（证据：UI 检查）"
+dependencies: []
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-OPS-03)"
+  - "docs/product/prd/04-business-rules.md (BR-CMP-3)"
+  - "docs/product/prd/05-nfr.md (NFR-SAFE-01, NFR-SAFE-02)"

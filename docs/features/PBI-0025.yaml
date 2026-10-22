@@ -1,0 +1,21 @@
+id: PBI-0025
+type: user-story
+feature_id: FEAT-007
+status: draft
+owner_role: ""
+title: "自建评测机判分"
+value: "模考闭环的判分能力；落地后错因诊断同步升级为'静态分析 + 动态重跑验证'（P1 诊断升级路径）"
+user_story:
+  as_a: "交卷的学生"
+  i_want: "尽快看到每题的得分与评测状态"
+  so_that: "知道整套卷哪里丢分，决定去弄懂哪几题"
+acceptance_criteria:
+  - "交卷后按题库测试数据逐题判分，输出总得分与逐题评测状态；官方公开样例判分一致率 100% 为强制门槛，判分口径与 PBI-0023 题库校准记录一致（FR-EXA-03）（证据：抽检比对记录）"
+  - "交卷后不超过 30 秒出判分结果（NFR-PERF-04）（证据：性能统计）"
+  - "模考判分不计入日限额（BR-LMT-3）（证据：计数测试）"
+  - "错题判分结果即时推送至错题本归集（J3 第 6 步数据源）（证据：归集触发测试）"
+dependencies: [PBI-0023]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-EXA-03)"
+  - "docs/product/prd/05-nfr.md (NFR-PERF-04)"
+  - "docs/product/prd/06-mvp-scope.md (P1 诊断升级)"

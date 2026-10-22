@@ -1,0 +1,20 @@
+id: PBI-0024
+type: user-story
+feature_id: FEAT-007
+status: draft
+owner_role: ""
+title: "真题套卷列表与限时模考"
+value: "覆盖考前两周冲刺窗口的结构化真题训练场景（成功指标：模考完成率 ≥50%）"
+user_story:
+  as_a: "进入冲刺阶段的学生"
+  i_want: "按级别选择真题套卷，在真实考试时长限制下在线作答"
+  so_that: "提前适应考试节奏与强度"
+acceptance_criteria:
+  - "模考页按级别组织套卷列表并标注来源（GESP 历届真题），默认选中用户所报级别（FR-EXA-01）（证据：UI 测试）"
+  - "开考后进入全屏答题界面并启动倒计时：1-4 级 120 分钟、5-8 级 180 分钟；倒计时结束自动交卷（FR-EXA-02）（证据：定时与自动交卷测试）"
+  - "在线 C++ 编辑器带语法高亮；断网期间作答内容本地暂存，网络恢复后不丢失（证据：断网恢复测试）"
+  - "模考开始与交卷提交可统计，支撑模考完成率指标（证据：埋点数据检查）"
+dependencies: [PBI-0023]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-EXA-01, FR-EXA-02)"
+  - "docs/product/prd/02-user-journeys.md (J3)"

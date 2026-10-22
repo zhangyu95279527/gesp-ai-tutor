@@ -1,0 +1,19 @@
+id: PBI-0002
+type: user-story
+feature_id: FEAT-001
+status: draft
+owner_role: ""
+title: "首次注册资料收集与级别管理"
+value: "获取讲解深度控制所需的最小资料（昵称/出生年月/所报级别），使级别适配机制可用"
+user_story:
+  as_a: "首次注册的学生"
+  i_want: "在首次使用时填写昵称、出生年月和所报 GESP 级别，并可随时修改级别"
+  so_that: "AI 讲解深度与我的备考级别匹配"
+acceptance_criteria:
+  - "首次注册完成后强制进入资料填写页；昵称、出生年月、所报级别（1-8）缺任一项不可进入主功能（证据：缺项提交的 UI 拦截测试）"
+  - "级别取值限定 1-8 级，可随时在个人设置中修改（证据：UI 测试）"
+  - "修改级别后次日 0 点起新会话按新级别讲解深度生效；历史会话按当时级别保留展示（BR-LVL-4）（证据：跨日会话行为对比 + 历史会话数据检查）"
+dependencies: [PBI-0001]
+references:
+  - "docs/product/prd/03-functional-requirements.md (FR-ACC-02)"
+  - "docs/product/prd/04-business-rules.md (BR-LVL)"
