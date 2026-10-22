@@ -1,0 +1,20 @@
+id: GATE-RECORD-0002
+gate: G2
+artifact: prd
+decision: go
+criteria_met:
+  - sections-complete
+  - mvp-scope-explicit
+  - no-material-open-questions
+  - requirements-traceable
+criteria_failed: []
+decided_by: "zhangyu95279527"
+role: "product-owner"
+date: "2026-10-22"
+recycle_target: ""
+follow_up:
+  - "启动 GA 架构基线（模型选型）：选型限定国内已备案模型（O9），产出 docs/architecture/architecture-baseline.md 提请 GA 评审"
+  - "O7 AI 造测试数据 POC（承 G1 follow-up）：GA 架构基线定稿前完成验证，结论作为诊断判题技术选型输入"
+  - "Q2 隐私政策法务评审：公开上线前完成（O6/O9）"
+  - "生成式 AI 登记与主体方案（注册公司）：决定公开上线时重启（O9）"
+notes: "四条判据全部满足，评审承载于 PR #3（g2-prd 分支）。评审期内完成 O9 合规策略修订（备案暂缓、邀请制内测为默认路径、公开上线以登记为前置，新增 FR-ACC-08 邀请码门控，FR 总数 37）。PRD Status: in-review -> living（living_applies_to: docs/product/prd），后续经 PBI/受控变更持续演化。"
