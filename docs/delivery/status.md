@@ -25,7 +25,7 @@ Generated: 2026-10-22
 | Artifact | Status | Gate | Latest decision |
 |---|---|---|---|
 | Product Brief | approved | G1 | go (2026-10-22) |
-| PRD (00-overview) | draft | G2 | — |
+| PRD (00-overview) | in-review | G2 | — |
 
 ## Architecture
 
