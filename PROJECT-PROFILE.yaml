@@ -1,17 +1,17 @@
 product:
-  name: ""
+  name: "GESP AI Tutor"
   type: "internet-product"
   stage: "discovery"
 
 delivery:
-  method: "scrum" # scrum | kanban | hybrid
-  sprint_length: "2-weeks"
+  # 本实例采用通用迭代(不启用 Scrum 仪式); 枚举中最接近的取值为 kanban
+  method: "kanban" # scrum | kanban | hybrid
+  sprint_length: ""
 
 ai:
   enabled: true
   coding_agents:
-    - codex
-    - claude-code
+    - trae
 
 engineering:
   source_control: git
@@ -22,4 +22,5 @@ engineering:
 
 architecture:
   style: "to-be-determined"
-  repository_strategy: "architecture-driven"
+  # 分离仓布局: 交付仓 + 组件仓; 组件仓地址登记到 .agent/local/git-policy.yaml 的 notes
+  repository_strategy: "multi-repo"

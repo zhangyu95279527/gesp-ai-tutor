@@ -2,7 +2,7 @@
 
 Derived from repository artifacts by `scripts/build-status.py`. Do not edit by hand; regenerate instead.
 
-Generated: 2026-10-20
+Generated: 2026-10-22
 
 ## Stage progress
 

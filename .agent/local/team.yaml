@@ -1,0 +1,21 @@
+# 团队名册: 人名 -> 角色 映射
+# 用法: 实例化时复制到 .agent/local/team.yaml 并填写; 该目录归实例所有, 模板升级不覆盖
+# 角色简称与 .agent/roles/role-catalog.md 一致:
+#   PO | Designer | Architect | Developer | QA | DevOps | Scrum Master
+# 一人可担多个角色, 多人可担同一角色; 角色描述的是责任, 不是职位
+members:
+  # 待填写: 实例化时选择了"多人团队"但未提供名单, 以下为占位成员,
+  # 请替换为真实姓名并按实际分工调整角色(可一人多角色、多人同角色)
+  # 本实例采用通用迭代, 暂不涉及 Scrum Master 角色
+  - name: "小策"
+    roles: [PO]
+  - name: "小美"
+    roles: [Designer]
+  - name: "小师"
+    roles: [Architect]
+  - name: "小开"
+    roles: [Developer]
+  - name: "小Q"
+    roles: [QA]
+  - name: "小维"
+    roles: [DevOps]
