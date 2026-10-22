@@ -1,0 +1,29 @@
+# Git 平台策略: 实例所在平台的 git 配置事实与确认位
+# 用法: 实例化时复制到 .agent/local/git-policy.yaml 并填写; 该目录归实例所有, 模板升级不覆盖
+# 定位: 分支命名/提交锚点等契约在 AGENTS.md 的 Git 一节(所有会话固定读取);
+#       本文件只记平台特有事实和"配没配"的确认, 供实例化核对与后续会话查询
+platform:
+  # 平台类型: github | gitlab | gitee | azure-devops | other
+  type: "github"
+  # 远程仓地址(交付仓; 分离仓布局时组件仓地址记到 notes)
+  remote_url: "https://github.com/zhangyu95279527/gesp-ai-tutor.git"
+
+# 平台侧核对清单: 实例化时由人逐项在平台上配置, 配好一项改一项为 true
+checks:
+  # main 分支保护已开启(禁止强推, 经 PR 评审合入)
+  main_protected: false
+  # 人工门 G1/G2/G5/GA/GB 的 required reviewers 已按团队名册完成映射
+  # (谁审什么由 .agent/local/team.yaml 与 .agent/roles/role-catalog.md 的问责矩阵决定, 本文件不重复记录)
+  gate_reviewers_mapped: false
+  # CI 已配置: 每次 push 运行 python scripts/build-status.py 重生成 docs/delivery/status.md
+  ci_build_status: false
+
+# 允许直推 main 的平台账号(滚动门 G3/G4 制品由 agent 直推, 属分支保护的例外);
+# 填平台上的账号或机器人名; 平台不支持按账号放行时在 notes 说明替代做法
+direct_push_accounts: []
+
+# 提交信息锚点 lint(AGENTS.md Git 一节的锚点契约): 默认关闭; 开启后由实例自行在 CI 加校验
+anchor_lint: false
+
+# 自由备注: 平台特殊限制、分离仓的组件仓地址、评审约定等
+notes: "分离仓布局: 本仓为交付仓; 组件仓创建后将其地址补充到此处。"
