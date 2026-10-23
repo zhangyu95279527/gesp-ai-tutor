@@ -1,8 +1,8 @@
 # Architecture Baseline（架构基线）
 
-Status: in-review <!-- 文档生命周期: draft | in-review | approved | living | superseded -->
+Status: approved <!-- 文档生命周期: draft | in-review | approved | living | superseded -->
 
-> 本基线承接 G2 通过的 PRD（docs/product/prd/），定义 MVP 阶段稳定架构边界，供 GA 人工门评审。
+> 本基线已通过 GA 人工门评审（2026-10-23 go，PR #4，门记录 GATE-RECORD-0003），定义 MVP 阶段稳定架构边界。
 > 需人工拍板项：① 模型选型（O3 移交 GA）与图片识别管线（OCR-first + 多模态升级）；② 云厂商中立原则与首期落地（阿里云）、技术栈、组件仓划分；③ 判题方案（Judge0 定制）；④ 可观测性栈（企业级四层 + Langfuse）；⑤ 成本测算结论（NFR-COST-02）；⑥ CI/CD 流水线形态；⑦ 开放架构问题清单。
 
 ## 关键架构决策与置信度

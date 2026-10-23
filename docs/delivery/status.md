@@ -2,7 +2,7 @@
 
 Derived from repository artifacts by `scripts/build-status.py`. Do not edit by hand; regenerate instead.
 
-Generated: 2026-10-22
+Generated: 2026-10-23
 
 ## Stage progress
 
@@ -10,7 +10,7 @@ Generated: 2026-10-22
 |---|---|---|
 | Discovery (G1) | done | go (2026-10-22) |
 | PRD (G2) | done | go (2026-10-22) |
-| Architecture baseline (GA) | pending | on-demand |
+| Architecture baseline (GA) | done | go (2026-10-23) |
 | Backlog & refinement (G3) | active | 26 PBIs (draft: 26); G3 passed: 0 |
 | Implementation & verification (G4) | pending | no PBI passed G3 yet |
 | Release (G5) | pending | no release yet |
@@ -56,7 +56,7 @@ Generated: 2026-10-22
 
 | Artifact | Status | Gate | Latest decision |
 |---|---|---|---|
-| Architecture Baseline | draft | GA | — |
+| Architecture Baseline | approved | GA | go (2026-10-23) |
 | ADR | — | GB | — |
 
 ## PBIs
@@ -100,5 +100,6 @@ No sprints yet.
 
 | Date | Gate | Artifact | Decision | Record |
 |---|---|---|---|---|
+| 2026-10-23 | GA | architecture-baseline | go | 20261023-ga-architecture-baseline-go.yaml |
 | 2026-10-22 | G2 | prd | go | 20261022-g2-prd-go.yaml |
 | 2026-10-22 | G1 | product-brief | go | 20261022-g1-product-brief-go.yaml |
