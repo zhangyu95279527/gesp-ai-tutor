@@ -24,6 +24,7 @@ Status: draft <!-- 文档生命周期: draft | in-review | approved | living | s
 
 - 自研运营后台 UI：基线已定运营入口为 Grafana / Langfuse（各自账号体系、邀请制），不建第三套。
 - 分享卡片图片角标与 EXIF/XMP 隐式标识：随 FEAT-004 暂缓；恢复时的落地规格登记于 §10-D3。
+- 分享回流指标：基线业务指标清单所含，数据源（分享卡片）随 FEAT-004 暂缓；恢复时补事件类型与看板 panel。
 - 体验转化漏斗的"注册引导"交互属 PBI-0013；本文仅定义漏斗事件契约（§3.1）与取数口径（§5.4）。
 - 日报的调度基础设施：不引入调度组件；日报产出动作初期由人工/主机 cron 触发 CLI（§4），看板实时可查。
 
@@ -72,7 +73,7 @@ class Event:
     owner_type: Literal["user", "guest"]
     owner_id: str              # user_id 或访客指纹 hash
     session_id: str | None     # 会话域事件必填（AC3 对账依据）
-    module: str | None         # tut / dia / exa / acc / lmt / ops / shr
+    module: str | None         # tut / dia / exa_review / acc / lmt / ops / shr（取值对齐 §5.1 枚举）
     level_band: Literal["1-4", "5-8"] | None
     props: dict                # 事件特定属性
 ```
@@ -89,7 +90,8 @@ class Event:
 |---|---|---|---|
 | session_started / echo_confirmed / ladder_unlocked(level) / followup_asked / understood_marked / variant_pushed / variant_answered(correct) | core/session（FEAT-002/003/007） | 见 FEAT-002 §6.3 | 会话数、解锁深度、轮次、听懂率、变式做对率 |
 | recognition_succeeded(route) / recognition_failed(reason) / echo_corrected / reidentify_used / ladder_compliance_violation(level) / ocr_fallback | core/session | route / reason / level | 质量过程指标 |
-| guest_experience_started / guest_experience_completed | core/session（FEAT-001 体验模式编排按本契约发射） | sample_question? | 体验漏斗前两步 |
+| landing_page_viewed | web 落地页（beacon 上报，接口见 §4） | utm_source? / referrer?；module 为空 | 体验漏斗首步 |
+| guest_experience_started / guest_experience_completed | core/session（FEAT-001 体验模式编排按本契约发射） | sample_question? | 体验漏斗中间两步 |
 | user_registered | acc（FEAT-001，PBI-0013 承接） | guest_fingerprint?（归因） | 漏斗终点 |
 | quota_rejected(action) | modules/lmt（FEAT-005） | action | 触顶率、触顶次日留存 |
 | safety_blocked(stage, category) / safety_truncated(category) | core/safety / core/llm | stage=input/output、命中类别 | 安全拦截率 |
@@ -151,10 +153,11 @@ docker compose exec api python -m modules.ops.blind_eval sync    # 评分回写 
 
 ## 4. 对外接口
 
-本特性无新增用户侧 REST 接口。运营面入口：
+本特性新增 1 个用户侧接口（落地页 beacon）；其余均为运营面入口：
 
 | 入口 | 形态 | 说明 |
 |---|---|---|
+| 落地页 beacon | `POST /api/ops/events`（无鉴权；防护见 §7） | web 落地页上报 `landing_page_viewed`；仅接受事件目录注册类型；客户端指纹上送后服务端 hash 落 events.owner_id，不存原文 |
 | Grafana 效果日报看板 | dashboard JSON provisioning（api 仓 `deploy/grafana/`） | PG 只读数据源账号；看板 = NFR-REL-02 全指标 + 盲评组（§5.4） |
 | 日报留档 CLI | `python -m modules.ops.daily_report --date <d>` | 复用看板同一组 SQL，渲染 markdown 快照，供"日报输出样例核对"（PBI-0019 AC1 证据）与复盘留档；每日产出动作初期人工/cron 触发 |
 | 盲评 CLI | §3.3 | sample / sync |
@@ -215,11 +218,11 @@ variant      变式题题面 / 首次作答 / 判读对错 / validated
 | evaluator | text | 教练标识（Langfuse 账号名；仲裁人同列区分） |
 | dimension | enum(guidance,correctness,level_fit,expression_safety,variant_difficulty) | 前四为引导效果组（数值），末为变式题质量组（档位） |
 | score_num | smallint? | 1–5，引导效果组 |
-| score_label | enum('相当','偏易','偏难')? | 变式题质量组 |
+| score_label | enum(on_par,too_easy,too_hard)? | 变式题质量组；展示层映射 相当/偏易/偏难 |
 | comment | text? | 自由评语 |
 | synced_at | timestamptz | 回写时间 |
 
-终值不物化，由 SQL 视图 `blind_eval_final` 计算：每 sample × dimension，无仲裁取 2 人均值，有仲裁取 3 人中位数；变式题质量组取多数档。日报与 Grafana 直接查视图，避免回写计算状态与原始评分漂移。
+终值不物化，由 SQL 视图 `blind_eval_final` 计算：每 sample × dimension，无仲裁取 2 人均值，有仲裁取 3 人中位数；变式题质量组取多数档。仅终值可计算的样本（数值组与档位组均 ≥2 人评分）进入视图结果，评分未齐样本不参与日报聚合。日报与 Grafana 直接查视图，避免回写计算状态与原始评分漂移。
 
 ### 5.3 safety_blocks（core/safety 所有）
 
@@ -250,7 +253,7 @@ variant      变式题题面 / 首次作答 / 判读对错 / validated
 | 会话轮次分布 | session_messages 中 role='user' 且 kind∈(followup_q, variant_answer) 的每会话计数分布 |
 | 限额触顶率 | 当日有 quota_rejected 的 distinct 注册用户 / 当日活跃用户（访客额度触顶属漏斗范畴，另列） |
 | 触顶用户次日留存率 | D 日触顶用户中 D+1 有任一事件者占比；同看板并置"当日活跃未触顶用户次日留存"对照（NFR-REL-02 回审 O3 的判据） |
-| 体验转化漏斗 | 当日 guest_experience_started（设备去重）→ guest_experience_completed → 同批指纹 7 日内 user_registered 归因转化（归因窗口见 §10-D2） |
+| 体验转化漏斗 | 当日 landing_page_viewed（指纹去重）→ guest_experience_started → guest_experience_completed → 同批指纹 7 日内 user_registered 归因转化（归因窗口见 §10-D2；首步数据源决策见 §10-D5） |
 | 盲评均分 / 偏易占比 | blind_eval_final 视图按 batch/iteration_tag 聚合（PBI-0020 AC"进日报"） |
 
 级别段 × 模块交叉查询（AC2 证据形态，Grafana 同构 panel）：
@@ -293,7 +296,7 @@ AI 内容渲染唯一入口 AiContent（§3.4），标识为渲染默认行为�
 
 ### 6.3 可观测性增量
 
-- 指标新增：`event_record_failures`（埋点写入失败率）、内容安全检测延迟与拦截率（按 stage × category × scene）、滑窗送检漏出风险监控（截断发生轮次分布）、盲评 sync 成功率。
+- 指标新增：`event_record_failures`（埋点写入失败率）、内容安全检测延迟与拦截率（按 stage × category × scene）、滑窗送检漏出风险监控（截断发生轮次分布）、盲评 sync 成功率、落地页 beacon/访问日志计数比（beacon 数据质量对照：比率稳定 ≤1，突变即 beacon 故障或非 JS 流量异常；访问日志保留基础设施职责，不进漏斗口径）。
 - 告警沿用基线分级：内容安全服务不可用 = P1；日报数据源（PG 只读账号 / Grafana）不可用 = P2；盲评 sync 连续失败 = P3。
 - 内容安全拦截单独日志流（基线日志节既定），safety_blocks 为可查询留痕，二者经 trace_id 互相关联。
 
@@ -301,6 +304,7 @@ AI 内容渲染唯一入口 AiContent（§3.4），标识为渲染默认行为�
 
 - 盲评导出最小化：白名单字段（§5.2）不含任何身份字段；导出访问受控——Langfuse 邀请制账号（基线身份/安全节），样本数据落库可审计（exported_by）。字段白名单由测试强制（§9），防止后续迭代混入身份字段。
 - safety_blocks 仅经 DB / 日志后台访问，无用户侧接口；申诉核查动作为人工查询，不留自动化数据出口。
+- beacon 接口防护（无鉴权写入口）：仅接受事件目录注册类型，props 白名单（utm_source / referrer，其余拒收）；按 IP + 指纹限流防灌水；指纹服务端 hash 落库，不存原文。
 - 未成年人：本特性不新增个人信息收集；events / safety_blocks 中的 owner_id 访客侧为指纹 hash，不可逆。
 - 数据保留：events / safety_blocks / blind_eval_* 对齐 NFR-DATA-02（保留至 2027-01 考后复盘完成，之后按隐私政策执行）。
 - 密钥：内容安全 / Langfuse API 凭据环境变量注入，不入仓（基线纪律）。
@@ -342,6 +346,7 @@ AI 内容渲染唯一入口 AiContent（§3.4），标识为渲染默认行为�
 | D2 | 漏斗"体验完成"与注册归因窗口口径 | 体验完成 = 会话内出现 understood_marked 或 variant_answered 之一（质量信号明确）；注册归因窗口 7 日（同日注册为主，留跨日余量） | PO 确认（非阻塞；PBI-0012/0013 发射事件时按本口径） | 70 |
 | D3 | 分享卡片角标与 EXIF/XMP 隐式标识（随 FEAT-004 恢复时落地） | 卡片图生成时写入 XMP 元数据 AIGC 标记（隐式）+ 图片右下角"AI 生成"角标（显式，FR-OPS-04 含分享卡片位）；由 FEAT-004 技术设计承接，本文不建 | 登记，FEAT-004 恢复时生效 | 85（与基线集成节既定方案一致） |
 | D4 | 输出滑窗 W=200 初始值 | 联调期按误拦率与截断前上屏量实测校准，只改配置 | 任务分解定稿 | 70 |
+| D5 | 漏斗首步"落地页"数据源 | beacon 上报 `landing_page_viewed` 入 events：四步同一指纹身份可设备级归因、UTM 渠道入场即采集、JS 执行天然滤爬虫；Loki 访问日志保留基础设施职责并作 beacon 数据质量对照（§6.3），不进漏斗口径 | 已定（2026-10-23 架构评审定论） | 80 |
 
 ## 11. G3 追踪
 
