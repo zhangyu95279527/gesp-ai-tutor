@@ -1,0 +1,21 @@
+id: GATE-RECORD-0003
+gate: GA
+artifact: architecture-baseline
+decision: go
+criteria_met:
+  - baseline-substantive
+  - tradeoffs-recorded
+  - open-questions-listed
+criteria_failed: []
+decided_by: "zhangyu95279527"
+role: "architect"
+date: "2026-10-23"
+recycle_target: ""
+follow_up:
+  - "A-Q1/A-Q2 性能压测与容量评审：P1 前完成（压测含模考交卷尖峰场景；确认 GLM 账户 TPM/RPM 档位与升档条件；容量评审含 RDS 连接数与 IO 余量，验收 RPO ≤ 5 分钟 / RTO ≤ 30 分钟恢复演练）"
+  - "A-Q3 模型质量盲评（BR-EVA）：GLM-5.3-Flash 与备选模型盲评，不达标即按切换机制更换备选模型"
+  - "A-Q6 真实截图评测集：验证 OCR 命中率 70% 假设与 VL 升级触发率，结论回馈图片识别管线"
+  - "A-Q7 备选模型热切换演练：冲刺窗口前完成密钥预置、prompt 模板兼容性冒烟与一次真实切换回切，演练记录入 P1 上线评审"
+  - "A-Q4/A-Q5：设备指纹 200 设备/日情景碰撞率验证、事务邮件厂商选定（P2 前），随对应特征设计推进"
+  - "O7 AI 造测试数据 POC（承 G2 follow-up）：验证结论尚未落档，随特征技术设计/PBI 精炼补齐"
+notes: "三条判据全部满足，评审承载于 PR #4（ga-baseline 分支）。评审期内完成一轮企业级自评审并闭环：3 项 P0（输出流式分片滑窗送检命中截断、A-Q7 模型热切换演练、A-Q1 并入模考交卷尖峰与 TPM/RPM 限额）与 5 项 P1（RPO/RTO 口径、内容安全 API 费用入成本模型、镜像 tag 组合发布语义、Grafana/Langfuse 运营入口、A-Q2 增 RDS 连接预算）。关键决议：GLM-5.3-Flash 模型选型；OCR-first + 多模态升级图片识别管线；云厂商中立原则、首期落地阿里云；FastAPI + Next.js 技术栈；Judge0 定制判题；可观测性四层 + Langfuse（PG 复用托管实例独立库，Redis/ClickHouse 随容器）；成本测算推理 ¥160–330/月 + 云资源 ¥500–800/月；CI/CD GitHub Actions + self-hosted runner。Architecture Baseline Status: in-review -> approved，作为后续特征技术设计的稳定边界。"
