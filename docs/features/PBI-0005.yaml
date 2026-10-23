@@ -35,3 +35,4 @@ references:
   - "docs/product/prd/05-nfr.md (NFR-COST-01)"
   - "docs/product/prd/06-mvp-scope.md (O3 成本超标回审预案)"
   - "docs/architecture/architecture-baseline.md (限额服务、quota_usage 流水、Redis 键口径)"
+  - "docs/features/feat-005-ux-ui-design.md (UX/UI 设计：用量指示器、超限提示与引导)"
