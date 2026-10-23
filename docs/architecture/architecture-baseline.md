@@ -87,6 +87,7 @@ PostgreSQL 主要实体（字段级设计在各 Feature 技术设计中完成）
 - invite_codes：码、来源、次数上限、作废标记（FR-ACC-08）
 - ai_sessions：类型（tut / dia / exa_review）、级别快照、状态、题目引用
 - session_steps：阶梯级别、解锁留痕、追问轮次、token 用量——BR-GUD 解锁追踪与 LLM 计量数据源
+- session_messages：会话逐轮内容（阶梯讲解正文、追问问答、变式题作答与判读、诊断结论与定位依据、解决状态）——FR-TUT-08 历史回看/继续追问与 FR-DIA-05 未解决续问的在线数据源；LLM 入出参全文同时经网关留痕 Langfuse，仅作观测与盲评，不作在线业务查询
 - questions：识别后的题目文本、考点、级别判定、来源
 - variant_attempts：变式题、首次作答、对错——金标准（变式题首次做对率）数据源
 - exam_papers / exam_questions / exam_runs / judge_submissions：P1 模考与判题（judge_submissions 记录 judge0 submission token、评测状态与资源消耗映射）
