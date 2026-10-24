@@ -21,3 +21,4 @@ references:
   - "docs/product/prd/03-functional-requirements.md (FR-TUT-04)"
   - "docs/product/prd/04-business-rules.md (BR-GUD, BR-LVL)"
   - "docs/product/prd/02-user-journeys.md (J1)"
+  - "docs/features/feat-002-tech-design.md"

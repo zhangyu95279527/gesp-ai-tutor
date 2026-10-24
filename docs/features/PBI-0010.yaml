@@ -19,3 +19,4 @@ dependencies: [PBI-0008, PBI-0005]
 references:
   - "docs/product/prd/03-functional-requirements.md (FR-TUT-07)"
   - "docs/product/prd/04-business-rules.md (BR-VAR, BR-EVA)"
+  - "docs/features/feat-002-tech-design.md"

@@ -19,3 +19,4 @@ dependencies: []
 references:
   - "docs/product/prd/03-functional-requirements.md (FR-TUT-01, FR-TUT-03)"
   - "docs/product/prd/05-nfr.md (NFR-USE-02)"
+  - "docs/features/feat-002-tech-design.md"
