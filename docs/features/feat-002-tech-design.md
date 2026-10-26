@@ -108,7 +108,7 @@ ocr 服务不可用/超时（10s）→ 降级 VL 通道 + 记录 ocr_fallback �
 ```
                  ┌────────────────────────────┐
  创建(识别) ─→ pending_confirm ─确认─→ l1_active ─解锁─→ l2_active ─解锁─→ l3_active
-                 │  纠正重识别(≤1次/会话)  ▲                                  │
+                 │  纠正重识别(不限次数)    ▲                                  │
                  └──────────┘            └── 追问(followup, 任意阶梯, 不改变状态) ┘
   l1/l2/l3_active ─听懂标记/主动发起─→ variant_pending ─作答判读─→ variant_done
   任意态 ─用户30天无操作或显式关闭─→ closed（历史可回看，可继续追问→回到对应阶梯态）
@@ -116,6 +116,7 @@ ocr 服务不可用/超时（10s）→ 降级 VL 通道 + 记录 ocr_fallback �
 
 规则：
 - 解锁仅允许相邻逐级（l1→l2→l3），禁止跳级（BR-GUD-3 与计数口径"L1→L2、L2→L3 各计 1 次"一致）；重复解锁同级拒绝。
+- 纠正重识别不限次数：同会话第 1 次免费（Redis reidentify 键放行），第 2 次起各计 1 次（BR-LMT-3，2026-10-24 PO 裁决细化）。
 - 追问不改变阶梯状态；回答深度按 level_snapshot 适配（BR-LVL-1）。
 - `out_of_syllabus=true` 的会话走同一状态机，system 槽位注入"通用讲解，不针对考级"标注要求（BR-LVL-5）。
 - 变式题每会话限 1 道（BR-VAR-3）；variant_pending 由"听懂标记"或用户主动 CTA 触发，未触发不推送。
@@ -140,7 +141,7 @@ ocr 服务不可用/超时（10s）→ 降级 VL 通道 + 记录 ocr_fallback �
 |---|---|---|
 | POST /api/uploads | 签发 OSS 私有桶签名 PUT URL（类型白名单 image/*，≤10MB） | 不计 |
 | POST /api/tut/sessions | 创建会话并同步执行识别管线；入参 `{text? \| image_oss_key?, code_snippet?(≤5000), question_note?}`；返回 `{session_id, echo}` 或 422（无效输入/识别失败） | 不计 |
-| POST /api/tut/sessions/{id}/reidentify | 同会话免费重识别 1 次（Redis `reidentify:{session_id}` SET NX 控制）；走 VL 通道 | 不计（BR-LMT-3） |
+| POST /api/tut/sessions/{id}/reidentify | 同会话重识别不限次数：第 1 次免费（Redis `reidentify:{session_id}` SET NX 放行），第 2 次起走 consume；走 VL 通道 | 第 1 次不计，第 2 次起各计 1 次（BR-LMT-3，2026-10-24 PO 裁决细化） |
 | POST /api/tut/sessions/{id}/confirm | 提交确认/纠正（question_text/knowledge_points/level）→ 记录纠正 → SSE 流式输出 L1 | **计 1 次**（发起讲题口径） |
 | POST /api/tut/sessions/{id}/unlock | `{target:2\|3}`，校验相邻逐级 → SSE 流式输出 L2/L3 | 各计 1 次 |
 | POST /api/tut/sessions/{id}/followups | `{question}` → SSE 流式回答 | 计 1 次 |
@@ -151,7 +152,7 @@ ocr 服务不可用/超时（10s）→ 降级 VL 通道 + 记录 ocr_fallback �
 | GET /api/tut/sessions/{id} | 完整回看：echo + messages + steps + variant + understood | 不计 |
 
 说明：
-- 创建会话时不计数、确认后首轮 L1 生成才计数——这是"识别失败/无效输入不计数"（PBI-0006/0007 AC）与"发起=识别+首轮讲解计 1 次"（BR-LMT-2）两条规则的相容解：计数点落在 confirm 触发的 L1 生成动作上，生成失败（LLM 错误）则返还。
+- 创建会话时不计数、确认后首轮 L1 生成才计数——这是"识别失败/无效输入不计数"（PBI-0006/0007 AC）与"发起=识别+首轮讲解计 1 次"（BR-LMT-2）两条规则的相容解：计数点落在 confirm 触发的 L1 生成动作上；生成失败（LLM 错误）已计次数不退还、重试按新请求计次（2026-10-24 PO 裁决：先计后调防失败重试绕过，故障损失由运营个案兜底）。
 - 计数判定前置：每个计费动作先经 lmt 接口 `consume()` 检查+扣减，超限时动作被拒绝、会话状态不推进；仅"输出被安全截断"场景计数照计（已发生推理成本，记录支撑申诉，FR-OPS-03）。
 
 ## 5. 数据设计（字段级）
@@ -239,10 +240,10 @@ ocr 服务不可用/超时（10s）→ 降级 VL 通道 + 记录 ocr_fallback �
 |---|---|---|
 | quota:user:{uid}:{yyyymmdd} | counter，至次日 0 点 | 基线已列，判定源 |
 | quota:guest:{fp}:{yyyymmdd} | counter，至次日 0 点 | 基线已列，体验额度 |
-| reidentify:{session_id} | flag，至次日 0 点 | 同会话免费重识别仅 1 次 |
+| reidentify:{session_id} | flag，至次日 0 点 | 同会话第 1 次重识别免费放行标记；第 2 次起走 consume 计次 |
 | stream:{message_id} | list，TTL=轮次结束+10min | SSE 分片缓冲与断连续传 |
 
-计数口径：Redis 计数器为超限判定源（INCR 原子），quota_usage 表同步写流水（动作明细，支撑触顶率与次日留存日报）。扣减失败（LLM 错误返还）经 DECR + 流水标 `refunded`。
+计数口径：Redis 计数器为超限判定源（INCR 原子），quota_usage 表同步写流水（动作明细，支撑触顶率与次日留存日报）。扣减后 LLM 调用失败/中断不退还（无 DECR 回退路径），流水标 `failed`；重试按新请求计次（2026-10-24 PO 裁决）。
 
 ### 5.3 访客会话承载（FEAT-001 接口点，本特性仅预留）
 
@@ -263,11 +264,10 @@ ocr 服务不可用/超时（10s）→ 降级 VL 通道 + 记录 ocr_fallback �
 ```python
 class QuotaService(Protocol):
     def consume(self, owner: OwnerRef, action: QuotaAction, session_id: str) -> ConsumeResult: ...
-    def refund(self, owner: OwnerRef, action: QuotaAction, session_id: str) -> None: ...
     def remaining(self, owner: OwnerRef) -> int: ...
 ```
 
-`QuotaAction = session_create | unlock | followup | variant`（dia/exa 动作由对应特性扩展）。ConsumeResult 含 allowed / remaining / reset_at。框架层在每个计费动作调用；guest 跳过规则内置于 consume（见 5.3）。用量展示（FR-LMT-02）经 GET /api/lmt/usage（lmt 模块自有路由，FEAT-005 定稿，本文不展开）。
+`QuotaAction = session_create | unlock | followup | variant`（dia/exa 动作由对应特性扩展）。ConsumeResult 含 allowed / remaining / reset_at。框架层在每个计费动作调用；guest 跳过规则内置于 consume（见 5.3）。无 refund 路径：放行后 LLM 失败/中断不退还，重试按新请求计次（2026-10-24 PO 裁决）。用量展示（FR-LMT-02）经 GET /api/lmt/usage（lmt 模块自有路由，FEAT-005 定稿，本文不展开）。
 
 ### 6.3 埋点（modules/ops 进程内接口）
 
@@ -299,7 +299,7 @@ class QuotaService(Protocol):
 | 无效输入（文本过短/非题目/图片模糊） | 422 + 重新输入提示 | 不计 |
 | OCR 失败/超时 | 自动升 VL 通道 + ocr_fallback 指标 | 不计 |
 | 识别结构化校验失败（重试 1 次后） | 文本路径→识别失败提示；截图路径→升 VL，VL 再失败→识别失败提示 | 不计 |
-| GLM 429/5xx/超时 | 网关内重试 1 次（指数退避）；仍失败 → SSE error 事件 | 已扣额度返还（refund） |
+| GLM 429/5xx/超时 | 网关内重试 1 次（指数退避）；仍失败 → SSE error 事件 | 已扣额度不退还，流水标 `failed`（2026-10-24 PO 裁决） |
 | 输入安全命中 | 422 safety_blocked + 申诉入口提示 | 不计 |
 | 输出安全命中 | 流截断 + safety_truncated 事件 + 提示 | 照计（记录支撑申诉） |
 | L1/L2 合规校验违规 | 重生成 1 次；再违规 → 去代码化截断版本 + 质量事件 | 照计 |
@@ -311,7 +311,7 @@ class QuotaService(Protocol):
 
 - 单测（api，pytest）：
   - 状态机：合法/非法转移全枚举（跳级解锁拒绝、重复解锁拒绝、closed 续问回到对应阶梯）。
-  - 计数矩阵（BR-LMT 逐条一个用例）：session_create/unlock/followup/variant 各计 1；免费重识别；识别失败不计；生成失败返还；guest 整体计 1 且内部动作跳过。
+  - 计数矩阵（BR-LMT 逐条一个用例）：session_create/unlock/followup/variant 各计 1；重识别第 1 次免费、第 2 次起计次；识别失败不计；生成失败不退还、重试另计；guest 整体计 1 且内部动作跳过。
   - prompt 组装快照：级别注入、阶梯边界、history 截断（N=10）、考纲外标注注入。
   - L1/L2 合规校验器：含代码块/不含代码块样例表驱动。
   - 识别/变式 JSON schema 校验：合法、缺字段、类型错误、重试耗尽路径。
@@ -345,7 +345,7 @@ OCR 置信度路由阈值初始取 0.85（经验值），A-Q6 真实截图评测
 | PBI | 本文覆盖节 | 备注 |
 |---|---|---|
 | PBI-0006 统一输入 | 4（uploads、sessions）、5.1、7 | 文本/图片上限校验在 web 与 api 双侧 |
-| PBI-0007 识别与回显 | 3.1/3.2/4、5.1、8 | 纠正留痕 corrections；免费重识别 reidentify 键 |
+| PBI-0007 识别与回显 | 3.1/3.2/4、5.1、8 | 纠正留痕 corrections；重识别首次免费 reidentify 键 |
 | PBI-0008 阶梯引导引擎 | 3.1/3.3/4、5.1、6.2 | Arch-1 契约即 3.1 |
 | PBI-0009 追问与级别适配 | 3.1/3.4/4 | history 组装与级别快照 |
 | PBI-0010 变式题检验 | 3.1/4、5.1、8、10-D1 | **D1 未决前不可进 G3** |
