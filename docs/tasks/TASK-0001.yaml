@@ -1,0 +1,47 @@
+id: TASK-0001
+pbi_id: PBI-0022
+status: in-verification
+owner_role: Developer
+objective: "建立 Next.js 工程与强制 AI 标识渲染组件，提供后续业务页面的可复用安全入口"
+acceptance_criteria:
+  - "PBI-0022 AC1"
+  - "PBI-0022 AC2"
+depends_on: []
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0022.yaml"
+  - "docs/features/feat-006-ui-implementation.md"
+  - "docs/features/feat-002-ux-ui-design.md"
+  - "docs/features/_shared/design-system.css"
+  - "docs/tasks/TASK-0001.yaml"
+affected_repositories:
+  - "gesp-tutor-web"
+affected_components:
+  - "web/components/ai"
+  - "web/app"
+allowed_scope:
+  - "gesp-tutor-web/package.json"
+  - "gesp-tutor-web/package-lock.json"
+  - "gesp-tutor-web/*.config.*"
+  - "gesp-tutor-web/tsconfig.json"
+  - "gesp-tutor-web/next-env.d.ts"
+  - "gesp-tutor-web/.gitignore"
+  - "gesp-tutor-web/README.md"
+  - "gesp-tutor-web/AGENTS.md"
+  - "gesp-tutor-web/src/**"
+  - "gesp-tutor-web/tests/**"
+  - "gesp-tutor-web/.github/workflows/ci.yml"
+verification:
+  - "AC1: Markdown 渲染固定包含标识；恶意 HTML/URL 不形成可执行内容"
+  - "AC2: 不提供隐藏/关闭标识参数；流式内容更新与空内容保持标识"
+  - "ESLint 实际拒绝绕过导入；类型检查、单测、生产构建通过"
+  - "开发组件预览可达，生产预览路由拒绝；证据保存 docs/verification/TASK-0001.md"
+scope_limits: "不实现模型/邮件/账号业务，不改变产品范围或架构，不以开发预览代替真实页面验收。"
+executor:
+  mode: agent
+  adapter: codex
+evidence:
+  - "docs/verification/TASK-0001.md"
+  - "docs/verification/TASK-0001-http.json"
+code_branch: "task-0001-ai-content-foundation"
+code_commit: "dca0590"

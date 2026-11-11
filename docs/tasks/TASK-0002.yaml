@@ -1,0 +1,35 @@
+id: TASK-0002
+pbi_id: PBI-0022
+status: ready
+owner_role: Developer
+objective: "在真实业务页面接入统一 AI 渲染组件并完成 PBI-0022 逐展示位检查"
+acceptance_criteria:
+  - "PBI-0022 AC1"
+  - "PBI-0022 AC2"
+depends_on:
+  - "TASK-0001"
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0022.yaml"
+  - "docs/features/feat-006-ui-implementation.md"
+  - "docs/features/feat-002-ux-ui-design.md"
+  - "docs/features/_shared/design-system.css"
+  - "docs/tasks/TASK-0002.yaml"
+affected_repositories:
+  - "gesp-tutor-web"
+affected_components:
+  - "web/components/ai"
+  - "web/app"
+allowed_scope:
+  - "gesp-tutor-web/src/app/**"
+  - "gesp-tutor-web/src/components/**"
+  - "gesp-tutor-web/tests/**"
+verification:
+  - "AC1: 讲题含历史、诊断、变式逐展示位检查；模考讲评于 P1 上线时补齐"
+  - "AC2: 每个真实展示位两端可见、无关闭入口，记录 UI 与自动化证据"
+  - "页面尚未交付时标 blocked，不能以开发组件样例替代逐页证据"
+scope_limits: "不实现模型/邮件/账号业务，不改变产品范围或架构，不以开发预览代替真实页面验收。"
+executor:
+  mode: agent
+  adapter: codex
+integration_prerequisites: "讲题、诊断、变式页面随各自 PBI 落地；模考讲评随 P1。当前尚未交付，执行前逐项核验。"

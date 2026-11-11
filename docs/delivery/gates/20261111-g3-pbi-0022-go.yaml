@@ -1,0 +1,17 @@
+id: GATE-RECORD-0004
+gate: G3
+artifact: PBI-0022
+decision: go
+criteria_met:
+  - ac-verifiable
+  - design-ready
+  - tech-design-ready
+  - tasks-decomposed
+  - dependencies-confirmed
+criteria_failed: []
+decided_by: Codex
+role: product-owner-and-architect
+date: "2026-11-11"
+recycle_target: ""
+follow_up: []
+notes: "AC 与定稿 UI 可追溯，最小实现技术设计及两任务 DAG 已建立；Node/npm 与 registry 已确认。首任务无外部运行服务依赖。真实展示位集成保留在 TASK-0002，随对应业务页面交付执行；G4 须取得实际逐页证据，不能以组件样例替代。本决定不批准任何待审 ADR。"

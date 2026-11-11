@@ -1,7 +1,7 @@
 id: PBI-0022
 type: user-story
 feature_id: FEAT-006
-status: draft
+status: in-progress
 owner_role: ""
 title: "AI 生成内容显式标识"
 value: "《人工智能生成合成内容标识办法》（2025-09-01 施行）的合规落点"
@@ -16,3 +16,8 @@ dependencies: []
 references:
   - "docs/product/prd/03-functional-requirements.md (FR-OPS-04)"
   - "docs/product/prd/05-nfr.md (NFR-SAFE-04)"
+  - "docs/features/feat-006-ui-implementation.md"
+  - "docs/features/feat-002-ux-ui-design.md"
+  - "docs/tasks/TASK-0001.yaml"
+  - "docs/tasks/TASK-0002.yaml"
+  - "docs/verification/TASK-0001.md"

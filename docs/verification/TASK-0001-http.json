@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-11-11T12:26:45.166Z",
+  "checks": [
+    {
+      "url": "http://127.0.0.1:3100/",
+      "status": 200,
+      "badges": 0,
+      "expectedTextPresent": true
+    },
+    {
+      "url": "http://127.0.0.1:3100/dev/components",
+      "status": 404,
+      "badges": 0,
+      "expectedTextPresent": null
+    },
+    {
+      "url": "http://127.0.0.1:3000/dev/components",
+      "status": 200,
+      "badges": 3,
+      "expectedTextPresent": true
+    }
+  ]
+}

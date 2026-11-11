@@ -2,7 +2,7 @@
 
 Derived from repository artifacts by `scripts/build-status.py`. Do not edit by hand; regenerate instead.
 
-Generated: 2026-10-24
+Generated: 2026-11-11
 
 ## Stage progress
 
@@ -11,8 +11,8 @@ Generated: 2026-10-24
 | Discovery (G1) | done | go (2026-10-22) |
 | PRD (G2) | done | go (2026-10-22) |
 | Architecture baseline (GA) | done | go (2026-10-23) |
-| Backlog & refinement (G3) | active | 26 PBIs (draft: 26); G3 passed: 0 |
-| Implementation & verification (G4) | pending | no PBI passed G3 yet |
+| Backlog & refinement (G3) | active | 26 PBIs (draft: 25, in-progress: 1); G3 passed: 1 |
+| Implementation & verification (G4) | active | executable: 1; done: 0; G4 passed: 0 |
 | Release (G5) | pending | no release yet |
 
 ## Next actions by role
@@ -36,7 +36,6 @@ Generated: 2026-10-24
 - PBI-0019 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0020 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0021 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
-- PBI-0022 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0023 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0024 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0025 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
@@ -44,6 +43,9 @@ Generated: 2026-10-24
 - PBI-0027 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0028 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0029 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
+
+### Developer
+- PBI-0022 实现中
 
 ## Product
 
@@ -57,11 +59,12 @@ Generated: 2026-10-24
 | Artifact | Status | Gate | Latest decision |
 |---|---|---|---|
 | Architecture Baseline | approved | GA | go (2026-10-23) |
-| ADR | — | GB | — |
+| ADR ADR-001-p0-variant-validation | draft | GB | — |
+| ADR ADR-002-private-beta-access | draft | GB | — |
 
 ## PBIs
 
-Total: 26 — draft: 26
+Total: 26 — draft: 25, in-progress: 1
 
 | PBI | Type | Feature | Status | Latest gate decision |
 |---|---|---|---|---|
@@ -83,7 +86,7 @@ Total: 26 — draft: 26
 | PBI-0019 | user-story | FEAT-006 | draft | — |
 | PBI-0020 | user-story | FEAT-006 | draft | — |
 | PBI-0021 | user-story | FEAT-006 | draft | — |
-| PBI-0022 | user-story | FEAT-006 | draft | — |
+| PBI-0022 | user-story | FEAT-006 | in-progress | go (2026-11-11) |
 | PBI-0023 | other | FEAT-007 | draft | — |
 | PBI-0024 | user-story | FEAT-007 | draft | — |
 | PBI-0025 | user-story | FEAT-007 | draft | — |
@@ -100,6 +103,7 @@ No sprints yet.
 
 | Date | Gate | Artifact | Decision | Record |
 |---|---|---|---|---|
+| 2026-11-11 | G3 | PBI-0022 | go | 20261111-g3-pbi-0022-go.yaml |
 | 2026-10-23 | GA | architecture-baseline | go | 20261023-ga-architecture-baseline-go.yaml |
 | 2026-10-22 | G2 | prd | go | 20261022-g2-prd-go.yaml |
 | 2026-10-22 | G1 | product-brief | go | 20261022-g1-product-brief-go.yaml |

@@ -10,3 +10,6 @@ coverage/
 .idea/
 .vscode/
 .DS_Store
+
+# 本机依赖查询缓存
+.cache/
