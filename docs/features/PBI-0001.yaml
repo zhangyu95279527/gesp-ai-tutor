@@ -1,7 +1,7 @@
 id: PBI-0001
 type: user-story
 feature_id: FEAT-001
-status: draft
+status: in-progress
 owner_role: ""
 title: "邮箱验证码注册/登录"
 value: "学生以最低成本获得账号与 30 天登录态，是邀请制内测与正式使用的统一入口"
@@ -21,3 +21,8 @@ references:
   - "docs/product/prd/02-user-journeys.md (J0)"
   - "docs/features/feat-001-ux-ui-design.md"
   - "docs/features/feat-001-tech-design.md"
+  - "docs/features/pbi-0001-login-implementation.md"
+  - "docs/tasks/TASK-0003.yaml"
+  - "docs/tasks/TASK-0004.yaml"
+  - "docs/tasks/TASK-0005.yaml"
+  - "docs/verification/PBI-0001-local-login.md"

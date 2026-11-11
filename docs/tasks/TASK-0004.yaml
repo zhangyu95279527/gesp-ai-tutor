@@ -1,0 +1,50 @@
+id: TASK-0004
+pbi_id: PBI-0001
+status: in-verification
+owner_role: Developer
+objective: "实现定稿A1/A2/A3登录页面并接入同源API"
+acceptance_criteria:
+  - "PBI-0001 AC1"
+  - "PBI-0001 AC2"
+  - "PBI-0001 AC3"
+  - "PBI-0001 AC4"
+  - "PBI-0001 AC5"
+depends_on:
+  - "TASK-0001"
+  - "TASK-0003"
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0001.yaml"
+  - "docs/features/feat-001-tech-design.md"
+  - "docs/features/pbi-0001-login-implementation.md"
+  - "docs/features/feat-001-ux-ui-design.md"
+  - "docs/tasks/TASK-0004.yaml"
+affected_repositories:
+  - "gesp-tutor-web"
+affected_components:
+  - "acc/auth"
+  - "web/login"
+allowed_scope:
+  - "gesp-tutor-web/src/app/login/**"
+  - "gesp-tutor-web/src/components/auth/**"
+  - "gesp-tutor-web/src/lib/auth/**"
+  - "gesp-tutor-web/tests/**"
+  - "gesp-tutor-web/next.config.ts"
+  - "gesp-tutor-web/package.json"
+  - "gesp-tutor-web/.gitignore"
+  - "gesp-tutor-web/next-env.d.ts"
+  - "gesp-tutor-web/README.md"
+  - "gesp-tutor-web/AGENTS.md"
+verification:
+  - "AC1: 邮箱格式与六格验证码支持粘贴/键盘"
+  - "AC2: 重发倒计时由服务端retry_after驱动"
+  - "AC3: 错误次数、锁定、网络失败和重复提交"
+  - "AC4/5: Cookie登录结果确认、过期/退出；不伪装资料完成"
+scope_limits: "不实现或绕过资料/监护同意，不开放模型调用，不批准待审ADR；开发测试替身不得用作生产回退。"
+executor:
+  mode: agent
+  adapter: codex
+evidence:
+  - "docs/verification/PBI-0001-local-login.md"
+code_commit: "1861c52"
+code_branch: "task-0004-email-login"

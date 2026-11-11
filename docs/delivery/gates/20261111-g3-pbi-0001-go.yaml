@@ -1,0 +1,12 @@
+id: GATE-RECORD-0005
+gate: G3
+artifact: PBI-0001
+decision: go
+criteria_met: [ac-verifiable, design-ready, tech-design-ready, tasks-decomposed, dependencies-confirmed]
+criteria_failed: []
+decided_by: Codex
+role: product-owner-and-architect
+date: "2026-11-11"
+recycle_target: ""
+follow_up: []
+notes: "五条 AC 映射 TASK-0003/0004/0005；账号 UI 已定稿，登录专属实现设计已补齐原子发码/单次消费/固定会话与失败契约。CPython/锁环境、PGlite PG协议 SELECT1、fakeredis TCP PING、SMTP NOOP 已实际验证，足以执行前两个开发任务；正式PG/Redis并发与DirectMail投递及两端真实页面验收仍须TASK-0005，G4/发布不豁免。仅确认登录切片，不批准账号特性其他草稿或ADR-001/002。"

@@ -1,0 +1,49 @@
+id: TASK-0003
+pbi_id: PBI-0001
+status: in-verification
+owner_role: Developer
+objective: "实现邮箱验证码、30天固定会话、PG/Redis/SMTP适配器及测试"
+acceptance_criteria:
+  - "PBI-0001 AC1"
+  - "PBI-0001 AC2"
+  - "PBI-0001 AC3"
+  - "PBI-0001 AC4"
+  - "PBI-0001 AC5"
+depends_on: []
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0001.yaml"
+  - "docs/features/feat-001-tech-design.md"
+  - "docs/features/pbi-0001-login-implementation.md"
+  - "docs/features/feat-001-ux-ui-design.md"
+  - "docs/tasks/TASK-0003.yaml"
+affected_repositories:
+  - "gesp-tutor-api"
+affected_components:
+  - "acc/auth"
+  - "web/login"
+allowed_scope:
+  - "gesp-tutor-api/src/**"
+  - "gesp-tutor-api/tests/**"
+  - "gesp-tutor-api/migrations/**"
+  - "gesp-tutor-api/alembic.ini"
+  - "gesp-tutor-api/pyproject.toml"
+  - "gesp-tutor-api/uv.lock"
+  - "gesp-tutor-api/README.md"
+  - "gesp-tutor-api/AGENTS.md"
+  - "gesp-tutor-api/.env.example"
+  - "gesp-tutor-api/.github/**"
+verification:
+  - "AC1: SMTP本机收件、格式与300秒过期"
+  - "AC2: 60秒冷却、并发发码与邮件失败回滚"
+  - "AC3: 五次错误、锁定600秒及重发不能清错"
+  - "AC4: 新老邮箱、单次消费、已注销账号拒绝登录"
+  - "AC5: 固定30天不续期、退出失效；pytest/ruff/mypy通过"
+scope_limits: "不实现或绕过资料/监护同意，不开放模型调用，不批准待审ADR；开发测试替身不得用作生产回退。"
+executor:
+  mode: agent
+  adapter: codex
+evidence:
+  - "docs/verification/PBI-0001-local-login.md"
+code_commit: "c0de418"
+code_branch: "task-0003-email-auth"

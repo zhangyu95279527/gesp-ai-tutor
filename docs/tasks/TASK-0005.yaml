@@ -1,0 +1,39 @@
+id: TASK-0005
+pbi_id: PBI-0001
+status: ready
+owner_role: QA
+objective: "核验真实部署依赖与登录端到端验收"
+acceptance_criteria:
+  - "PBI-0001 AC1"
+  - "PBI-0001 AC2"
+  - "PBI-0001 AC3"
+  - "PBI-0001 AC4"
+  - "PBI-0001 AC5"
+depends_on:
+  - "TASK-0003"
+  - "TASK-0004"
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0001.yaml"
+  - "docs/features/feat-001-tech-design.md"
+  - "docs/features/pbi-0001-login-implementation.md"
+  - "docs/features/feat-001-ux-ui-design.md"
+  - "docs/tasks/TASK-0005.yaml"
+affected_repositories:
+  - "gesp-tutor-api"
+  - "gesp-tutor-web"
+affected_components:
+  - "acc/auth"
+  - "web/login"
+allowed_scope:
+  - "gesp-tutor-api/tests/**"
+  - "gesp-tutor-web/tests/**"
+verification:
+  - "AC1-5: 真实PostgreSQL/Redis/SMTP及测试邮箱收件证据"
+  - "移动与桌面浏览器两端登录、过期及锁定验证"
+  - "缺少真实服务或正式协议内容则保持待验收，不产生G4 go"
+scope_limits: "不实现或绕过资料/监护同意，不开放模型调用，不批准待审ADR；开发测试替身不得用作生产回退。"
+executor:
+  mode: agent
+  adapter: codex
+readiness_notes: "真实服务投递、正式协议/资料流程和移动视口证据尚缺；当前不可宣称本任务或PBI完成。"

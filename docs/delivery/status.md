@@ -11,14 +11,13 @@ Generated: 2026-11-11
 | Discovery (G1) | done | go (2026-10-22) |
 | PRD (G2) | done | go (2026-10-22) |
 | Architecture baseline (GA) | done | go (2026-10-23) |
-| Backlog & refinement (G3) | active | 26 PBIs (draft: 25, in-progress: 1); G3 passed: 1 |
-| Implementation & verification (G4) | active | executable: 1; done: 0; G4 passed: 0 |
+| Backlog & refinement (G3) | active | 26 PBIs (draft: 24, in-progress: 2); G3 passed: 2 |
+| Implementation & verification (G4) | active | executable: 2; done: 0; G4 passed: 0 |
 | Release (G5) | pending | no release yet |
 
 ## Next actions by role
 
 ### PO
-- PBI-0001 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0002 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0003 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0005 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
@@ -45,6 +44,7 @@ Generated: 2026-11-11
 - PBI-0029 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 
 ### Developer
+- PBI-0001 实现中
 - PBI-0022 实现中
 
 ## Product
@@ -64,11 +64,11 @@ Generated: 2026-11-11
 
 ## PBIs
 
-Total: 26 — draft: 25, in-progress: 1
+Total: 26 — draft: 24, in-progress: 2
 
 | PBI | Type | Feature | Status | Latest gate decision |
 |---|---|---|---|---|
-| PBI-0001 | user-story | FEAT-001 | draft | — |
+| PBI-0001 | user-story | FEAT-001 | in-progress | go (2026-11-11) |
 | PBI-0002 | user-story | FEAT-001 | draft | — |
 | PBI-0003 | user-story | FEAT-001 | draft | — |
 | PBI-0005 | user-story | FEAT-005 | draft | — |
@@ -104,6 +104,7 @@ No sprints yet.
 | Date | Gate | Artifact | Decision | Record |
 |---|---|---|---|---|
 | 2026-11-11 | G3 | PBI-0022 | go | 20261111-g3-pbi-0022-go.yaml |
+| 2026-11-11 | G3 | PBI-0001 | go | 20261111-g3-pbi-0001-go.yaml |
 | 2026-10-23 | GA | architecture-baseline | go | 20261023-ga-architecture-baseline-go.yaml |
 | 2026-10-22 | G2 | prd | go | 20261022-g2-prd-go.yaml |
 | 2026-10-22 | G1 | product-brief | go | 20261022-g1-product-brief-go.yaml |
