@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GESP AI 辅导 · 错因诊断 高保真原型</title>
+<!-- 公共设计系统：tokens / 画廊外壳 / 帧结构 / 设备框 / 会话页公共组件 -->
+<link rel="stylesheet" href="../_shared/design-system.css">
+<style>
+/* ============================================================
+   FEAT-003 特性样式（仅诊断特有组件，公共组件一律复用共享层）
+   ============================================================ */
+
+/* ---------- 分段入口 .seg-tabs（首页「AI 讲题 / 错因诊断」） ---------- */
+.seg-tabs{
+  display:flex;background:var(--paper-sunken);border:1px solid var(--hairline);
+  border-radius:var(--r-pill);padding:3px;width:320px;margin:0 auto 14px;
+}
+.seg-tabs .seg{
+  flex:1;text-align:center;padding:8px 0;border-radius:var(--r-pill);
+  font-size:13px;font-weight:600;color:var(--ink-3);
+}
+.seg-tabs .seg.on{background:var(--paper-raised);color:var(--indigo);box-shadow:var(--shadow-raised)}
+.seg-tabs .seg.off{opacity:.45;cursor:not-allowed}
+
+/* ---------- 诊断发起页布局（≥768px 两栏：左题目+评测，右代码通高） ---------- */
+.diag-wrap{flex:1;overflow-y:auto;padding:22px 30px 26px;background:var(--paper)}
+.diag-wrap .dw-inner{max-width:860px;margin:0 auto}
+.diag-title{font-family:var(--f-display);font-size:19px;font-weight:700;color:var(--ink);text-align:center}
+.diag-sub{font-size:12.5px;color:var(--ink-2);text-align:center;margin-top:7px;line-height:1.7}
+.diag-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:14px;margin-top:18px}
+.diag-col{display:flex;flex-direction:column;gap:14px}
+.diag-submit{margin-top:18px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.btn-primary.disabled{opacity:.45;box-shadow:none}
+
+/* ---------- 三件套上传区 .upload-tile（虚线=未提供的内容不伪装成实体） ---------- */
+.upload-tile{
+  border:1.5px dashed #C9CFDB;border-radius:var(--r-card);background:var(--paper);
+  padding:16px 15px;display:flex;flex-direction:column;gap:8px;
+}
+.upload-tile .ut-head{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--ink-3);letter-spacing:.08em}
+.upload-tile .ut-icon{
+  width:36px;height:36px;border-radius:10px;background:var(--indigo-tint);color:var(--indigo);
+  display:grid;place-items:center;flex-shrink:0;
+}
+.upload-tile .ut-main{font-family:var(--f-display);font-weight:700;font-size:14.5px;color:var(--ink)}
+.upload-tile .ut-sub{font-size:12px;color:var(--ink-3);line-height:1.65}
+/* 就绪态：实底浮起 */
+.upload-tile.ready{
+  border-style:solid;border-color:var(--hairline);
+  background:var(--paper-raised);box-shadow:var(--shadow-raised);
+}
+/* 缺项拦截态 */
+.upload-tile.err{border-style:solid;border-color:var(--danger)}
+.ut-err-text{font-size:11.5px;color:var(--danger);display:flex;gap:5px;align-items:center}
+.ut-remove{align-self:flex-end;font-size:11.5px;color:var(--ink-3)}
+/* 就绪内容：附件 chip / 评测缩略 / 代码预览 */
+.ut-chip{
+  display:flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--hairline);
+  border-radius:10px;padding:8px 10px;font-size:12.5px;color:var(--ink-2);line-height:1.5;
+}
+.ut-thumb{
+  background:var(--paper-sunken);border:1px solid var(--hairline);border-radius:10px;
+  padding:12px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.ut-thumb .mono{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);line-height:1.6}
+.code-mini{
+  background:#FBFAF6;border:1px solid var(--hairline);border-radius:10px;
+  padding:10px 12px;font-family:var(--f-mono);font-size:11.5px;line-height:1.7;
+  color:var(--ink-2);flex:1;white-space:pre;overflow:hidden;
+}
+.code-mini .kw{color:var(--code-kw)}
+.code-mini .num{color:var(--code-num)}
+.code-mini .cmt{color:var(--code-cmt)}
+.word-count{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);text-align:right}
+
+/* ---------- 错因类别章 .cause-chip（中性事实：墨色实底，不占阶梯色/警示色） ---------- */
+.cause-chip{
+  display:inline-flex;align-items:center;height:24px;padding:0 11px;border-radius:8px;
+  background:var(--ink);color:#fff;font-family:var(--f-display);font-size:12px;font-weight:700;
+}
+.cause-chip.minor{background:transparent;color:var(--ink-2);border:1.5px solid var(--hairline);font-weight:600}
+.cause-chip.minor .low{font-size:10.5px;color:var(--ink-3);margin-left:6px;font-weight:400}
+
+/* ---------- 错因定位卡 .cause-card（核心组件） ---------- */
+.cause-card{
+  background:var(--paper-raised);border:1px solid var(--hairline);border-radius:var(--r-card);
+  box-shadow:var(--shadow-raised);margin-bottom:16px;overflow:hidden;
+}
+.cause-card .cc-head{display:flex;align-items:center;gap:8px;padding:12px 15px;border-bottom:1px solid var(--hairline)}
+.cause-card .cc-head .grow{flex:1}
+.cause-card .cc-body{padding:13px 15px}
+.cc-label{font-size:11.5px;color:var(--ink-3);letter-spacing:.08em;margin-bottom:8px}
+.cc-minor-row{display:flex;align-items:center;gap:8px;margin-bottom:13px}
+.evi-list{display:flex;flex-direction:column;gap:9px;margin-bottom:13px}
+.evi-list .evi{display:flex;gap:9px;font-size:13px;color:var(--ink);line-height:1.65}
+.evi-list .evi .no{font-family:var(--f-mono);font-size:11px;color:var(--indigo);font-weight:700;flex-shrink:0;margin-top:2px}
+.line-ref{
+  display:inline-block;font-family:var(--f-mono);font-size:11.5px;background:var(--paper-sunken);
+  border:1px solid var(--hairline);border-radius:6px;padding:1px 7px;color:var(--ink-2);
+}
+.cause-card .cc-foot{padding:14px 15px;border-top:1px solid var(--hairline);text-align:center}
+
+/* ---------- L3 修正要点列表 ---------- */
+.point-list{display:flex;flex-direction:column;gap:10px;margin:10px 0 12px}
+.point-list .pt{display:flex;gap:10px;font-size:13.5px;line-height:1.7;color:var(--ink)}
+.point-list .pt .no{font-family:var(--f-mono);font-size:11px;color:var(--indigo);font-weight:700;flex-shrink:0;margin-top:3px}
+
+/* ---------- 解决状态回填卡 .resolve-card（系统消息属性，不挂 AI 角标） ---------- */
+.resolve-card{
+  background:var(--paper-raised);border:1px solid var(--hairline);border-radius:var(--r-card);
+  box-shadow:var(--shadow-raised);padding:18px 16px;margin-bottom:16px;text-align:center;
+}
+.resolve-card .rc-q{font-family:var(--f-display);font-size:15.5px;font-weight:700;color:var(--ink)}
+.resolve-card .rc-btns{display:flex;gap:10px;justify-content:center;margin-top:13px}
+.btn-resolve{
+  height:38px;padding:0 22px;border-radius:var(--r-pill);font-size:13px;font-weight:600;
+  display:inline-flex;align-items:center;gap:7px;
+}
+.btn-resolve.ok{border:1.5px solid var(--bamboo);background:var(--bamboo-tint);color:var(--bamboo)}
+.btn-resolve.no{border:1.5px solid var(--hairline);background:var(--paper);color:var(--ink-2)}
+.resolve-card .rc-note{font-size:11px;color:var(--ink-3);margin-top:11px}
+
+/* ---------- 历史列表诊断项标签 ---------- */
+.mini-tag.diag{background:var(--indigo-tint);color:var(--indigo);font-weight:600}
+.mini-tag.unresolved{background:var(--ochre-tint);color:var(--ochre);font-weight:600}
+
+/* ---------- 未登录诊断入口置灰提示 ---------- */
+.seg-hint{
+  text-align:center;font-size:11.5px;color:var(--ink-3);margin:-6px auto 12px;
+  width:320px;line-height:1.6;
+}
+</style>
+</head>
+<body>
+
+<!-- ================= 画廊头部与导航（非产品 UI） ================= -->
+<header class="gallery-head">
+  <h1>GESP AI 辅导 · 错因诊断 高保真原型</h1>
+  <p>FEAT-003 错因诊断精细设计 · 覆盖 PBI-0014/0015/0016：三件套上传、识别回显与评测状态、六类错因定位、引导式修正、解决状态回填与变式衔接。贯穿案例「数字反转」（GESP C++ 三级），学生代码漏处理负数边界判 WA。公共样式共享自 _shared/design-system.css，可离线评审。</p>
+  <div class="tags">
+    <span>FEAT-003</span><span>PBI-0014</span><span>PBI-0015</span><span>PBI-0016</span>
+    <span>桌面端 1120 主场</span><span>移动端 390 验证</span>
+  </div>
+</header>
+<div class="gallery-nav">
+  <nav>
+    <a href="#s1"><b>S1</b>入口·未登录</a>
+    <a href="#a1"><b>A1</b>发起空态</a>
+    <a href="#a2"><b>A2</b>三件套就绪</a>
+    <a href="#a3"><b>A3</b>缺项拦截</a>
+    <a href="#a4"><b>A4</b>识别失败</a>
+    <a href="#b1"><b>B1</b>回显确认</a>
+    <a href="#b2"><b>B2</b>诊断中</a>
+    <a href="#b3"><b>B3</b>错因定位</a>
+    <a href="#c1"><b>C1</b>修正 L1</a>
+    <a href="#c2"><b>C2</b>L3 要点</a>
+    <a href="#c3"><b>C3</b>状态回填</a>
+    <a href="#c4"><b>C4</b>解决留痕</a>
+    <a href="#c5"><b>C5</b>历史列表</a>
+  </nav>
+</div>
+
+<!-- ==================== S1 移动 · 首页分段入口（未登录） ==================== -->
+<section class="frame" id="s1">
+  <div class="frame-meta">
+    <span class="fid">S1</span>
+    <h2>移动端 · 首页分段入口（未登录）</h2>
+    <p>对 FEAT-002 空态首页的增量挂载：输入区上方加入「AI 讲题 / 错因诊断」分段控件，默认选中「AI 讲题」。未登录体验模式仅讲题可点，「错因诊断」置灰并给登录引导提示——体验范围不含诊断。</p>
+    <ul class="ac">
+      <li>PBI-0014 AC：首页提供错因诊断入口</li>
+      <li>FR-ACC-06：未登录体验范围不含错因诊断</li>
+      <li>交互：点置灰段，展示登录引导提示</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device phone"><div class="scr">
+      <div class="statusbar"><span>9:41</span><span class="sic">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="24" height="11" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/><path d="M23.5 4v4c1-.3 1.5-1 1.5-2s-.5-1.7-1.5-2z" fill="currentColor" opacity=".4"/></svg>
+      </span></div>
+      <div class="appbar">
+        <span class="title">GESP AI 辅导</span>
+        <span class="spacer"></span>
+        <!-- guest-chip：体验态替代 C1 用量指示器，非按钮 -->
+        <span class="guest-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+          体验模式
+        </span>
+      </div>
+      <div class="flow">
+        <div class="home-hero" style="padding-top:26px">
+          <div class="hi">把题目<em>贴进来</em>，<br>我们一步步讲。</div>
+        </div>
+        <div class="paste-hint">
+          支持 <kbd>Ctrl</kbd> + <kbd>V</kbd> 粘贴截图，或点左下角回形针选图<br>
+          图片 ≤ 10MB · 文字 ≤ 10000 字
+        </div>
+        <div class="sample-sec">
+          <div class="ss-t">没题可贴？选一道示例题体验</div>
+          <div class="sample-grid">
+            <div class="sample-item"><div class="lv">一级 · 顺序结构</div><div class="tt">交换两个变量的值</div></div>
+            <div class="sample-item"><div class="lv">三级 · 循环结构</div><div class="tt">数字之和</div></div>
+            <div class="sample-item"><div class="lv">五级 · 一维数组</div><div class="tt">成绩统计</div></div>
+            <div class="sample-item"><div class="lv">七级 · 字符串</div><div class="tt">回文串判定</div></div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+      </div>
+      <!-- 分段入口：挂载于输入区上方；未登录态「错因诊断」置灰 -->
+      <div class="seg-tabs">
+        <span class="seg on">AI 讲题</span>
+        <span class="seg off">错因诊断</span>
+      </div>
+      <div class="seg-hint">错因诊断需登录后使用，先体验一次讲题吧</div>
+      <div class="composer">
+        <div class="row">
+          <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15V19a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+          <div class="input-box"><span class="ph">粘贴题目，开始今日体验…</span></div>
+          <span class="send-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+        </div>
+        <div class="tips"><span>体验会话整体计 1 次，含完整讲解与变式</span><span>0/10000</span></div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== A1 桌面 · 诊断发起页空态 ==================== -->
+<section class="frame" id="a1">
+  <div class="frame-meta">
+    <span class="fid">A1</span>
+    <h2>桌面端 · 诊断发起页（空态）</h2>
+    <p>seg-tabs 选中「错因诊断」。三个 upload-tile 均为虚线空态：题目区「Ctrl+V 粘贴题面文本或截图」、评测结果区「粘贴 OJ 评测结果截图（含评测状态）」、代码区 mono 占位「粘贴你的代码（≤5000 字），或上传代码文件」。三件套未齐备，主按钮禁用。桌面两栏：题目+评测左列，代码右列通高（代码需要更大编辑面）。</p>
+    <ul class="ac">
+      <li>PBI-0014 AC：题目 / 评测结果 / 代码三个上传区</li>
+      <li>PBI-0014 AC：双区支持 Ctrl+V 粘贴，即贴即传</li>
+      <li>PBI-0014 AC：三件套未齐备时主按钮禁用</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/diagnosis</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="desk-body">
+        <aside class="desk-side">
+          <div class="ds-head">历史会话</div>
+          <div class="ds-list">
+            <div class="hist-item"><div class="row1"><span class="qt">数字之和</span><span class="date">昨天</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag ladder-ok">已听懂</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">判断闰年</span><span class="date">10-24</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag unresolved">未解决</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">鸡兔同笼</span><span class="date">10-23</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag">L2</span></div></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="appbar">
+            <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+            <span class="title">错因诊断</span>
+            <span class="spacer"></span>
+            <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>12</b> 次</span>
+          </div>
+          <div class="diag-wrap"><div class="dw-inner">
+            <div class="seg-tabs">
+              <span class="seg">AI 讲题</span>
+              <span class="seg on">错因诊断</span>
+            </div>
+            <div class="diag-title">判错的题，我们一起找到原因</div>
+            <div class="diag-sub">题目、评测结果、你的代码——三件套齐备才能定位错因，缺少任何一件都只是在猜。</div>
+            <div class="diag-grid">
+              <div class="diag-col">
+                <!-- 题目区：空态虚线 -->
+                <div class="upload-tile">
+                  <div class="ut-head">
+                    <span class="ut-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span>
+                    题目 · 必需
+                  </div>
+                  <div class="ut-main">Ctrl+V 粘贴题面文本或截图</div>
+                  <div class="ut-sub">也可以点此上传图片文件（≤ 10MB），移动端支持相册</div>
+                </div>
+                <!-- 评测结果区：空态虚线 -->
+                <div class="upload-tile">
+                  <div class="ut-head">
+                    <span class="ut-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4a3 3 0 016 0"/><path d="M9 13l2 2 4-4"/></svg></span>
+                    OJ 评测结果 · 必需
+                  </div>
+                  <div class="ut-main">粘贴 OJ 评测结果截图（含评测状态）</div>
+                  <div class="ut-sub">洛谷 / Codeforces 等评测页截图，需包含 WA / TLE / RE 等状态</div>
+                </div>
+              </div>
+              <!-- 代码区：右列通高 -->
+              <div class="upload-tile">
+                <div class="ut-head">
+                  <span class="ut-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-5 6 5 6"/><path d="M16 6l5 6-5 6"/></svg></span>
+                  你的代码 · 必需
+                </div>
+                <div class="ut-main">粘贴你的代码（≤5000 字），或上传代码文件</div>
+                <div class="ut-sub">从 OJ 编辑器直接 Ctrl+C / Ctrl+V 即可，支持 .cpp / .c / .py 文件</div>
+                <div class="code-mini" aria-hidden="true"><span class="cmt">// 粘贴后这里会出现语法高亮预览</span>
+<span class="kw">int</span> main() {
+    …
+}</div>
+                <div class="word-count">0/5000</div>
+              </div>
+            </div>
+            <div class="diag-submit">
+              <span class="btn-primary disabled">开始诊断 · 消耗 1 次 · 今日剩余 12 → 11</span>
+              <span style="font-size:11.5px;color:var(--ink-3)">三件套齐备后可提交</span>
+            </div>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== A2 桌面 · 三件套就绪 ==================== -->
+<section class="frame" id="a2">
+  <div class="frame-meta">
+    <span class="fid">A2</span>
+    <h2>桌面端 · 三件套就绪</h2>
+    <p>三 tile 由虚线转为实底浮起：题目区转附件 chip（文本摘要）；评测区缩略预览 + 已识别 verdict-chip「WA」；代码区语法高亮预览 + 字数 286/5000。每区右上「移除」文字按钮。主按钮激活，明示「消耗 1 次 · 今日剩余 12 → 11」。贯穿案例「数字反转」：学生代码 while (n &gt; 0) 漏处理负数边界。</p>
+    <ul class="ac">
+      <li>PBI-0014 AC：粘贴即传后转为实底附件预览态</li>
+      <li>PBI-0014 AC：评测状态识别（WA / TLE / RE / 部分得分章）</li>
+      <li>PBI-0014 AC：代码 ≤5000 字符，超长保留原文并阻止提交，不截断后诊断</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/diagnosis</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="desk-body">
+        <aside class="desk-side">
+          <div class="ds-head">历史会话</div>
+          <div class="ds-list">
+            <div class="hist-item"><div class="row1"><span class="qt">数字之和</span><span class="date">昨天</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag ladder-ok">已听懂</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">判断闰年</span><span class="date">10-24</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag unresolved">未解决</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">鸡兔同笼</span><span class="date">10-23</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag">L2</span></div></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="appbar">
+            <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+            <span class="title">错因诊断</span>
+            <span class="spacer"></span>
+            <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>12</b> 次</span>
+          </div>
+          <div class="diag-wrap"><div class="dw-inner">
+            <div class="seg-tabs">
+              <span class="seg">AI 讲题</span>
+              <span class="seg on">错因诊断</span>
+            </div>
+            <div class="diag-grid">
+              <div class="diag-col">
+                <!-- 题目区：就绪，附件 chip 摘要 -->
+                <div class="upload-tile ready">
+                  <div class="ut-head">
+                    <span class="ut-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span>
+                    题目 · 已提供
+                  </div>
+                  <div class="ut-chip">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--indigo)" stroke-width="1.8" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6"/></svg>
+                    <span>【题面文本】输入一个整数 n（-10⁹ ≤ n ≤ 10⁹），输出它各位数字反转后的结果。样例：输入 -123，输出 -321。</span>
+                  </div>
+                  <span class="ut-remove">移除</span>
+                </div>
+                <!-- 评测结果区：就绪，缩略预览 + 状态章 -->
+                <div class="upload-tile ready">
+                  <div class="ut-head">
+                    <span class="ut-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4a3 3 0 016 0"/><path d="M9 13l2 2 4-4"/></svg></span>
+                    OJ 评测结果 · 已提供
+                  </div>
+                  <div class="ut-thumb">
+                    <span class="mono">洛谷 · 评测记录 #241026<br>测试点 1 ✓ · 2 ✓ · 3 ✗ · 4 ✓ · 5 ✓<br>得分 80 / 100</span>
+                    <span class="verdict-chip wa">WA</span>
+                  </div>
+                  <div class="ut-sub" style="display:flex;gap:5px;align-items:center">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--bamboo)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                    已识别评测状态：WA · 部分测试点通过
+                  </div>
+                  <span class="ut-remove">移除</span>
+                </div>
+              </div>
+              <!-- 代码区：就绪，语法高亮预览 -->
+              <div class="upload-tile ready">
+                <div class="ut-head">
+                  <span class="ut-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-5 6 5 6"/><path d="M16 6l5 6-5 6"/></svg></span>
+                  你的代码 · 已提供
+                </div>
+                <div class="code-mini" aria-hidden="true"><span class="kw">#include</span> &lt;iostream&gt;
+<span class="kw">using namespace</span> std;
+
+<span class="kw">int</span> main() {
+    <span class="kw">int</span> n;
+    cin &gt;&gt; n;
+    <span class="kw">int</span> rev = <span class="num">0</span>;
+    <span class="kw">while</span> (n &gt; <span class="num">0</span>) {
+        rev = rev * <span class="num">10</span> + n % <span class="num">10</span>;
+        n /= <span class="num">10</span>;
+    }
+    cout &lt;&lt; rev &lt;&lt; endl;
+    <span class="kw">return</span> <span class="num">0</span>;
+}</div>
+                <div class="word-count">286/5000</div>
+                <span class="ut-remove">移除</span>
+              </div>
+            </div>
+            <div class="diag-submit">
+              <span class="btn-primary">开始诊断 · 消耗 1 次 · 今日剩余 12 → 11</span>
+            </div>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== A3 移动 · 缺项拦截 ==================== -->
+<section class="frame" id="a3">
+  <div class="frame-meta">
+    <span class="fid">A3</span>
+    <h2>移动端 · 缺项拦截</h2>
+    <p>题目与代码已就绪、缺评测结果截图时点了提交：评测 tile 描边转 danger + 行内红字「还差 OJ 评测结果截图」，焦点定位到缺项 tile，主按钮保持禁用。移动端三 tile 单列堆叠验证。</p>
+    <ul class="ac">
+      <li>PBI-0014 AC：三件套未齐备时拦截并定位缺项</li>
+      <li>文案口径：还差 OJ 评测结果截图</li>
+      <li>响应式：&lt;768px 三 tile 单列堆叠</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device phone"><div class="scr">
+      <div class="statusbar"><span>9:41</span><span class="sic">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="24" height="11" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/><path d="M23.5 4v4c1-.3 1.5-1 1.5-2s-.5-1.7-1.5-2z" fill="currentColor" opacity=".4"/></svg>
+      </span></div>
+      <div class="appbar">
+        <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+        <span class="title">错因诊断</span>
+        <span class="spacer"></span>
+        <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg><b>12</b> 次</span>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:14px 14px 18px;display:flex;flex-direction:column;gap:12px">
+        <div class="seg-tabs" style="width:100%;margin-bottom:2px">
+          <span class="seg">AI 讲题</span>
+          <span class="seg on">错因诊断</span>
+        </div>
+        <!-- 题目区：就绪 -->
+        <div class="upload-tile ready">
+          <div class="ut-head">
+            <span class="ut-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span>
+            题目 · 已提供
+          </div>
+          <div class="ut-chip">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--indigo)" stroke-width="1.8" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6"/></svg>
+            <span>【题面文本】输入一个整数 n（-10⁹ ≤ n ≤ 10⁹），输出它各位数字反转后的结果…</span>
+          </div>
+        </div>
+        <!-- 评测结果区：缺项拦截，描边 danger + 行内红字，焦点定位于此 -->
+        <div class="upload-tile err">
+          <div class="ut-head">
+            <span class="ut-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4a3 3 0 016 0"/><path d="M9 13l2 2 4-4"/></svg></span>
+            OJ 评测结果 · 必需
+          </div>
+          <div class="ut-main">粘贴 OJ 评测结果截图（含评测状态）</div>
+          <div class="ut-err-text">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 8v5"/><circle cx="12" cy="16.5" r="0.5" fill="currentColor"/></svg>
+            还差 OJ 评测结果截图
+          </div>
+        </div>
+        <!-- 代码区：就绪 -->
+        <div class="upload-tile ready">
+          <div class="ut-head">
+            <span class="ut-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-5 6 5 6"/><path d="M16 6l5 6-5 6"/></svg></span>
+            你的代码 · 已提供
+          </div>
+          <div class="code-mini" aria-hidden="true"><span class="kw">int</span> main() {
+    <span class="kw">int</span> n;  cin &gt;&gt; n;
+    <span class="kw">while</span> (n &gt; <span class="num">0</span>) { … }
+}</div>
+          <div class="word-count">286/5000</div>
+        </div>
+        <div class="diag-submit" style="margin-top:4px">
+          <span class="btn-primary disabled">开始诊断 · 消耗 1 次 · 今日剩余 12 → 11</span>
+          <span style="font-size:11.5px;color:var(--danger)">还差 1 项：OJ 评测结果截图</span>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== A4 桌面 · 评测状态识别失败 ==================== -->
+<section class="frame" id="a4">
+  <div class="frame-meta">
+    <span class="fid">A4</span>
+    <h2>桌面端 · 评测状态识别失败</h2>
+    <p>评测截图无法识别状态：赭石行内提示「没认出评测结果——重新粘贴截图，或用文字描述」，已贴内容不清空。双分支平级：「重新粘贴截图」/「用文字描述」；文字描述展开输入框，占位示例「例如：洛谷判 WA，第 3 个测试点错了，得了 40 分」。文字描述与截图等价，齐备后可提交。</p>
+    <ul class="ac">
+      <li>PBI-0014 AC（BR-DIA-3）：识别失败提供补传 / 文字描述双分支</li>
+      <li>识别失败不清空已贴内容</li>
+      <li>文字描述与截图等价，齐备后可提交</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/diagnosis</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="desk-body">
+        <aside class="desk-side">
+          <div class="ds-head">历史会话</div>
+          <div class="ds-list">
+            <div class="hist-item"><div class="row1"><span class="qt">数字之和</span><span class="date">昨天</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag ladder-ok">已听懂</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">判断闰年</span><span class="date">10-24</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag unresolved">未解决</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">鸡兔同笼</span><span class="date">10-23</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag">L2</span></div></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="appbar">
+            <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+            <span class="title">错因诊断</span>
+            <span class="spacer"></span>
+            <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>12</b> 次</span>
+          </div>
+          <div class="diag-wrap"><div class="dw-inner">
+            <div class="seg-tabs">
+              <span class="seg">AI 讲题</span>
+              <span class="seg on">错因诊断</span>
+            </div>
+            <div class="diag-grid">
+              <div class="diag-col">
+                <div class="upload-tile ready">
+                  <div class="ut-head">
+                    <span class="ut-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span>
+                    题目 · 已提供
+                  </div>
+                  <div class="ut-chip">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--indigo)" stroke-width="1.8" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6"/></svg>
+                    <span>【题面文本】输入一个整数 n（-10⁹ ≤ n ≤ 10⁹），输出它各位数字反转后的结果。样例：输入 -123，输出 -321。</span>
+                  </div>
+                  <span class="ut-remove">移除</span>
+                </div>
+                <!-- 评测结果区：识别失败，不清空已贴内容，双分支平级 -->
+                <div class="upload-tile ready">
+                  <div class="ut-head">
+                    <span class="ut-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4a3 3 0 016 0"/><path d="M9 13l2 2 4-4"/></svg></span>
+                    OJ 评测结果 · 已提供
+                  </div>
+                  <div class="ut-thumb">
+                    <span class="mono">洛谷 · 评测记录 #241026<br>（截图中的评测状态无法确认）</span>
+                    <span class="verdict-chip partial">未识别</span>
+                  </div>
+                  <div class="sys-msg warn" style="margin:0">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 8v5"/><circle cx="12" cy="16.5" r="0.5" fill="currentColor"/></svg>
+                    <span>没认出评测结果——重新粘贴截图，或用文字描述</span>
+                  </div>
+                  <div style="display:flex;gap:8px">
+                    <span class="btn-resolve no" style="height:32px;padding:0 14px;font-size:12px">重新粘贴截图</span>
+                    <span class="btn-resolve no" style="height:32px;padding:0 14px;font-size:12px;border-color:var(--indigo);color:var(--indigo);background:var(--indigo-tint)">用文字描述</span>
+                  </div>
+                  <!-- 文字描述展开：与截图等价 -->
+                  <div style="border:1.5px dashed #C9CFDB;border-radius:10px;padding:10px 12px;font-size:12.5px;color:var(--ink-3);line-height:1.6">例如：洛谷判 WA，第 3 个测试点错了，得了 40 分</div>
+                  <span class="ut-remove">移除</span>
+                </div>
+              </div>
+              <div class="upload-tile ready">
+                <div class="ut-head">
+                  <span class="ut-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-5 6 5 6"/><path d="M16 6l5 6-5 6"/></svg></span>
+                  你的代码 · 已提供
+                </div>
+                <div class="code-mini" aria-hidden="true"><span class="kw">int</span> main() {
+    <span class="kw">int</span> n;
+    cin &gt;&gt; n;
+    <span class="kw">int</span> rev = <span class="num">0</span>;
+    <span class="kw">while</span> (n &gt; <span class="num">0</span>) {
+        rev = rev * <span class="num">10</span> + n % <span class="num">10</span>;
+        n /= <span class="num">10</span>;
+    }
+    cout &lt;&lt; rev &lt;&lt; endl;
+    <span class="kw">return</span> <span class="num">0</span>;
+}</div>
+                <div class="word-count">286/5000</div>
+                <span class="ut-remove">移除</span>
+              </div>
+            </div>
+            <div class="diag-submit">
+              <span class="btn-primary">开始诊断 · 消耗 1 次 · 今日剩余 12 → 11</span>
+              <span style="font-size:11.5px;color:var(--ink-3)">文字描述评测状态后即可提交</span>
+            </div>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== B1 桌面 · 识别回显确认 ==================== -->
+<section class="frame" id="b1">
+  <div class="frame-meta">
+    <span class="fid">B1</span>
+    <h2>桌面端 · 识别回显确认</h2>
+    <p>复用 FEAT-002 echo-card：题干 / 考点 / 级别三行 + 第四行评测状态 verdict-chip「WA · 部分测试点通过」，每行可点铅笔纠正。确认按钮「确认，开始诊断 · 消耗 1 次」，确认后 C1 刷新 12 → 11。诊断会话与讲题会话同骨架：顶栏 C1 槽位 → 消息流 → 输入区。</p>
+    <ul class="ac">
+      <li>PBI-0015 AC：识别回显确认，可纠正</li>
+      <li>确认计 1 次，纠正不计次</li>
+      <li>诊断会话复用讲题会话骨架</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/diagnosis/session</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="desk-body">
+        <aside class="desk-side">
+          <div class="ds-head">历史会话</div>
+          <div class="ds-list">
+            <div class="hist-item sel"><div class="row1"><span class="qt">数字反转</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag lv">三级</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">数字之和</span><span class="date">昨天</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag ladder-ok">已听懂</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">判断闰年</span><span class="date">10-24</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag unresolved">未解决</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">鸡兔同笼</span><span class="date">10-23</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag">L2</span></div></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="appbar">
+            <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+            <span class="title">错因诊断</span>
+            <span class="spacer"></span>
+            <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>12</b> 次</span>
+          </div>
+          <div class="flow"><div class="inner">
+            <div class="msg-user"><div class="bub">
+              题目文本 + 评测结果截图 + 我的代码（286 字），已提交
+              <div class="meta">错因诊断 · 三件套齐备</div>
+            </div></div>
+            <!-- echo-card 复用 FEAT-002，追加第四行评测状态章 -->
+            <div class="echo-card">
+              <div class="echo-head">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--indigo)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+                <span class="t">我识别到的是…</span>
+              </div>
+              <div class="echo-row">
+                <span class="k">题目</span>
+                <span class="v">输入一个整数 n（-10⁹ ≤ n ≤ 10⁹），输出它各位数字反转后的结果。样例输入 -123，样例输出 -321。</span>
+                <span class="edit"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+              </div>
+              <div class="echo-row">
+                <span class="k">考点</span>
+                <span class="v"><span class="pill">整数运算 · 数位拆分</span></span>
+                <span class="edit"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+              </div>
+              <div class="echo-row">
+                <span class="k">级别</span>
+                <span class="v"><span class="pill">GESP C++ 三级</span></span>
+                <span class="edit"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+              </div>
+              <div class="echo-row">
+                <span class="k">评测状态</span>
+                <span class="v"><span class="verdict-chip wa">WA</span>&nbsp;&nbsp;部分测试点通过 · 得分 80/100</span>
+                <span class="edit"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+              </div>
+              <div class="echo-foot">
+                <div class="hint">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v5"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/></svg>
+                  识别有误？点右侧铅笔纠正，纠正后才计入诊断。
+                </div>
+                <div class="btn-primary">
+                  确认，开始诊断
+                  <span class="sub">（消耗 1 次 · 今日剩余 12 → 11）</span>
+                </div>
+              </div>
+            </div>
+          </div></div>
+          <div class="composer"><div class="inner">
+            <div class="row">
+              <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15V19a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+              <div class="input-box"><span class="ph">先确认上面的识别信息…</span></div>
+              <span class="send-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+            </div>
+            <div class="tips"><span>确认后开始诊断 · 消耗 1 次</span><span>0/10000</span></div>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== B2 桌面 · 诊断中 ==================== -->
+<section class="frame" id="b2">
+  <div class="frame-meta">
+    <span class="fid">B2</span>
+    <h2>桌面端 · 诊断中</h2>
+    <p>确认回显后进入诊断。骨架 shimmer 与打点复用 FEAT-002 A5，不引入新动效；骨架形态暗示即将出现的内容结构（错因章 + 依据行），等待可预期。诊断中输入区保持可聚焦但不建议输入。</p>
+    <ul class="ac">
+      <li>PBI-0015 AC：诊断中骨架 + 打点文案</li>
+      <li>打点文案：正在对比题目、评测结果与你的代码…</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/diagnosis/session</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="desk-body">
+        <aside class="desk-side">
+          <div class="ds-head">历史会话</div>
+          <div class="ds-list">
+            <div class="hist-item sel"><div class="row1"><span class="qt">数字反转</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag lv">三级</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">数字之和</span><span class="date">昨天</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag ladder-ok">已听懂</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">判断闰年</span><span class="date">10-24</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag unresolved">未解决</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">鸡兔同笼</span><span class="date">10-23</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag">L2</span></div></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="appbar">
+            <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+            <span class="title">错因诊断</span>
+            <span class="spacer"></span>
+            <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>11</b> 次</span>
+          </div>
+          <div class="flow"><div class="inner">
+            <div class="msg-user"><div class="bub">
+              题目文本 + 评测结果截图 + 我的代码（286 字），已提交
+              <div class="meta">错因诊断 · 三件套齐备</div>
+            </div></div>
+            <div class="msg-ai"><div class="card">
+              <div class="card-head">
+                <span class="lvl-chip" style="background:var(--ink-3)">诊断中</span>
+                <span class="spacer" style="flex:1"></span>
+              </div>
+              <div class="card-body">
+                <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)">
+                  正在对比题目、评测结果与你的代码 <span class="dots-typing"><i></i><i></i><i></i></span>
+                </div>
+                <!-- 错因章占位 -->
+                <div class="skel" style="height:24px;width:132px;border-radius:8px;margin-top:14px"></div>
+                <!-- 依据行占位 -->
+                <div class="skel" style="height:12px;margin-top:14px;width:92%"></div>
+                <div class="skel" style="height:12px;margin-top:8px;width:84%"></div>
+                <div class="skel" style="height:12px;margin-top:8px;width:60%"></div>
+              </div>
+            </div></div>
+          </div></div>
+          <div class="composer"><div class="inner">
+            <div class="row">
+              <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15V19a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+              <div class="input-box"><span class="ph">诊断中，稍等片刻…</span></div>
+              <span class="send-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+            </div>
+            <div class="tips"><span>本次诊断已计 1 次</span><span>0/10000</span></div>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== B3 桌面 · 错因定位卡（核心帧） ==================== -->
+<section class="frame" id="b3">
+  <div class="frame-meta">
+    <span class="fid">B3</span>
+    <h2>桌面端 · 错因定位卡（核心帧）</h2>
+    <p>错因定位输出：卡头 cause-chip 首选错因「边界条件遗漏」（墨色实底，中性事实不占阶梯色/警示色）+ AI 角标；次候选降级描边章「实现细节错误 · 可能性较低」（最多 2 候选，UI 收敛为首选+次候选两级，避免选择瘫痪）；定位依据编号列表，每条引用具体证据（代码行号 / 评测测试点 / 题面数据范围）；置信标注复用共享 beyond-note 赭石虚线框（BR-DIA-2，P0 阶段恒渲染）；卡底主按钮「开始引导修正」。</p>
+    <ul class="ac">
+      <li>PBI-0015 AC：首选 + 次候选排序、定位依据、置信标注</li>
+      <li>BR-DIA-2：缺乏测试数据时置信标注完整文字呈现</li>
+      <li>无障碍：错因类别文字直书，不单靠颜色</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/diagnosis/session</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="desk-body">
+        <aside class="desk-side">
+          <div class="ds-head">历史会话</div>
+          <div class="ds-list">
+            <div class="hist-item sel"><div class="row1"><span class="qt">数字反转</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag lv">三级</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">数字之和</span><span class="date">昨天</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag ladder-ok">已听懂</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">判断闰年</span><span class="date">10-24</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag unresolved">未解决</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">鸡兔同笼</span><span class="date">10-23</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag">L2</span></div></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="appbar">
+            <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+            <span class="title">错因诊断</span>
+            <span class="spacer"></span>
+            <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>11</b> 次</span>
+          </div>
+          <div class="flow"><div class="inner">
+            <div class="msg-user"><div class="bub">
+              题目文本 + 评测结果截图 + 我的代码（286 字），已提交
+              <div class="meta">错因诊断 · 三件套齐备</div>
+            </div></div>
+            <div class="cause-card">
+              <div class="cc-head">
+                <span class="cause-chip">边界条件遗漏</span>
+                <span class="grow"></span>
+                <span class="ai-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z"/></svg>AI 生成</span>
+              </div>
+              <div class="cc-body">
+                <div class="cc-minor-row">
+                  <span style="font-size:11.5px;color:var(--ink-3);letter-spacing:.08em">次候选</span>
+                  <span class="cause-chip minor">实现细节错误<span class="low">可能性较低</span></span>
+                </div>
+                <div class="cc-label">定位依据</div>
+                <div class="evi-list">
+                  <div class="evi"><span class="no">1</span><div><span class="line-ref">你的代码第 8 行</span> 循环条件 <b>while (n &gt; 0)</b>：n 为负数时循环一次也不执行，rev 保持初始值 0。</div></div>
+                  <div class="evi"><span class="no">2</span><div>评测结果第 3 个测试点判 <span class="verdict-chip wa">WA</span>：输入 n = -123，期望输出 -321，你的程序输出 0。</div></div>
+                  <div class="evi"><span class="no">3</span><div><span class="line-ref">题目第 2 行</span> 数据范围 -10⁹ ≤ n ≤ 10⁹，明确包含负数。</div></div>
+                </div>
+                <div class="beyond-note"><span class="bn-tag">置信标注</span>基于静态分析推断——平台暂无本题测试数据。</div>
+              </div>
+              <div class="cc-foot">
+                <span class="btn-primary">开始引导修正</span>
+              </div>
+            </div>
+          </div></div>
+          <div class="composer"><div class="inner">
+            <div class="row">
+              <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15V19a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+              <div class="input-box"><span class="ph">对错因有疑问？可以追问…</span></div>
+              <span class="send-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+            </div>
+            <div class="tips"><span>引导修正 L1 不计次 · 追问计 1 次</span><span>0/10000</span></div>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== C1 桌面 · 修正阶梯 L1 ==================== -->
+<section class="frame" id="c1">
+  <div class="frame-meta">
+    <span class="fid">C1</span>
+    <h2>桌面端 · 修正阶梯 L1 自查方向</h2>
+    <p>阶梯机制复用 FEAT-002，诊断语境级标签映射：L1 自查方向 / L2 定位线索 / L3 修正要点。L1 卡为提问式引导（ask-line 复用），只给自查方向不给定位；解锁卡复用，消耗预告「消耗 1 次 · 今日剩余 11 → 10」。</p>
+    <ul class="ac">
+      <li>PBI-0016 AC：阶梯复用、L1 提问式引导、手动解锁</li>
+      <li>BR-LMT-2：解锁消耗预告口径与 FEAT-002 一致</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/diagnosis/session</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="desk-body">
+        <aside class="desk-side">
+          <div class="ds-head">历史会话</div>
+          <div class="ds-list">
+            <div class="hist-item sel"><div class="row1"><span class="qt">数字反转</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag lv">三级</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">数字之和</span><span class="date">昨天</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag ladder-ok">已听懂</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">判断闰年</span><span class="date">10-24</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag unresolved">未解决</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">鸡兔同笼</span><span class="date">10-23</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag">L2</span></div></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="appbar">
+            <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+            <span class="title">错因诊断</span>
+            <span class="spacer"></span>
+            <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>11</b> 次</span>
+          </div>
+          <div class="ladder-strip">
+            <div class="ld-step active lv1"><span class="dot">1</span><span class="lbl">L1 自查方向</span><span class="sub">提问式引导</span></div>
+            <div class="ld-step locked"><span class="dot"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></span><span class="lbl">L2 定位线索</span><span class="sub">指向代码区域</span></div>
+            <div class="ld-step locked"><span class="dot"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></span><span class="lbl">L3 修正要点</span><span class="sub">要点说明</span></div>
+          </div>
+          <div class="flow"><div class="inner">
+            <div class="msg-ai"><div class="card">
+              <div class="card-head">
+                <span class="lvl-chip lv1">L1 · 自查方向</span>
+                <span class="ai-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z"/></svg>AI 生成</span>
+              </div>
+              <div class="card-body">
+                <p>错因是「边界条件遗漏」。先别急着改代码，我们用一个具体输入把程序走一遍。</p>
+                <div class="ask-line">拿 <b>n = -123</b> 在纸上走一遍：<br>走到你的代码第 8 行 <b>while (n &gt; 0)</b>，这个条件还成立吗？<br>循环体会执行几次？最后输出的 rev 是多少？</div>
+                <p>想清楚这三问，修正方向就在里面了。</p>
+              </div>
+              <div class="card-foot">
+                <span class="btn-understood"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>听懂了</span>
+              </div>
+            </div></div>
+            <div class="unlock-card">
+              <div class="uc-q">想缩小范围吗？</div>
+              <div class="uc-sub">L2 会指向具体代码区域，还不会直接给改法</div>
+              <span class="btn-unlock"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 017.7-1.5"/></svg>解锁 L2 定位线索</span>
+              <div><span class="uc-cost"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>消耗 1 次 · 今日剩余 11 → 10</span></div>
+            </div>
+          </div></div>
+          <div class="composer"><div class="inner">
+            <div class="row">
+              <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15V19a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+              <div class="input-box"><span class="ph">听懂了吗？也可以追问…</span></div>
+              <span class="send-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+            </div>
+            <div class="tips"><span>L1 不额外计次 · 解锁 L2 计 1 次</span><span>0/10000</span></div>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== C2 桌面 · L3 修正要点 ==================== -->
+<section class="frame" id="c2">
+  <div class="frame-meta">
+    <span class="fid">C2</span>
+    <h2>桌面端 · L3 修正要点</h2>
+    <p>L1/L2 已解锁（各计 1 次，今日剩余 11 → 9）。L3 修正要点卡：要点说明列表 + 代码行定位引用（mono line-ref 条），<b>不含完整改后代码</b>（BR-DIA-4 边界以「要点说明」形态呈现）；卡底提示「按要点自己改，回 OJ 验证后再来回填结果」。</p>
+    <ul class="ac">
+      <li>PBI-0016 AC：L3 修正要点 + 行号引用、无完整改后代码</li>
+      <li>BR-DIA-4：要点说明形态，不直接给可粘贴答案</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/diagnosis/session</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="desk-body">
+        <aside class="desk-side">
+          <div class="ds-head">历史会话</div>
+          <div class="ds-list">
+            <div class="hist-item sel"><div class="row1"><span class="qt">数字反转</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag lv">三级</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">数字之和</span><span class="date">昨天</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag ladder-ok">已听懂</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">判断闰年</span><span class="date">10-24</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag unresolved">未解决</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">鸡兔同笼</span><span class="date">10-23</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag">L2</span></div></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="appbar">
+            <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+            <span class="title">错因诊断</span>
+            <span class="spacer"></span>
+            <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>9</b> 次</span>
+          </div>
+          <div class="ladder-strip">
+            <div class="ld-step done"><span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span class="lbl">L1 自查方向</span><span class="sub">提问式引导</span></div>
+            <div class="ld-step done"><span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span class="lbl">L2 定位线索</span><span class="sub">指向代码区域</span></div>
+            <div class="ld-step active lv3"><span class="dot">3</span><span class="lbl">L3 修正要点</span><span class="sub">要点说明</span></div>
+          </div>
+          <div class="flow"><div class="inner">
+            <div class="msg-ai"><div class="card">
+              <div class="card-head">
+                <span class="lvl-chip lv3">L3 · 修正要点</span>
+                <span class="ai-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z"/></svg>AI 生成</span>
+              </div>
+              <div class="card-body">
+                <p>三个要点，按顺序改：</p>
+                <div class="point-list">
+                  <div class="pt"><span class="no">1</span><div><span class="line-ref">第 8 行之前</span> 先记下符号再取绝对值：加一句 <span style="font-family:var(--f-mono);font-size:12px;background:var(--paper-sunken);border-radius:5px;padding:1px 6px">bool neg = n &lt; 0;</span>，然后 <span style="font-family:var(--f-mono);font-size:12px;background:var(--paper-sunken);border-radius:5px;padding:1px 6px">n = abs(n);</span>。</div></div>
+                  <div class="pt"><span class="no">2</span><div><span class="line-ref">第 8 行</span> 循环条件 <span style="font-family:var(--f-mono);font-size:12px;background:var(--paper-sunken);border-radius:5px;padding:1px 6px">n &gt; 0</span> 可以保留——取绝对值后它总是非负的。</div></div>
+                  <div class="pt"><span class="no">3</span><div><span class="line-ref">第 12 行</span> 输出前把符号补回来：<span style="font-family:var(--f-mono);font-size:12px;background:var(--paper-sunken);border-radius:5px;padding:1px 6px">if (neg) rev = -rev;</span>。</div></div>
+                </div>
+                <p style="font-size:12.5px;color:var(--ink-3);margin-bottom:0">按要点自己改，回 OJ 验证后再来回填结果。</p>
+              </div>
+            </div></div>
+          </div></div>
+          <div class="composer"><div class="inner">
+            <div class="row">
+              <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15V19a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+              <div class="input-box"><span class="ph">改完去 OJ 提交，回来告诉我结果…</span></div>
+              <span class="send-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+            </div>
+            <div class="tips"><span>已解锁至 L3 · 追问计 1 次</span><span>0/10000</span></div>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== C3 桌面 · 解决状态回填卡 ==================== -->
+<section class="frame" id="c3">
+  <div class="frame-meta">
+    <span class="fid">C3</span>
+    <h2>桌面端 · 解决状态回填卡</h2>
+    <p>学生回 OJ 验证后回到会话。系统消息属性的回填卡（不挂 AI 角标）：「验证过了吗？」+ 双按钮平级「已解决」（竹绿描边）/「还没解决」（纸底描边）；不计次说明。可改判：留痕章旁「改状态」文字按钮，解决率统计以最终态为准。</p>
+    <ul class="ac">
+      <li>PBI-0016 AC：已解决/未解决标记、不计次、可改判</li>
+      <li>选「已解决」→ 竹绿留痕章 + 触发变式入口；选「还没解决」→ 赭石留痕章 + 引导追问</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/diagnosis/session</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="desk-body">
+        <aside class="desk-side">
+          <div class="ds-head">历史会话</div>
+          <div class="ds-list">
+            <div class="hist-item sel"><div class="row1"><span class="qt">数字反转</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag lv">三级</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">数字之和</span><span class="date">昨天</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag ladder-ok">已听懂</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">判断闰年</span><span class="date">10-24</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag unresolved">未解决</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">鸡兔同笼</span><span class="date">10-23</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag">L2</span></div></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="appbar">
+            <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+            <span class="title">错因诊断</span>
+            <span class="spacer"></span>
+            <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>9</b> 次</span>
+          </div>
+          <div class="ladder-strip">
+            <div class="ld-step done"><span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span class="lbl">L1 自查方向</span><span class="sub">提问式引导</span></div>
+            <div class="ld-step done"><span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span class="lbl">L2 定位线索</span><span class="sub">指向代码区域</span></div>
+            <div class="ld-step done"><span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span class="lbl">L3 修正要点</span><span class="sub">要点说明</span></div>
+          </div>
+          <div class="flow"><div class="inner">
+            <div class="resolve-card">
+              <div class="rc-q">验证过了吗？</div>
+              <div class="rc-btns">
+                <span class="btn-resolve ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>已解决</span>
+                <span class="btn-resolve no">还没解决</span>
+              </div>
+              <div class="rc-note">标记不计次 · 解决率统计以最终态为准，之后可改状态</div>
+            </div>
+          </div></div>
+          <div class="composer"><div class="inner">
+            <div class="row">
+              <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15V19a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+              <div class="input-box"><span class="ph">还没解决？把新的代码和评测结果发我…</span></div>
+              <span class="send-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+            </div>
+            <div class="tips"><span>回填状态不计次 · 继续追问计 1 次</span><span>0/10000</span></div>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== C4 桌面 · 已解决留痕 + 变式入口 ==================== -->
+<section class="frame" id="c4">
+  <div class="frame-meta">
+    <span class="fid">C4</span>
+    <h2>桌面端 · 已解决留痕 + 变式入口</h2>
+    <p>选「已解决」后：回填卡转为竹绿留痕条「已标记「已解决」· 已计入诊断解决率」，旁挂「改状态」文字按钮（可改判，解决率以最终态为准）；消息流末尾出现变式入口卡，复用 FEAT-002 B7 组件与消耗口径（生成 + 判读共消耗 1 次，今日剩余 9 → 8）。</p>
+    <ul class="ac">
+      <li>PBI-0016 AC：解决留痕、可改判、诊断后变式衔接（J2 第 6 步）</li>
+      <li>消耗说明与 FEAT-002 B7 一致</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/diagnosis/session</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="desk-body">
+        <aside class="desk-side">
+          <div class="ds-head">历史会话</div>
+          <div class="ds-list">
+            <div class="hist-item sel"><div class="row1"><span class="qt">数字反转</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag ladder-ok">已解决</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">数字之和</span><span class="date">昨天</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag ladder-ok">已听懂</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">判断闰年</span><span class="date">10-24</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag unresolved">未解决</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">鸡兔同笼</span><span class="date">10-23</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag">L2</span></div></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="appbar">
+            <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+            <span class="title">错因诊断</span>
+            <span class="spacer"></span>
+            <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>9</b> 次</span>
+          </div>
+          <div class="ladder-strip">
+            <div class="ld-step done"><span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span class="lbl">L1 自查方向</span><span class="sub">提问式引导</span></div>
+            <div class="ld-step done"><span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span class="lbl">L2 定位线索</span><span class="sub">指向代码区域</span></div>
+            <div class="ld-step done"><span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span class="lbl">L3 修正要点</span><span class="sub">要点说明</span></div>
+          </div>
+          <div class="flow"><div class="inner">
+            <div class="resolved-bar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M8.5 12.5l2.5 2.5 5-5.5"/></svg>
+              <span>已标记「已解决」· 已计入诊断解决率</span>
+              <span class="rb-change">改状态</span>
+            </div>
+            <div class="variant-card">
+              <div class="variant-head">
+                <span class="t">变式小题 · 巩固一下</span>
+                <span class="tag">同考点 · 整数运算</span>
+                <span style="flex:1"></span>
+                <span class="ai-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z"/></svg>AI 生成</span>
+              </div>
+              <div class="variant-body">
+                <p style="font-size:13px;color:var(--ink-2);margin-bottom:12px">「边界条件遗漏」已经攻克。来道同考点的变式题，确认真的掌握了吗？</p>
+                <span class="btn-primary" style="width:100%;justify-content:center">出道变式题试试<span class="sub">生成 + 判读共消耗 1 次 · 今日剩余 9 → 8</span></span>
+              </div>
+            </div>
+          </div></div>
+          <div class="composer"><div class="inner">
+            <div class="row">
+              <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15V19a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+              <div class="input-box"><span class="ph">也可以先追问，再作答…</span></div>
+              <span class="send-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+            </div>
+            <div class="tips"><span>变式生成 + 判读共 1 次 · 追问计 1 次</span><span>0/10000</span></div>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== C5 移动 · 历史列表诊断项 ==================== -->
+<section class="frame" id="c5">
+  <div class="frame-meta">
+    <span class="fid">C5</span>
+    <h2>移动端 · 历史列表诊断项</h2>
+    <p>复用 FEAT-002 C1 列表（搜索 + 状态筛选 + 时间倒序），筛选 chip 增加「错因诊断」。诊断项差异：类型章「错因诊断」（indigo 底）+ 错因类标签（边界条件遗漏）+ 解决状态标签（竹绿「已解决」/ 赭石「未解决」）；讲题项维持原口径。回看历史不计次。</p>
+    <ul class="ac">
+      <li>诊断项与讲题项同列表混排，类型章区分入口</li>
+      <li>解决状态文字直书（已解决/未解决），不单靠颜色</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device phone"><div class="scr">
+      <div class="statusbar"><span>21:07</span><span class="sic">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="24" height="11" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/><path d="M23.5 4v4c1-.3 1.5-1 1.5-2s-.5-1.7-1.5-2z" fill="currentColor" opacity=".4"/></svg>
+      </span></div>
+      <div class="appbar">
+        <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+        <span class="title">历史会话</span>
+        <span class="spacer"></span>
+        <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>9</b> 次</span>
+      </div>
+      <div class="search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        搜索题目或知识点
+      </div>
+      <div class="chip-row">
+        <span class="chip on">全部</span><span class="chip">错因诊断</span><span class="chip">已听懂</span><span class="chip">待复习</span>
+      </div>
+      <div class="flow">
+        <div class="date-divider"><span>今天</span></div>
+        <div class="hist-item">
+          <div class="row1"><span class="qt">数字反转</span><span class="date">16:20</span></div>
+          <div class="row2">
+            <span class="mini-tag diag">错因诊断</span>
+            <span class="mini-ladder"><i class="done lv1"></i><i class="done lv2"></i><i class="done lv3"></i></span>
+            <span class="mini-tag">边界条件遗漏</span>
+            <span class="mini-tag ladder-ok">已解决</span>
+          </div>
+        </div>
+        <div class="hist-item">
+          <div class="row1"><span class="qt">数字之和</span><span class="date">15:02</span></div>
+          <div class="row2">
+            <span class="mini-tag lv">三级</span>
+            <span class="mini-ladder"><i class="done lv1"></i><i class="done lv2"></i><i class="done lv3"></i></span>
+            <span class="mini-tag stamp-mini">已听懂</span>
+            <span class="mini-tag variant-ok">变式答对</span>
+          </div>
+        </div>
+        <div class="date-divider"><span>昨天</span></div>
+        <div class="hist-item">
+          <div class="row1"><span class="qt">判断闰年</span><span class="date">20:14</span></div>
+          <div class="row2">
+            <span class="mini-tag diag">错因诊断</span>
+            <span class="mini-ladder"><i class="done lv1"></i><i class="done lv2"></i><i></i></span>
+            <span class="mini-tag">实现细节错误</span>
+            <span class="mini-tag unresolved">未解决</span>
+          </div>
+        </div>
+        <div class="hist-item">
+          <div class="row1"><span class="qt">鸡兔同笼</span><span class="date">18:40</span></div>
+          <div class="row2">
+            <span class="mini-tag lv">三级</span>
+            <span class="mini-ladder"><i class="done lv1"></i><i class="done lv2"></i><i></i></span>
+            <span class="mini-tag stamp-mini">已听懂</span>
+            <span class="mini-tag">变式未做</span>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+
+<footer class="gallery-foot">GESP AI 辅导 · FEAT-003 错因诊断 · 高保真原型 13 帧 · 共享 design-system.css · 离线可开</footer>
+
+</body>
+</html>

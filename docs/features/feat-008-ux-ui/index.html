@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GESP AI 辅导 · 错题本 高保真原型</title>
+<!-- 公共设计系统：tokens / 画廊外壳 / 帧结构 / 设备框 / 会话页公共组件 / 入口横幅卡 / 弹窗 / 深墨编辑器 -->
+<link rel="stylesheet" href="../_shared/design-system.css">
+<style>
+/* ============================================================
+   FEAT-008 特性样式（仅错题本特有组件，公共组件一律复用共享层）
+   ============================================================ */
+
+/* 弹窗定位基准（仅本文件内生效） */
+.scr{position:relative}
+
+/* 入口卡待办数（挂在共享 .exam-banner 内） */
+.eb-count{
+  font-family:var(--f-mono);font-size:11px;font-weight:700;color:var(--ochre);
+  background:var(--ochre-tint);border-radius:var(--r-pill);padding:2px 8px;margin-left:6px;
+  vertical-align:2px;
+}
+
+/* ---------- 错题列表页 ---------- */
+/* 统计带 */
+.wb-stats{
+  display:flex;gap:20px;background:var(--paper-raised);border:1px solid var(--hairline);
+  border-radius:var(--r-card);box-shadow:var(--shadow-raised);
+  padding:13px 18px;margin-bottom:16px;font-size:12.5px;color:var(--ink-2);
+}
+.wb-stats b{font-family:var(--f-mono);font-size:16px;color:var(--ink);margin-right:4px}
+.wb-stats .ws-pending b{color:var(--ochre)}
+
+/* 筛选分组：小标 + chip-row */
+.wb-filter{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.wb-filter .wf-label{font-size:11px;color:var(--ink-3);letter-spacing:.1em;flex-shrink:0;width:36px}
+.wb-filter .chip-row{padding:0;flex:1;flex-wrap:wrap}
+.wb-count{font-size:11.5px;color:var(--ink-3);margin:12px 0 10px}
+.wb-count b{color:var(--indigo);font-family:var(--f-mono)}
+
+/* 错题行卡 .wb-row（row1 主信息 + 操作 / row2 考点与首次、重练状态） */
+.wb-rows{display:flex;flex-direction:column;gap:10px}
+.wb-row{
+  background:var(--paper-raised);border:1px solid var(--hairline);
+  border-radius:var(--r-card);box-shadow:var(--shadow-raised);padding:13px 16px;
+}
+.wb-row .wr1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.wb-row .wr-name{font-family:var(--f-display);font-size:15px;font-weight:700;color:var(--ink)}
+.wb-row .wr-ops{margin-left:auto;display:flex;align-items:center;gap:10px}
+.wb-row .wr2{display:flex;align-items:center;gap:12px;margin-top:8px;font-size:11.5px;color:var(--ink-3);flex-wrap:wrap}
+.wb-row .wr2 .wr-first{font-family:var(--f-mono)}
+/* 重练状态点（赭石待重练 / 竹绿已重练） */
+.wr-status{display:inline-flex;align-items:center;gap:5px;font-size:11.5px}
+.wr-status .dot-s{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.wr-status.pending{color:var(--ochre)}
+.wr-status.pending .dot-s{background:var(--ochre)}
+.wr-status.done{color:var(--bamboo)}
+.wr-status.done .dot-s{background:var(--bamboo)}
+/* 重练小按钮 / 移除链 */
+.btn-retake{
+  height:30px;padding:0 14px;border-radius:var(--r-pill);background:var(--indigo);
+  color:#fff;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:5px;
+}
+.wr-remove{font-size:11.5px;color:var(--ink-3);text-decoration:underline}
+
+/* ---------- 重练页 ---------- */
+/* 计次说明丸（评测机判分不计次 / AI 判读计 1 次，直书口径） */
+.retake-note{
+  display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-2);
+  background:var(--paper-sunken);border:1px solid var(--hairline);
+  border-radius:var(--r-pill);padding:5px 12px;margin:0 auto;
+}
+/* AI 判读文本作答卡 */
+.answer-box{
+  background:var(--paper-raised);border:1px solid var(--hairline);
+  border-radius:var(--r-card);box-shadow:var(--shadow-raised);padding:16px 18px;margin-top:14px;
+}
+.answer-box .ab-label{font-size:11px;color:var(--ink-3);letter-spacing:.12em;margin-bottom:9px}
+.answer-box .ab-body{
+  border:1.5px dashed var(--hairline);border-radius:10px;padding:13px 14px;
+  font-size:13px;line-height:1.8;color:var(--ink-2);min-height:96px;
+}
+.answer-box .ab-foot{display:flex;justify-content:center;margin-top:14px}
+
+/* 重练结果对比 */
+.compare-wrap{
+  background:var(--paper-raised);border:1px solid var(--hairline);
+  border-radius:var(--r-card);box-shadow:var(--shadow-raised);padding:20px 22px;margin-bottom:14px;
+}
+.compare-grid{display:flex;align-items:center;gap:14px}
+.cmp-card{flex:1;border:1px solid var(--hairline);border-radius:12px;padding:14px 16px;background:var(--paper)}
+.cmp-card.now{background:var(--bamboo-tint);border-color:#CBE5D8}
+.cmp-card .cp-label{font-size:10.5px;color:var(--ink-3);letter-spacing:.12em;margin-bottom:7px}
+.cmp-card .cp-score{font-family:var(--f-display);font-size:26px;font-weight:700;color:var(--ink)}
+.cmp-card .cp-sub{font-size:11px;color:var(--ink-3);margin-top:5px}
+.cmp-arrow{color:var(--bamboo);flex-shrink:0}
+.cmp-delta{text-align:center;margin-top:14px}
+.cmp-delta .cd-num{font-family:var(--f-display);font-size:30px;font-weight:700;color:var(--bamboo)}
+.cmp-delta .cd-note{font-size:11.5px;color:var(--ink-3);margin-top:3px}
+
+/* ---------- 提醒 ---------- */
+/* 站内通知行 */
+.notice-list{display:flex;flex-direction:column;gap:9px}
+.notice-row{
+  display:flex;align-items:center;gap:11px;background:var(--paper-raised);
+  border:1px solid var(--hairline);border-radius:12px;padding:13px 15px;
+  font-size:13px;color:var(--ink-2);
+}
+.notice-row .nr-dot{width:8px;height:8px;border-radius:50%;background:var(--indigo);flex-shrink:0}
+.notice-row.read .nr-dot{background:transparent}
+.notice-row .nr-t{font-weight:600;color:var(--ink)}
+.notice-row.read .nr-t{font-weight:400;color:var(--ink-2)}
+.notice-row .nr-time{margin-left:auto;font-family:var(--f-mono);font-size:11px;color:var(--ink-3);flex-shrink:0}
+
+/* 每周邮件样例卡 */
+.mail-card{
+  max-width:560px;margin:0 auto;background:#FFFEFA;border:1px solid var(--hairline);
+  border-radius:var(--r-card);box-shadow:var(--shadow-raised);overflow:hidden;
+}
+.mail-head{padding:13px 18px;border-bottom:1px solid var(--hairline);background:var(--paper-sunken)}
+.mail-head .mh-row{display:flex;gap:8px;font-size:11.5px;color:var(--ink-3);line-height:1.9}
+.mail-head .mh-row b{color:var(--ink);font-weight:600}
+.mail-body{padding:18px 20px;font-size:13px;color:var(--ink-2);line-height:1.85}
+.mail-body .mb-num{font-family:var(--f-display);font-size:22px;font-weight:700;color:var(--ink)}
+.mail-cta{padding:0 20px 18px;text-align:center}
+
+/* 提醒设置行 + 开关 */
+.set-card{
+  background:var(--paper-raised);border:1px solid var(--hairline);
+  border-radius:var(--r-card);box-shadow:var(--shadow-raised);overflow:hidden;
+}
+.set-row{display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid var(--hairline)}
+.set-row:last-child{border-bottom:none}
+.set-row .sr-t{font-size:13.5px;font-weight:600;color:var(--ink)}
+.set-row .sr-sub{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.switch{width:40px;height:23px;border-radius:12px;background:var(--indigo);position:relative;flex-shrink:0;margin-left:auto}
+.switch::after{content:"";position:absolute;top:3px;right:3px;width:17px;height:17px;border-radius:50%;background:#FFFEFA}
+.switch.off{background:var(--paper-sunken);border:1px solid var(--hairline)}
+.switch.off::after{right:auto;left:3px;background:var(--ink-3)}
+</style>
+</head>
+<body>
+
+<!-- ================= 画廊头部与导航（非产品 UI） ================= -->
+<header class="gallery-head">
+  <h1>GESP AI 辅导 · 错题本 高保真原型</h1>
+  <p>FEAT-008 错题本精细设计 · 覆盖 PBI-0027/0028/0029：三源自动归集（模考判分 / 讲题会话 / 诊断会话）、考点 / 级别 / 来源 / 题型筛选、手动移除、三类重练（编程题评测机判分 / 客观题即时判分 / 讲题诊断源 AI 判读）与首次对比、站内通知 + 每周邮件双通道提醒（可分别关闭）。贯穿数据与 FEAT-007 判分结果同源（官方 100 分制卷面：选择 15×2 + 判断 10×2 + 编程 2×25）：8 题在册、6 题待重练、本周归集 5 题。公共样式共享自 _shared/design-system.css，可离线评审。</p>
+  <div class="tags">
+    <span>FEAT-008</span><span>PBI-0027</span><span>PBI-0028</span><span>PBI-0029</span>
+    <span>桌面端 1120 主场</span><span>移动端 390 验证</span>
+  </div>
+</header>
+<div class="gallery-nav">
+  <nav>
+    <a href="#s1"><b>S1</b>首页入口</a>
+    <a href="#a1"><b>A1</b>讲题收入</a>
+    <a href="#a2"><b>A2</b>诊断收入</a>
+    <a href="#b1"><b>B1</b>错题列表</a>
+    <a href="#b2"><b>B2</b>移除确认</a>
+    <a href="#b3"><b>B3</b>列表·移动</a>
+    <a href="#c1"><b>C1</b>评测机重练</a>
+    <a href="#c2"><b>C2</b>客观题重练</a>
+    <a href="#c3"><b>C3</b>AI 判读重练</a>
+    <a href="#c4"><b>C4</b>结果对比</a>
+    <a href="#d1"><b>D1</b>站内通知</a>
+    <a href="#d2"><b>D2</b>每周邮件</a>
+    <a href="#d3"><b>D3</b>提醒设置</a>
+  </nav>
+</div>
+
+<!-- ==================== S1 移动 · 首页错题本入口 ==================== -->
+<section class="frame" id="s1">
+  <div class="frame-meta">
+    <span class="fid">S1</span>
+    <h2>移动端 · 首页错题本入口</h2>
+    <p>对首页的增量挂载：错题本入口卡与模考入口同构（复用共享 exam-banner），挂模考卡之下、seg-tabs 之上。墨圆章「错」+ 标题旁赭石待办数「6」，副标直书「三源自动归集 · 待重练 6 题」。浏览与重练（非 AI 部分）不计日限额（BR-LMT-3），usage-pill 6 不受影响。</p>
+    <ul class="ac">
+      <li>J4 第 1 步：错题本入口可达</li>
+      <li>FR-WBK-01：归集结果在首页可见（待重练数直书）</li>
+      <li>待重练 6 与 B1 统计带口径一致</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device phone"><div class="scr">
+      <div class="statusbar"><span>9:41</span><span class="sic">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="24" height="11" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/><path d="M23.5 4v4c1-.3 1.5-1 1.5-2s-.5-1.7-1.5-2z" fill="currentColor" opacity=".4"/></svg>
+      </span></div>
+      <div class="appbar">
+        <span class="title">GESP AI 辅导</span>
+        <span class="spacer"></span>
+        <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>6</b> 次</span>
+      </div>
+      <div class="flow">
+        <div class="home-hero" style="padding-top:22px">
+          <div class="hi">把题目<em>贴进来</em>，<br>我们一步步讲。</div>
+        </div>
+        <div class="sample-sec">
+          <div class="ss-t">没题可贴？选一道示例题体验</div>
+          <div class="sample-grid">
+            <div class="sample-item"><div class="lv">一级 · 顺序结构</div><div class="tt">交换两个变量的值</div></div>
+            <div class="sample-item"><div class="lv">三级 · 循环结构</div><div class="tt">数字之和</div></div>
+          </div>
+        </div>
+        <!-- 模考入口卡（FEAT-007 已挂载） -->
+        <div class="exam-banner">
+          <span class="eb-seal">考</span>
+          <span class="eb-main">
+            <span class="eb-t">真题模考</span>
+            <div class="eb-sub">GESP 历届真题 · 3–6 级 · 限时作答</div>
+          </span>
+          <svg class="eb-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+        <!-- 错题本入口卡：同构挂载于模考卡之下，待办数直书 -->
+        <div class="exam-banner">
+          <span class="eb-seal">错</span>
+          <span class="eb-main">
+            <span class="eb-t">错题本<span class="eb-count">6</span></span>
+            <div class="eb-sub">三源自动归集 · 待重练 6 题</div>
+          </span>
+          <svg class="eb-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+      </div>
+      <div class="seg-tabs" style="width:calc(100% - 32px);margin:0 16px 12px">
+        <span class="seg on">AI 讲题</span>
+        <span class="seg">错因诊断</span>
+      </div>
+      <div class="composer">
+        <div class="row">
+          <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15V19a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+          <div class="input-box"><span class="ph">粘贴题目，开讲…</span></div>
+          <span class="send-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+        </div>
+        <div class="tips"><span>讲题 / 诊断按次计 · 错题本不计次</span><span>0/10000</span></div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== A1 桌面 · 讲题会话收入错题本 ==================== -->
+<section class="frame" id="a1">
+  <div class="frame-meta">
+    <span class="fid">A1</span>
+    <h2>桌面端 · 讲题会话收入错题本（留痕态）</h2>
+    <p>三源归集之「AI 讲题」手动源：学生在讲题卡片上点过「收入错题本」后的留痕态——btn-understood 旁挂竹绿 mini-tag「已收入错题本」，卡下 resolved-bar 确认去向并给「去错题本」跳转。收入动作本身不计次（BR-LMT-3），usage-pill 11 不变。会话本体浓缩呈现（复用 FEAT-003 会话骨架）。</p>
+    <ul class="ac">
+      <li>FR-WBK-01 / PBI-0027 AC：讲题源手动收入即时生效并留痕</li>
+      <li>留痕双件套：mini-tag（卡内）+ resolved-bar（去向 + 跳转）</li>
+      <li>BR-LMT-3：收入动作不计入日限额</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/tutor/session</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="desk-body">
+        <aside class="desk-side">
+          <div class="ds-head">历史会话</div>
+          <div class="ds-list">
+            <div class="hist-item sel"><div class="row1"><span class="qt">数字之和</span><span class="date">昨天</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag ladder-ok">已听懂</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">数字反转</span><span class="date">10-25</span></div><div class="row2"><span class="mini-tag">模考讲评</span><span class="mini-tag lv">三级</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">判断闰年</span><span class="date">10-24</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag unresolved">未解决</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">鸡兔同笼</span><span class="date">10-23</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag">L2</span></div></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="appbar">
+            <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+            <span class="title">AI 讲题</span>
+            <span class="spacer"></span>
+            <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>11</b> 次</span>
+          </div>
+          <div class="ladder-strip">
+            <div class="ld-step active lv1"><span class="dot">1</span><span class="lbl">L1 思路提示</span><span class="sub">只给方向</span></div>
+            <div class="ld-step locked"><span class="dot"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></span><span class="lbl">L2 关键步骤</span><span class="sub">分步伪代码</span></div>
+            <div class="ld-step locked"><span class="dot"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></span><span class="lbl">L3 完整讲解</span><span class="sub">代码 + 讲解</span></div>
+          </div>
+          <div class="flow"><div class="inner">
+            <div class="msg-ai"><div class="card">
+              <div class="card-head">
+                <span class="lvl-chip lv1">L1 · 思路提示</span>
+                <span class="ai-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z"/></svg>AI 生成</span>
+              </div>
+              <div class="card-body">
+                <p>求各位数字之和，关键是把每一位「拆」出来。核心动作就两步：取末位 <b>n % 10</b>，再去掉末位 <b>n / 10</b>。</p>
+                <div class="ask-line">拿 <b>n = 1234</b> 想一想：<br>第一次循环 sum 加的是谁？n 变成了几？<br>循环到什么时候停？</div>
+              </div>
+              <div class="card-foot">
+                <span class="btn-understood"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>听懂了</span>
+                <span class="mini-tag ladder-ok">已收入错题本</span>
+              </div>
+            </div></div>
+            <div class="resolved-bar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M8.5 12.5l2.5 2.5 5-5.5"/></svg>
+              <span>已收入错题本，可随时去重练 · 浏览与重练不计入日限额</span>
+              <span class="rb-change">去错题本</span>
+            </div>
+          </div></div>
+          <div class="composer"><div class="inner">
+            <div class="row">
+              <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15V19a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+              <div class="input-box"><span class="ph">听懂了吗？也可以追问…</span></div>
+              <span class="send-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+            </div>
+            <div class="tips"><span>L1 不额外计次 · 解锁 L2 计 1 次</span><span>0/10000</span></div>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== A2 桌面 · 诊断会话收入错题本 ==================== -->
+<section class="frame" id="a2">
+  <div class="frame-meta">
+    <span class="fid">A2</span>
+    <h2>桌面端 · 诊断会话收入错题本（留痕态）</h2>
+    <p>三源归集之「错因诊断」手动源，与 A1 同构：诊断卡留痕 mini-tag「已收入错题本」+ resolved-bar。差异在文案——诊断会话有「未解决」状态（side 栏 unresolved 标签），故留痕直书「诊断记录不受影响」，避免学生误以为收入错题本就等于诊断闭环。收入同样不计次。</p>
+    <ul class="ac">
+      <li>FR-WBK-01 / PBI-0027 AC：诊断源手动收入即时生效并留痕</li>
+      <li>留痕文案差异化：「诊断记录不受影响」</li>
+      <li>BR-LMT-3：收入动作不计入日限额</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/diagnosis/session</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="desk-body">
+        <aside class="desk-side">
+          <div class="ds-head">历史会话</div>
+          <div class="ds-list">
+            <div class="hist-item sel"><div class="row1"><span class="qt">判断闰年</span><span class="date">10-24</span></div><div class="row2"><span class="mini-tag diag">错因诊断</span><span class="mini-tag unresolved">未解决</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">数字之和</span><span class="date">昨天</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag ladder-ok">已听懂</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">数字反转</span><span class="date">10-25</span></div><div class="row2"><span class="mini-tag">模考讲评</span><span class="mini-tag lv">三级</span></div></div>
+            <div class="hist-item"><div class="row1"><span class="qt">鸡兔同笼</span><span class="date">10-23</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag">L2</span></div></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="appbar">
+            <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+            <span class="title">错因诊断</span>
+            <span class="spacer"></span>
+            <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>11</b> 次</span>
+          </div>
+          <div class="ladder-strip">
+            <div class="ld-step active lv1"><span class="dot">1</span><span class="lbl">L1 自查方向</span><span class="sub">提问式引导</span></div>
+            <div class="ld-step locked"><span class="dot"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></span><span class="lbl">L2 定位线索</span><span class="sub">指向代码区域</span></div>
+            <div class="ld-step locked"><span class="dot"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></span><span class="lbl">L3 修正要点</span><span class="sub">要点说明</span></div>
+          </div>
+          <div class="flow"><div class="inner">
+            <div class="msg-ai"><div class="card">
+              <div class="card-head">
+                <span class="lvl-chip lv1">L1 · 自查方向</span>
+                <span class="ai-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z"/></svg>AI 生成</span>
+              </div>
+              <div class="card-body">
+                <p>错因大概率在「条件组合」。闰年的规则是：能被 4 整除但不能被 100 整除，<b>或者</b>能被 400 整除——两层是「或」的关系。</p>
+                <div class="ask-line">拿 <b>year = 1900</b> 走一遍你的条件：<br>它进入了哪个分支？输出了什么？<br>1900 到底该不该是闰年？</div>
+              </div>
+              <div class="card-foot">
+                <span class="btn-understood"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>听懂了</span>
+                <span class="mini-tag ladder-ok">已收入错题本</span>
+              </div>
+            </div></div>
+            <div class="resolved-bar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M8.5 12.5l2.5 2.5 5-5.5"/></svg>
+              <span>已收入错题本 · 诊断记录不受影响</span>
+              <span class="rb-change">去错题本</span>
+            </div>
+          </div></div>
+          <div class="composer"><div class="inner">
+            <div class="row">
+              <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15V19a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+              <div class="input-box"><span class="ph">听懂了吗？也可以追问…</span></div>
+              <span class="send-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+            </div>
+            <div class="tips"><span>L1 不额外计次 · 解锁 L2 计 1 次</span><span>0/10000</span></div>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== B1 桌面 · 错题列表（筛选生效态） ==================== -->
+<section class="frame" id="b1">
+  <div class="frame-meta">
+    <span class="fid">B1</span>
+    <h2>桌面端 · 错题列表（筛选生效态）</h2>
+    <p>错题本主页：顶部统计带「共 8 题 · 待重练 6 · 本周归集 5」与 S1 待办数口径一致；四组筛选（级别 / 考点 / 来源 / 题型），本帧呈现<b>来源 = 真题模考</b>生效态——wb-count「共 5 题」+ 五行模考源题卡（编程：数字反转 部分得分 15/25、最短排队 WA 0/25；客观题：循环执行次数、数组下标越界、逻辑运算符优先级 均答错 0/2，全部待重练）。行卡含题型 mini-tag、考点、首次得分、重练状态点（赭石 pending / 竹绿 done），操作列为「重练」主按钮 +「移除」下划线链。</p>
+    <ul class="ac">
+      <li>FR-WBK-01 / PBI-0027 AC：考点 / 级别 / 来源 / 题型四维筛选</li>
+      <li>统计带 8 · 6 · 5 与 S1 首页待办数一致</li>
+      <li>FR-WBK-03：移除入口在行内可见</li>
+      <li>BR-LMT-3：浏览列表不计次，usage-pill 6</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/wrongbook</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="appbar">
+        <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+        <span class="title">错题本</span>
+        <span class="spacer"></span>
+        <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>6</b> 次</span>
+      </div>
+      <div class="exam-list"><div class="el-inner">
+        <div class="wb-stats">
+          <span>共 <b>8</b> 题</span>
+          <span class="ws-pending">待重练 <b>6</b> 题</span>
+          <span>本周归集 <b>5</b> 题</span>
+        </div>
+        <div class="wb-filter"><span class="wf-label">级别</span><div class="chip-row"><span class="chip on">全部</span><span class="chip">二级</span><span class="chip">三级</span><span class="chip">四级</span></div></div>
+        <div class="wb-filter"><span class="wf-label">考点</span><div class="chip-row"><span class="chip on">全部</span><span class="chip">循环结构</span><span class="chip">条件分支</span><span class="chip">排序与贪心</span></div></div>
+        <div class="wb-filter"><span class="wf-label">来源</span><div class="chip-row"><span class="chip">全部</span><span class="chip on">真题模考</span><span class="chip">错因诊断</span><span class="chip">AI 讲题</span></div></div>
+        <div class="wb-filter"><span class="wf-label">题型</span><div class="chip-row"><span class="chip on">全部</span><span class="chip">选择</span><span class="chip">判断</span><span class="chip">编程</span></div></div>
+        <div class="wb-count">来源「真题模考」· 共 <b>5</b> 题</div>
+        <div class="wb-rows">
+          <div class="wb-row">
+            <div class="wr1">
+              <span class="wr-name">数字反转</span>
+              <span class="mini-tag lv">三级</span>
+              <span class="mini-tag">真题模考</span>
+              <span class="mini-tag">编程题</span>
+              <span class="verdict-chip partial">部分得分</span>
+              <span class="wr-ops"><span class="btn-retake">重练</span><span class="wr-remove">移除</span></span>
+            </div>
+            <div class="wr2">
+              <span>考点 · 循环结构</span>
+              <span class="wr-first">首次 15 / 25</span>
+              <span class="wr-status pending"><span class="dot-s"></span>未重练</span>
+            </div>
+          </div>
+          <div class="wb-row">
+            <div class="wr1">
+              <span class="wr-name">最短排队</span>
+              <span class="mini-tag lv">三级</span>
+              <span class="mini-tag">真题模考</span>
+              <span class="mini-tag">编程题</span>
+              <span class="verdict-chip wa">WA</span>
+              <span class="wr-ops"><span class="btn-retake">重练</span><span class="wr-remove">移除</span></span>
+            </div>
+            <div class="wr2">
+              <span>考点 · 排序与贪心</span>
+              <span class="wr-first">首次 0 / 25</span>
+              <span class="wr-status pending"><span class="dot-s"></span>未重练</span>
+            </div>
+          </div>
+          <div class="wb-row">
+            <div class="wr1">
+              <span class="wr-name">循环执行次数</span>
+              <span class="mini-tag lv">三级</span>
+              <span class="mini-tag">真题模考</span>
+              <span class="mini-tag">选择题</span>
+              <span class="verdict-chip wa">答错</span>
+              <span class="wr-ops"><span class="btn-retake">重练</span><span class="wr-remove">移除</span></span>
+            </div>
+            <div class="wr2">
+              <span>考点 · 循环结构 · 第 6 题</span>
+              <span class="wr-first">首次 0 / 2</span>
+              <span class="wr-status pending"><span class="dot-s"></span>未重练</span>
+            </div>
+          </div>
+          <div class="wb-row">
+            <div class="wr1">
+              <span class="wr-name">数组下标越界</span>
+              <span class="mini-tag lv">三级</span>
+              <span class="mini-tag">真题模考</span>
+              <span class="mini-tag">选择题</span>
+              <span class="verdict-chip wa">答错</span>
+              <span class="wr-ops"><span class="btn-retake">重练</span><span class="wr-remove">移除</span></span>
+            </div>
+            <div class="wr2">
+              <span>考点 · 数组 · 第 12 题</span>
+              <span class="wr-first">首次 0 / 2</span>
+              <span class="wr-status pending"><span class="dot-s"></span>未重练</span>
+            </div>
+          </div>
+          <div class="wb-row">
+            <div class="wr1">
+              <span class="wr-name">逻辑运算符优先级</span>
+              <span class="mini-tag lv">三级</span>
+              <span class="mini-tag">真题模考</span>
+              <span class="mini-tag">判断题</span>
+              <span class="verdict-chip wa">答错</span>
+              <span class="wr-ops"><span class="btn-retake">重练</span><span class="wr-remove">移除</span></span>
+            </div>
+            <div class="wr2">
+              <span>考点 · 表达式求值 · 第 19 题</span>
+              <span class="wr-first">首次 0 / 2</span>
+              <span class="wr-status pending"><span class="dot-s"></span>未重练</span>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== B2 桌面 · 移除确认弹窗 ==================== -->
+<section class="frame" id="b2">
+  <div class="frame-meta">
+    <span class="fid">B2</span>
+    <h2>桌面端 · 移除确认弹窗</h2>
+    <p>点「移除」压暗列表，居中 modal-card 二次确认：副标直书影响范围「将从错题本移除，不影响模考与讲评记录」（消除学生顾虑）。次按钮「取消」用共享 btn-line，主按钮「确认移除」用 btn-primary。移除后该题从列表消失，统计带「共 8 题」相应减一。</p>
+    <ul class="ac">
+      <li>FR-WBK-03 / PBI-0027 AC：可手动移除，移除前二次确认</li>
+      <li>确认文案明示影响范围（不动源记录）</li>
+      <li>弹窗复用共享 modal-mask / modal-card</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/wrongbook</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="appbar">
+        <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+        <span class="title">错题本</span>
+        <span class="spacer"></span>
+        <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>6</b> 次</span>
+      </div>
+      <div class="exam-list"><div class="el-inner">
+        <div class="wb-stats">
+          <span>共 <b>8</b> 题</span>
+          <span class="ws-pending">待重练 <b>6</b> 题</span>
+          <span>本周归集 <b>5</b> 题</span>
+        </div>
+        <div class="wb-rows">
+          <div class="wb-row">
+            <div class="wr1">
+              <span class="wr-name">数字反转</span>
+              <span class="mini-tag lv">三级</span>
+              <span class="mini-tag">真题模考</span>
+              <span class="mini-tag">编程题</span>
+              <span class="verdict-chip partial">部分得分</span>
+              <span class="wr-ops"><span class="btn-retake">重练</span><span class="wr-remove">移除</span></span>
+            </div>
+            <div class="wr2">
+              <span>考点 · 循环结构</span>
+              <span class="wr-first">首次 15 / 25</span>
+              <span class="wr-status pending"><span class="dot-s"></span>未重练</span>
+            </div>
+          </div>
+          <div class="wb-row">
+            <div class="wr1">
+              <span class="wr-name">最短排队</span>
+              <span class="mini-tag lv">三级</span>
+              <span class="mini-tag">真题模考</span>
+              <span class="mini-tag">编程题</span>
+              <span class="verdict-chip wa">WA</span>
+              <span class="wr-ops"><span class="btn-retake">重练</span><span class="wr-remove">移除</span></span>
+            </div>
+            <div class="wr2">
+              <span>考点 · 排序与贪心</span>
+              <span class="wr-first">首次 0 / 25</span>
+              <span class="wr-status pending"><span class="dot-s"></span>未重练</span>
+            </div>
+          </div>
+        </div>
+      </div></div>
+      <div class="modal-mask"><div class="modal-card">
+        <div class="mc-t">移除这道错题？</div>
+        <div class="mc-sub">数字反转 · 将从错题本移除，不影响模考与讲评记录。</div>
+        <div class="mc-btns">
+          <span class="btn-line">取消</span>
+          <span class="btn-primary">确认移除</span>
+        </div>
+      </div></div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== B3 移动 · 错题列表 ==================== -->
+<section class="frame" id="b3">
+  <div class="frame-meta">
+    <span class="fid">B3</span>
+    <h2>移动端 · 错题列表</h2>
+    <p>B1 的移动浓缩：筛选收为单行横滑 chip-row（默认全部），统计带压缩为一行三数。四行题卡呈现状态组合：模考源编程题待重练（数字反转 15/25 / 最短排队 0/25，pending 赭石点）+ 模考源客观题待重练（循环执行次数 · 选择题 答错 0/2）+ 讲题源已重练（数字之和，首次得分显「—」——讲题源无首次判分，done 竹绿点附判读方式「AI 判读正确」）。</p>
+    <ul class="ac">
+      <li>FR-WBK-01：移动端筛选与列表可用</li>
+      <li>讲题源首次结果列显「—」（开放决策①）</li>
+      <li>重练状态点双色 + 文字直书，不单靠颜色</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device phone"><div class="scr">
+      <div class="statusbar"><span>9:41</span><span class="sic">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="24" height="11" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/><path d="M23.5 4v4c1-.3 1.5-1 1.5-2s-.5-1.7-1.5-2z" fill="currentColor" opacity=".4"/></svg>
+      </span></div>
+      <div class="appbar">
+        <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+        <span class="title">错题本</span>
+        <span class="spacer"></span>
+        <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>6</b> 次</span>
+      </div>
+      <div class="exam-list" style="padding:14px 14px 18px"><div class="el-inner">
+        <div class="chip-row" style="flex-wrap:nowrap;overflow-x:auto">
+          <span class="chip on">全部</span><span class="chip">真题模考</span><span class="chip">错因诊断</span><span class="chip">AI 讲题</span>
+        </div>
+        <div class="wb-stats" style="gap:14px;padding:11px 14px">
+          <span>共 <b>8</b> 题</span>
+          <span class="ws-pending">待重练 <b>6</b></span>
+          <span>本周 <b>5</b></span>
+        </div>
+        <div class="wb-rows">
+          <div class="wb-row">
+            <div class="wr1">
+              <span class="wr-name">数字反转</span>
+              <span class="mini-tag lv">三级</span>
+              <span class="mini-tag">真题模考</span>
+              <span class="mini-tag">编程题</span>
+              <span class="verdict-chip partial">部分得分</span>
+              <span class="wr-ops"><span class="btn-retake">重练</span></span>
+            </div>
+            <div class="wr2">
+              <span>考点 · 循环结构</span>
+              <span class="wr-first">首次 15 / 25</span>
+              <span class="wr-status pending"><span class="dot-s"></span>未重练</span>
+            </div>
+          </div>
+          <div class="wb-row">
+            <div class="wr1">
+              <span class="wr-name">最短排队</span>
+              <span class="mini-tag lv">三级</span>
+              <span class="mini-tag">真题模考</span>
+              <span class="mini-tag">编程题</span>
+              <span class="verdict-chip wa">WA</span>
+              <span class="wr-ops"><span class="btn-retake">重练</span></span>
+            </div>
+            <div class="wr2">
+              <span>考点 · 排序与贪心</span>
+              <span class="wr-first">首次 0 / 25</span>
+              <span class="wr-status pending"><span class="dot-s"></span>未重练</span>
+            </div>
+          </div>
+          <div class="wb-row">
+            <div class="wr1">
+              <span class="wr-name">循环执行次数</span>
+              <span class="mini-tag lv">三级</span>
+              <span class="mini-tag">真题模考</span>
+              <span class="mini-tag">选择题</span>
+              <span class="verdict-chip wa">答错</span>
+              <span class="wr-ops"><span class="btn-retake">重练</span></span>
+            </div>
+            <div class="wr2">
+              <span>考点 · 循环结构 · 第 6 题</span>
+              <span class="wr-first">首次 0 / 2</span>
+              <span class="wr-status pending"><span class="dot-s"></span>未重练</span>
+            </div>
+          </div>
+          <div class="wb-row">
+            <div class="wr1">
+              <span class="wr-name">数字之和</span>
+              <span class="mini-tag lv">三级</span>
+              <span class="mini-tag">AI 讲题</span>
+              <span class="wr-ops"><span class="btn-retake">重练</span></span>
+            </div>
+            <div class="wr2">
+              <span>考点 · 循环结构</span>
+              <span class="wr-first">首次 —</span>
+              <span class="wr-status done"><span class="dot-s"></span>已重练 · AI 判读正确</span>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== C1 桌面 · 评测机重练（模考源） ==================== -->
+<section class="frame" id="c1">
+  <div class="frame-meta">
+    <span class="fid">C1</span>
+    <h2>桌面端 · 评测机重练（模考源）</h2>
+    <p>模考来源题的重练沿用评测机判分（FR-WBK-02）：复用共享 exam-shell 作答骨架，顶栏 et-name「重练 · 数字反转（真题第 26 题）」+ retake-note 直书计次口径「重练 · 评测机判分 · 不计入日限额」（替代模考的 timer-pill 位置）+ 提交判分按钮。编辑器呈现<b>已修正负数边界</b>的完整代码（先存符号 sign、再对绝对值反转），对应 C4 将拿到的满分 25 / 25。</p>
+    <ul class="ac">
+      <li>FR-WBK-02 / PBI-0028 AC：模考源重练走评测机判分</li>
+      <li>BR-LMT-3：评测机判分不计次，计次口径直书于顶栏</li>
+      <li>作答骨架复用共享 exam-shell，不重造</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/wrongbook/retake</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="exam-shell">
+        <div class="exam-top">
+          <span class="et-name">重练 · 数字反转（真题第 26 题）</span>
+          <span class="retake-note">重练 · 评测机判分 · 不计入日限额</span>
+          <span class="btn-submit-exam">提交判分</span>
+        </div>
+        <div class="exam-body">
+          <div class="exam-q">
+            <div class="eq-no">错题重练 · 编程题 · 25 分 · 源自 2024 年 3 月真题第 26 题</div>
+            <div class="eq-title">数字反转</div>
+            <div class="eq-sec">给定一个整数 n（可能为负数），输出它的各位数字反转后的结果，<b>保留原有符号</b>。</div>
+            <div class="eq-sec"><b>输入：</b>一行一个整数 n（-10⁹ ≤ n ≤ 10⁹）。<br><b>输出：</b>一行一个整数，表示反转后的结果。</div>
+            <div class="eq-sample">输入
+-123
+
+输出
+-321</div>
+            <div class="eq-sec"><b>提示：</b>上次丢分就在负数边界——先存符号，再对绝对值反转。</div>
+          </div>
+          <div class="exam-code">
+            <div class="code-top">
+              <span class="ftab">main.cpp</span>
+              <span class="save-st">已暂存 20:17</span>
+            </div>
+            <div class="code-editor">
+              <div class="ln">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16</div>
+              <div class="lc"><span class="kw">#include</span> &lt;iostream&gt;
+<span class="kw">using namespace</span> std;
+
+<span class="kw">int</span> main() {
+    <span class="kw">int</span> n;
+    cin &gt;&gt; n;
+    <span class="kw">int</span> sign = n &lt; <span class="num">0</span> ? <span class="num">-1</span> : <span class="num">1</span>;  <span class="cmt">// 先存符号</span>
+    n = abs(n);                 <span class="cmt">// 对绝对值反转</span>
+    <span class="kw">int</span> rev = <span class="num">0</span>;
+    <span class="kw">while</span> (n &gt; <span class="num">0</span>) {
+        rev = rev * <span class="num">10</span> + n % <span class="num">10</span>;
+        n /= <span class="num">10</span>;
+    }
+    cout &lt;&lt; sign * rev &lt;&lt; endl;
+    <span class="kw">return</span> <span class="num">0</span>;
+}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== C2 桌面 · 客观题重练（模考源选择/判断题） ==================== -->
+<section class="frame" id="c2">
+  <div class="frame-meta">
+    <span class="fid">C2</span>
+    <h2>桌面端 · 客观题重练（模考源选择 / 判断题）</h2>
+    <p>选择 / 判断错题的重练 = 重做该题、即时判分（FR-WBK-02）：复用共享 exam-shell 骨架 + exam-q.wide 单栏（无代码编辑器），顶栏 et-name 直书题源「重练 · 选择题 第 6 题」+ retake-note 计次口径「重练 · 即时判分 · 不计入日限额」。选项列表复用共享 opt-list（FEAT-007 作答同款）。本帧定格提交后的即时反馈态：学生改选 B（上次错选 C），resolved-bar 竹绿确认「回答正确 · 已掌握」，待重练 6 → 5。</p>
+    <ul class="ac">
+      <li>FR-WBK-02 / PBI-0028 AC：客观题重练 = 重做该题，即时判分</li>
+      <li>BR-LMT-3：客观题重练判分不计次，口径直书顶栏</li>
+      <li>作答组件复用共享 opt-list，不重造</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/wrongbook/retake-obj</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="exam-shell">
+        <div class="exam-top">
+          <span class="et-name">重练 · 选择题 第 6 题</span>
+          <span class="retake-note">重练 · 即时判分 · 不计入日限额</span>
+          <span class="btn-submit-exam">提交判分</span>
+        </div>
+        <div class="exam-body">
+          <div class="exam-q wide">
+            <div class="eq-no">错题重练 · 选择题 · 2 分 · 源自 2024 年 3 月三级真题</div>
+            <div class="eq-title">循环执行次数</div>
+            <div class="eq-sec">阅读下面的 C++ 代码片段，循环体一共执行多少次？</div>
+            <div class="eq-sample">for (int i = 1; i &lt;= 10; i += 2) {
+    cout &lt;&lt; i &lt;&lt; " ";
+}</div>
+            <div class="opt-list">
+              <div class="opt"><span class="o-key">A</span><span>4 次</span></div>
+              <div class="opt sel"><span class="o-key">B</span><span>5 次</span></div>
+              <div class="opt"><span class="o-key">C</span><span>6 次<span style="color:var(--ink-3)">（上次错选）</span></span></div>
+              <div class="opt"><span class="o-key">D</span><span>10 次</span></div>
+            </div>
+            <div class="eq-sec" style="margin-top:14px;font-size:12px;color:var(--ink-3)">i 依次取 1 / 3 / 5 / 7 / 9，共 5 次——正确答案是 B，上次错选 C。</div>
+            <div class="resolved-bar" style="margin-top:16px">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M8.5 12.5l2.5 2.5 5-5.5"/></svg>
+              <span>回答正确 · 本题已标记为已掌握 · 待重练 6 → 5 · 重练判分不计入日限额</span>
+              <span class="rb-change">返回错题本</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== C3 桌面 · AI 判读重练（讲题/诊断源） ==================== -->
+<section class="frame" id="c3">
+  <div class="frame-meta">
+    <span class="fid">C3</span>
+    <h2>桌面端 · AI 判读重练（讲题 / 诊断源）</h2>
+    <p>讲题与诊断来源题没有评测机环境，重练走 AI 判读正误（FR-WBK-02）：题卡沿用 wb-row（数字之和 · 三级 · AI 讲题 · 首次 —），下方 answer-box 虚线作答区收集文字思路，底部主按钮<b>直书消耗预告</b>「消耗 1 次 · 今日剩余 6 → 5」——AI 判读属 AI 服务，不在 BR-LMT-3 豁免范围，计 1 次。</p>
+    <ul class="ac">
+      <li>FR-WBK-02 / PBI-0028 AC：非模考源重练走 AI 判读</li>
+      <li>计次口径差异化：AI 判读计 1 次，按钮直书 6 → 5</li>
+      <li>作答方式：文字说明思路即可，不要求可运行代码</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/wrongbook/retake-ai</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="appbar">
+        <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+        <span class="title">重练 · 数字之和</span>
+        <span class="spacer"></span>
+        <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>6</b> 次</span>
+      </div>
+      <div class="exam-list"><div class="el-inner">
+        <div class="wb-rows">
+          <div class="wb-row">
+            <div class="wr1">
+              <span class="wr-name">数字之和</span>
+              <span class="mini-tag lv">三级</span>
+              <span class="mini-tag">AI 讲题</span>
+            </div>
+            <div class="wr2">
+              <span>考点 · 循环结构</span>
+              <span class="wr-first">首次 —</span>
+              <span>给定正整数 n，求它的各位数字之和</span>
+            </div>
+          </div>
+        </div>
+        <div class="answer-box">
+          <div class="ab-label">你的作答 · 文字说明思路即可</div>
+          <div class="ab-body">我用 while 循环，每次取 n % 10 加到 sum，再 n /= 10 去掉末位，直到 n 变成 0。比如 31415，依次加 5、4、1、3、1，最后 sum = 14。</div>
+          <div class="ab-foot">
+            <span class="btn-primary">提交判读<span class="sub">消耗 1 次 · 今日剩余 6 → 5</span></span>
+          </div>
+        </div>
+      </div></div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== C4 桌面 · 重练结果对比 ==================== -->
+<section class="frame" id="c4">
+  <div class="frame-meta">
+    <span class="fid">C4</span>
+    <h2>桌面端 · 重练结果对比</h2>
+    <p>C1 提交后的结果页：compare-grid 双卡对比——首次「15 · 部分得分 · 负数边界丢分」 vs 本次「25 · AC · 5/5 测试点通过」（竹绿 now 变体），中间竹绿箭头；cmp-delta 大数字「+10 分」+ 正确率注记。底部 resolved-bar 确认本题转已掌握、待重练更新为 5 题（与 D1 提醒文案联动）。评测机判分不计次，usage-pill 6 不变。</p>
+    <ul class="ac">
+      <li>FR-WBK-02 / PBI-0028 AC：重练结果与首次对比（最简：正确率 / 分数对比数字）</li>
+      <li>重练正确后标记已掌握，待重练数 6 → 5</li>
+      <li>BR-LMT-3：评测机判分不计次</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/wrongbook/result</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="appbar">
+        <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+        <span class="title">重练结果</span>
+        <span class="spacer"></span>
+        <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>6</b> 次</span>
+      </div>
+      <div class="exam-list"><div class="el-inner">
+        <div class="compare-wrap">
+          <div class="compare-grid">
+            <div class="cmp-card">
+              <div class="cp-label">首次作答 · 模考判分</div>
+              <div class="cp-score">15</div>
+              <div class="cp-sub">部分得分 · 满分 25 · 负数边界丢分</div>
+            </div>
+            <svg class="cmp-arrow" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+            <div class="cmp-card now">
+              <div class="cp-label">本次重练 · 评测机判分</div>
+              <div class="cp-score">25</div>
+              <div class="cp-sub">AC · 5/5 测试点通过</div>
+            </div>
+          </div>
+          <div class="cmp-delta">
+            <div class="cd-num">+10 分</div>
+            <div class="cd-note">重练正确率 100% · 统计入长期指标</div>
+          </div>
+        </div>
+        <div class="resolved-bar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M8.5 12.5l2.5 2.5 5-5.5"/></svg>
+          <span>本题已标记为已掌握 · 错题本待重练更新为 5 题</span>
+          <span class="rb-change">返回错题本</span>
+        </div>
+      </div></div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== D1 桌面 · 站内通知 ==================== -->
+<section class="frame" id="d1">
+  <div class="frame-meta">
+    <span class="fid">D1</span>
+    <h2>桌面端 · 站内通知</h2>
+    <p>提醒双通道之一（FR-WBK-04）：未读行置顶，靛蓝圆点 + 加粗标题；已读行圆点透明、字重回落。置顶未读即本周重练提醒「6 道待重练 · 本周已重练 1 道」（周一 09:00 定时发出）；下方已读为模考判分完成通知（官方 100 分制总分直书 59 / 100）与欢迎通知。通知浏览不计次。</p>
+    <ul class="ac">
+      <li>FR-WBK-04 / PBI-0029 AC：站内通知通道每周提醒</li>
+      <li>未读 / 已读双态可辨（圆点 + 字重，不单靠颜色）</li>
+      <li>提醒文案含待重练数与本周进度</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/notifications</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="appbar">
+        <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+        <span class="title">通知</span>
+        <span class="spacer"></span>
+        <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>6</b> 次</span>
+      </div>
+      <div class="exam-list"><div class="el-inner">
+        <div class="notice-list">
+          <div class="notice-row">
+            <span class="nr-dot"></span>
+            <span><span class="nr-t">错题重练提醒</span>：你有 6 道错题待重练，本周已重练 1 道。</span>
+            <span class="nr-time">周一 09:00</span>
+          </div>
+          <div class="notice-row read">
+            <span class="nr-dot"></span>
+            <span><span class="nr-t">模考判分完成</span>：2024 年 3 月 GESP C++ 三级真题 · 总分 59 / 100。</span>
+            <span class="nr-time">10-25 21:03</span>
+          </div>
+          <div class="notice-row read">
+            <span class="nr-dot"></span>
+            <span><span class="nr-t">欢迎使用 GESP AI 辅导</span>：把题目贴进来，我们一步步讲。</span>
+            <span class="nr-time">10-20 08:30</span>
+          </div>
+        </div>
+      </div></div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== D2 桌面 · 每周邮件 ==================== -->
+<section class="frame" id="d2">
+  <div class="frame-meta">
+    <span class="fid">D2</span>
+    <h2>桌面端 · 每周邮件</h2>
+    <p>提醒双通道之二（FR-WBK-04）：每周一 09:00 发出，主题含周期「本周错题回顾 · 10-20 ~ 10-26」。正文直书两项核心数据——本周新归集 5 道（来源：真题模考，2 编程 + 2 选择 + 1 判断）、已重练 1 / 6 道且重练正确率 100%，收尾一句鼓励；底部 mail-cta 主按钮「去重练」直达错题本。</p>
+    <ul class="ac">
+      <li>FR-WBK-04 / PBI-0029 AC：邮件含本周新归集数与重练完成情况</li>
+      <li>周期直书于主题，CTA 单一明确</li>
+      <li>数据与 D1 / B1 统计口径一致</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">mail.gesp-ai.cn/weekly</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="exam-list"><div class="el-inner" style="padding-top:26px">
+        <div class="mail-card">
+          <div class="mail-head">
+            <div class="mh-row"><b>发件人：</b>GESP AI 辅导 &lt;weekly@gesp-ai.cn&gt;</div>
+            <div class="mh-row"><b>主题：</b>本周错题回顾 · 10-20 ~ 10-26</div>
+            <div class="mh-row"><b>时间：</b>每周一 09:00</div>
+          </div>
+          <div class="mail-body">
+            <p>同学你好，这是你的本周错题回顾：</p>
+            <p>本周新归集错题 <span class="mb-num">5</span> 道，全部来自真题模考（2 编程 + 2 选择 + 1 判断）。</p>
+            <p>本周已重练 <span class="mb-num">1</span> / 6 道，重练正确率 100%——「数字反转」从 15 分提到 25 分（满分），负数边界已经拿下。</p>
+            <p>还剩 5 道待重练（最短排队、循环执行次数、数组下标越界、逻辑运算符优先级、判断闰年），坚持重练，薄弱点才会真正消失。</p>
+          </div>
+          <div class="mail-cta"><span class="btn-primary">去重练</span></div>
+        </div>
+      </div></div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== D3 桌面 · 提醒设置 ==================== -->
+<section class="frame" id="d3">
+  <div class="frame-meta">
+    <span class="fid">D3</span>
+    <h2>桌面端 · 提醒设置</h2>
+    <p>两个通道各自一个 switch，可分别关闭（FR-WBK-04）：本帧呈现「站内通知 开 / 每周邮件 关」组合态——开态靛蓝底圆点在右，关态凹底圆点在左（switch.off）。底部说明行直书发送时间与关闭后果「关闭后不再发送对应提醒」，不藏口径。</p>
+    <ul class="ac">
+      <li>FR-WBK-04 / PBI-0029 AC：双通道可分别关闭</li>
+      <li>开关双态可辨（位置 + 底色，不单靠颜色）</li>
+      <li>发送时间每周一 09:00 直书</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/settings</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="appbar">
+        <span class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+        <span class="title">提醒设置</span>
+        <span class="spacer"></span>
+        <span class="usage-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>今日剩余 <b>6</b> 次</span>
+      </div>
+      <div class="exam-list"><div class="el-inner" style="max-width:640px">
+        <div class="set-card">
+          <div class="set-row">
+            <div>
+              <div class="sr-t">站内通知</div>
+              <div class="sr-sub">在「通知」页接收每周错题重练提醒</div>
+            </div>
+            <span class="switch"></span>
+          </div>
+          <div class="set-row">
+            <div>
+              <div class="sr-t">每周邮件</div>
+              <div class="sr-sub">每周一 09:00 发送本周错题回顾到注册邮箱</div>
+            </div>
+            <span class="switch off"></span>
+          </div>
+        </div>
+        <div class="wb-count" style="margin-top:12px">提醒每周一 09:00 发送；两个通道可分别关闭，关闭后不再发送对应提醒。</div>
+      </div></div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<footer class="gallery-foot">GESP AI 辅导 · FEAT-008 错题本 · 高保真原型 13 帧 · 共享 design-system.css · 离线可开</footer>
+</body>
+</html>

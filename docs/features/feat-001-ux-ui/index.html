@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GESP AI 辅导 · 账号与合规 高保真原型</title>
+<!-- 公共设计系统：tokens / 画廊外壳 / 帧结构 / 设备框 / 会话页公共组件 -->
+<link rel="stylesheet" href="../_shared/design-system.css">
+<style>
+/* ============================================================
+   FEAT-001 特性样式：登录/资料/设置/体验模式专属组件
+   公共部分全部来自 ../_shared/design-system.css，此处不重复定义
+   ============================================================ */
+
+/* ---------- 认证流布局（登录/注册/onboarding 独立流页面） ---------- */
+.auth-wrap{flex:1;display:flex;min-height:0}
+.brand-side{
+  width:420px;flex-shrink:0;background:var(--paper-sunken);border-right:1px solid var(--hairline);
+  display:flex;flex-direction:column;justify-content:center;padding:48px 44px;
+}
+.brand-side .slogan{font-family:var(--f-display);font-size:28px;font-weight:700;color:var(--ink);line-height:1.65}
+.brand-side .slogan em{font-style:normal;color:var(--indigo)}
+.brand-side .blist{margin-top:26px;display:flex;flex-direction:column;gap:12px}
+.brand-side .bi{display:flex;gap:9px;align-items:center;font-size:13px;color:var(--ink-2)}
+.brand-side .bi svg{color:var(--indigo);flex-shrink:0}
+.auth-main{flex:1;display:flex;align-items:center;justify-content:center;background:var(--paper);padding:32px}
+.auth-card{
+  width:480px;max-width:100%;background:var(--paper-raised);border:1px solid var(--hairline);
+  border-radius:var(--r-card);box-shadow:var(--shadow-raised);padding:28px 30px 24px;
+}
+.auth-card .ttl{font-family:var(--f-display);font-size:20px;font-weight:700;color:var(--ink);line-height:1.6}
+.auth-card .sub{font-size:12.5px;color:var(--ink-2);margin-top:8px;line-height:1.7}
+
+/* 移动端认证单列（无卡片，全宽） */
+.m-auth{flex:1;padding:52px 24px 24px;display:flex;flex-direction:column}
+.m-auth .logo-row{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--indigo);margin-bottom:26px}
+.m-auth .ttl{font-family:var(--f-display);font-size:24px;font-weight:700;color:var(--ink);line-height:1.55}
+.m-auth .sub{font-size:12.5px;color:var(--ink-2);margin-top:10px;line-height:1.75}
+.m-auth .btn-primary{margin-top:22px}
+
+/* ---------- 表单字段 ---------- */
+.field{margin-top:18px}
+.field .lb{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2);margin-bottom:7px}
+.field .lb .err-text{color:var(--danger);font-size:11.5px}
+.field .inbox{
+  height:46px;border:1.5px solid var(--hairline);border-radius:12px;background:var(--paper);
+  display:flex;align-items:center;padding:0 14px;font-size:14.5px;color:var(--ink);gap:8px;
+}
+.field .inbox .ph{color:var(--ink-3)}
+.field .inbox.focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(46,75,215,.1)}
+.field .inbox.err{border-color:var(--danger)}
+
+/* ---------- 验证码分格 .otp-row（6 格独立格） ---------- */
+.otp-row{display:flex;gap:9px;margin-top:18px}
+.otp-cell{
+  flex:1;height:56px;border:1.5px solid var(--hairline);border-radius:12px;background:var(--paper);
+  display:grid;place-items:center;font-family:var(--f-mono);font-size:20px;color:var(--ink);
+}
+.otp-cell.cur{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(46,75,215,.12)}
+/* 错误态：整组 danger 边框 + 单次 0.3s 抖动（全特性唯一新增动效） */
+.otp-row.err .otp-cell{border-color:var(--danger);animation:otpShake .3s 1}
+@keyframes otpShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+/* 锁定态：整组置灰禁用 */
+.otp-row.locked .otp-cell{background:var(--paper-sunken);color:var(--ink-3)}
+
+/* ---------- 协议勾选行 ---------- */
+.agree-row{display:flex;align-items:flex-start;gap:8px;margin-top:16px;font-size:12px;color:var(--ink-2);line-height:1.7}
+.cbx{
+  width:17px;height:17px;border-radius:5px;border:1.5px solid var(--hairline);background:var(--paper);
+  flex-shrink:0;display:grid;place-items:center;color:#fff;margin-top:2px;
+}
+.cbx.on{background:var(--indigo);border-color:var(--indigo)}
+.cbx.miss{border-color:var(--danger)}
+.link{color:var(--indigo)}
+
+/* ---------- 行内错误提示 ---------- */
+.inline-err{display:flex;align-items:center;gap:6px;color:var(--danger);font-size:12px;margin-top:10px}
+
+/* ---------- 重发与返回 ---------- */
+.resend-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-size:12px;color:var(--ink-3)}
+.resend-btn{color:var(--indigo);font-weight:600;font-size:12.5px}
+.resend-btn.off{color:var(--ink-3);font-weight:400}
+.back-link{display:flex;align-items:center;gap:5px;justify-content:center;margin-top:18px;font-size:12.5px;color:var(--ink-2)}
+
+/* ---------- 设置页 ---------- */
+.settings-wrap{flex:1;display:flex;min-height:0;background:var(--paper)}
+.set-nav{width:200px;flex-shrink:0;padding:22px 14px;border-right:1px solid var(--hairline);background:var(--paper-sunken)}
+.set-nav .ni{padding:10px 14px;border-radius:10px;font-size:13px;color:var(--ink-2);margin-bottom:4px}
+.set-nav .ni.on{background:var(--paper-raised);color:var(--ink);font-weight:600;box-shadow:var(--shadow-raised)}
+.set-main{flex:1;padding:26px 32px;overflow-y:auto}
+.set-main .col{max-width:640px}
+.set-sec-t{font-size:12px;color:var(--ink-3);letter-spacing:.08em;margin:22px 0 10px}
+.set-sec-t:first-child{margin-top:0}
+/* 身份卡 .id-card */
+.id-card{background:var(--paper-raised);border:1px solid var(--hairline);border-radius:var(--r-card);box-shadow:var(--shadow-raised);overflow:hidden}
+.id-row{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--hairline)}
+.id-row:last-child{border-bottom:none}
+.id-row .k{width:104px;flex-shrink:0;font-family:var(--f-mono);font-size:11px;color:var(--ink-3);letter-spacing:.06em}
+.id-row .v{flex:1;font-size:14px;color:var(--ink)}
+.id-row .v .nm{font-family:var(--f-display);font-size:16.5px;font-weight:700}
+.id-row .v .ver{font-size:11.5px;color:var(--ink-3);margin-left:8px}
+.id-row .act{flex-shrink:0;font-size:12.5px;color:var(--indigo)}
+.id-row .act.danger{color:var(--danger)}
+.note-line{font-size:11.5px;color:var(--ink-3);margin-top:8px;display:flex;gap:5px;line-height:1.6}
+
+/* ---------- 体验说明条 ---------- */
+.exp-note{
+  margin:14px 20px 0;background:var(--ochre-tint);border:1px solid #EAD3AC;border-radius:12px;
+  padding:10px 13px;font-size:12px;color:#7A4A17;line-height:1.7;display:flex;gap:8px;
+}
+.exp-note svg{flex-shrink:0;margin-top:1px}
+
+/* ---------- 示例题列表（C2：1-8 级各 1 道） ---------- */
+.sample-row{
+  display:flex;align-items:center;gap:11px;background:var(--paper-raised);border:1px solid var(--hairline);
+  border-radius:12px;padding:12px 13px;margin-bottom:9px;box-shadow:var(--shadow-raised);
+}
+.sample-row .lv-badge{
+  width:38px;height:38px;border-radius:10px;background:var(--indigo-tint);color:var(--indigo);
+  display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:13px;flex-shrink:0;
+}
+.sample-row .mid{flex:1;min-width:0}
+.sample-row .tt{font-family:var(--f-display);font-weight:700;font-size:14px;color:var(--ink)}
+.sample-row .tp{font-size:11px;color:var(--ink-3);margin-top:3px}
+.sample-row .chev{color:var(--ink-3);flex-shrink:0}
+
+/* ---------- 注册墙 .guest-wall（整页替换输入区，非模态） ---------- */
+.guest-wall{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 28px;text-align:center}
+.guest-wall .gw-icon{
+  width:52px;height:52px;border-radius:50%;background:var(--ochre-tint);
+  display:grid;place-items:center;color:var(--ochre);margin-bottom:16px;
+}
+.guest-wall .gw-main{font-family:var(--f-display);font-size:19px;font-weight:700;color:var(--ink)}
+.guest-wall .gw-sub{font-size:12.5px;color:var(--ink-2);margin-top:8px;line-height:1.7}
+.guest-wall .btn-primary{margin-top:6px}
+.value-list{margin:18px 0;text-align:left;display:flex;flex-direction:column;gap:10px}
+.value-list .vi{display:flex;gap:9px;align-items:center;font-size:13px;color:var(--ink)}
+.value-list .vi svg{color:var(--indigo);flex-shrink:0}
+
+/* ---------- 注册引导卡 .signup-card（不使用印章朱） ---------- */
+.signup-card{
+  background:var(--paper-raised);border:1px solid var(--hairline);border-radius:var(--r-card);
+  box-shadow:var(--shadow-raised);padding:20px 18px;margin-bottom:16px;text-align:center;
+}
+.signup-card .sc-t{font-family:var(--f-display);font-size:16px;font-weight:700;color:var(--ink)}
+.signup-card .sc-sub{font-size:12px;color:var(--ink-2);margin-top:6px}
+.signup-card .value-list{margin:14px 0 16px}
+
+/* ---------- 人机验证滑块 ---------- */
+.slide-card{
+  width:320px;background:var(--paper-raised);border:1px solid var(--hairline);border-radius:var(--r-card);
+  box-shadow:var(--shadow-raised);padding:20px 18px;
+}
+.slide-card .sv-t{font-family:var(--f-display);font-weight:700;font-size:15.5px;color:var(--ink)}
+.slide-card .sv-p{font-size:12px;color:var(--ink-2);margin-top:6px;line-height:1.7}
+.slide-track{
+  height:44px;border-radius:var(--r-pill);background:var(--paper-sunken);border:1px solid var(--hairline);
+  position:relative;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink-3);
+  margin-top:14px;
+}
+.slide-knob{
+  position:absolute;left:3px;top:3px;width:38px;height:38px;border-radius:50%;background:var(--paper-raised);
+  border:1px solid var(--hairline);box-shadow:0 2px 6px rgba(30,36,48,.15);display:grid;place-items:center;color:var(--ink-2);
+}
+
+/* ---------- 模态 ---------- */
+.modal-mask{position:absolute;inset:0;background:rgba(30,36,48,.45);display:flex;align-items:center;justify-content:center;z-index:5}
+.modal{
+  width:400px;background:var(--paper-raised);border-radius:16px;
+  box-shadow:0 12px 40px rgba(30,36,48,.25);padding:22px;
+}
+.modal .md-t{font-family:var(--f-display);font-size:17px;font-weight:700;color:var(--ink)}
+.modal .md-list{margin:14px 0 18px;display:flex;flex-direction:column;gap:9px}
+.modal .md-li{display:flex;gap:8px;font-size:12.5px;color:var(--ink-2);line-height:1.6}
+.modal .md-li svg{flex-shrink:0;margin-top:2px;color:var(--danger)}
+.btn-danger{
+  width:100%;height:42px;border-radius:12px;background:var(--danger);color:#fff;font-size:14px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px -4px rgba(179,38,30,.5);
+}
+
+/* ---------- 回流成功条（D2） ---------- */
+.success-bar{
+  display:flex;gap:9px;background:var(--bamboo-tint);border:1px solid #CBE5D8;border-radius:12px;
+  padding:12px 14px;font-size:12.5px;color:#2C5A44;margin-bottom:16px;align-items:center;
+}
+.success-bar svg{flex-shrink:0;color:var(--bamboo)}
+
+/* ---------- 帧内多设备并排 ---------- */
+.stage-row{display:flex;gap:48px;justify-content:center;flex-wrap:wrap;align-items:flex-start}
+.stage-row .dev-cap{text-align:center;color:#8A919E;font-size:12px;margin-top:12px}
+</style>
+</head>
+<body>
+
+<!-- ================= 画廊头部与导航（非产品 UI） ================= -->
+<header class="gallery-head">
+  <h1>GESP AI 辅导 · 账号与合规 高保真原型</h1>
+  <p>FEAT-001 账号与合规精细设计 · 覆盖 PBI-0001/0002/0003/0012/0013：邮箱验证码登录注册、首次资料与未成年合规、设置与注销、未登录体验模式、体验转注册。公共样式共享自 _shared/design-system.css，可离线评审。</p>
+  <div class="tags">
+    <span>FEAT-001</span><span>PBI-0001</span><span>PBI-0002</span><span>PBI-0003</span>
+    <span>PBI-0012</span><span>PBI-0013</span><span>移动端 390</span><span>桌面端 1120</span>
+  </div>
+</header>
+<div class="gallery-nav">
+  <nav>
+    <a href="#a1"><b>A1</b>邮箱输入</a>
+    <a href="#a2"><b>A2</b>验证码</a>
+    <a href="#a3"><b>A3</b>错误与锁定</a>
+    <a href="#b1"><b>B1</b>资料收集</a>
+    <a href="#b2"><b>B2</b>未成年条款</a>
+    <a href="#b3"><b>B3</b>设置页</a>
+    <a href="#b4"><b>B4</b>注销确认</a>
+    <a href="#c1"><b>C1</b>体验首页</a>
+    <a href="#c2"><b>C2</b>示例题</a>
+    <a href="#c3"><b>C3</b>体验会话</a>
+    <a href="#c4"><b>C4</b>人机验证</a>
+    <a href="#c5"><b>C5</b>注册墙</a>
+    <a href="#d1"><b>D1</b>结果页引导</a>
+    <a href="#d2"><b>D2</b>注册回流</a>
+  </nav>
+</div>
+
+<!-- ============================================================
+     A 组 · 验证码登录/注册（PBI-0001）
+     同一入口不分流：新邮箱验证后自动注册，已注册邮箱直接登录
+     ============================================================ -->
+
+<!-- ===== A1 移动端 · 邮箱输入 ===== -->
+<section class="frame" id="a1">
+  <div class="frame-meta">
+    <span class="fid">A1</span>
+    <h2>移动端 · 邮箱输入</h2>
+    <p>登录/注册同一入口，无「注册/登录」分流。宋体欢迎标题定调；协议勾选行前置；获客渠道（小红书/公众号）移动端打开，故此帧移动优先。</p>
+    <ul class="ac">
+      <li>PBI-0001 AC：邮箱验证码登录，新邮箱验证后自动注册</li>
+      <li>BR-CMP：协议勾选前置，链接可点开</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device phone"><div class="scr">
+      <div class="statusbar"><span>9:41</span><span class="sic">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="24" height="11" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/><path d="M23.5 4v4c1-.3 1.5-1 1.5-2s-.5-1.7-1.5-2z" fill="currentColor" opacity=".4"/></svg>
+      </span></div>
+      <div class="m-auth">
+        <div class="logo-row">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          GESP AI 辅导
+        </div>
+        <div class="ttl">刷题遇阻，<br>知道错在哪、该怎么想</div>
+        <div class="sub">不直接给答案。先提示思路，你想不通，再解锁下一步——像老师坐在旁边一样。</div>
+        <div class="field">
+          <div class="lb"><span>邮箱</span></div>
+          <div class="inbox focus">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="color:var(--ink-3)"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg>
+            <span class="ph">输入你的邮箱</span>
+          </div>
+        </div>
+        <div class="agree-row">
+          <span class="cbx on"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <span>我已阅读并同意<span class="link">《用户协议》</span>和<span class="link">《隐私政策》</span></span>
+        </div>
+        <div class="btn-primary" style="margin-top:20px">获取验证码</div>
+        <div class="note-line" style="justify-content:center;margin-top:12px">未注册的邮箱验证后将自动完成注册</div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ===== A2 桌面端 · 验证码输入 ===== -->
+<section class="frame" id="a2">
+  <div class="frame-meta">
+    <span class="fid">A2</span>
+    <h2>桌面端 · 验证码输入</h2>
+    <p>桌面居中 480px 卡 + 左侧常驻品牌区。6 格 otp-row 分格输入；重发按钮倒计时中禁用并显示剩余秒数；提供「换个邮箱」回退。</p>
+    <ul class="ac">
+      <li>PBI-0001 AC：6 位验证码，5 分钟内有效</li>
+      <li>PBI-0001 AC：重发间隔 60s，间隔内重复请求提示剩余等待秒数</li>
+      <li>NFR-USE-01：PC 为刷题主场，注册转化承接桌面布局</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/login</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="auth-wrap">
+        <aside class="brand-side">
+          <div class="logo-row" style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--indigo);margin-bottom:30px">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            GESP AI 辅导
+          </div>
+          <div class="slogan">刷题遇阻，<br>知道错在哪、<br><em>该怎么想</em></div>
+          <div class="blist">
+            <div class="bi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>L1-L3 阶梯式讲解，不直接给答案</div>
+            <div class="bi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg>错因诊断，定位代码为什么错</div>
+            <div class="bi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.1V12a10 10 0 11-5.9-9.1"/><path d="M22 4L12 14l-3-3"/></svg>对齐 GESP 1-8 级考纲</div>
+          </div>
+        </aside>
+        <div class="auth-main">
+          <div class="auth-card">
+            <div class="ttl">验证码已发送至 hi@chenyu.cn</div>
+            <div class="sub">验证码 5 分钟内有效</div>
+            <div class="otp-row">
+              <span class="otp-cell">3</span>
+              <span class="otp-cell">8</span>
+              <span class="otp-cell cur"></span>
+              <span class="otp-cell"></span>
+              <span class="otp-cell"></span>
+              <span class="otp-cell"></span>
+            </div>
+            <div class="resend-row">
+              <span>没收到验证码？</span>
+              <span class="resend-btn off">42 秒后可重发</span>
+            </div>
+            <div class="btn-primary" style="margin-top:20px">验证并登录</div>
+            <div class="back-link">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+              换个邮箱
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ===== A3 移动端 · 验证码错误与锁定 ===== -->
+<section class="frame" id="a3">
+  <div class="frame-meta">
+    <span class="fid">A3</span>
+    <h2>移动端 · 错误与锁定</h2>
+    <p>左机：验证码错误，整组 danger 边框 + 单次 0.3s 抖动，行内提示剩余可试次数。右机：连续错 5 次锁定 10 分钟，输入区与重发按钮整体禁用。两态同帧对照呈现。</p>
+    <ul class="ac">
+      <li>PBI-0001 AC：连续错误 5 次锁定 10 分钟</li>
+      <li>动效约束：错误抖动为本特性唯一新增动效（错误反馈语义）</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="stage-row">
+      <div>
+        <div class="device phone"><div class="scr">
+          <div class="statusbar"><span>9:41</span><span class="sic">
+            <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+            <svg width="24" height="11" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/><path d="M23.5 4v4c1-.3 1.5-1 1.5-2s-.5-1.7-1.5-2z" fill="currentColor" opacity=".4"/></svg>
+          </span></div>
+          <div class="m-auth">
+            <div class="ttl" style="font-size:19px">验证码已发送至 hi@chenyu.cn</div>
+            <div class="sub">验证码 5 分钟内有效</div>
+            <div class="otp-row err">
+              <span class="otp-cell">1</span>
+              <span class="otp-cell">2</span>
+              <span class="otp-cell">3</span>
+              <span class="otp-cell">4</span>
+              <span class="otp-cell">5</span>
+              <span class="otp-cell">6</span>
+            </div>
+            <div class="inline-err">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><circle cx="12" cy="16" r=".5" fill="currentColor"/></svg>
+              验证码不正确，还可尝试 4 次
+            </div>
+            <div class="resend-row">
+              <span>没收到验证码？</span>
+              <span class="resend-btn">重新获取</span>
+            </div>
+            <div class="btn-primary" style="margin-top:20px">验证并登录</div>
+            <div class="back-link">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+              换个邮箱
+            </div>
+          </div>
+        </div></div>
+        <div class="dev-cap">错误态：还可尝试 4 次</div>
+      </div>
+      <div>
+        <div class="device phone"><div class="scr">
+          <div class="statusbar"><span>9:41</span><span class="sic">
+            <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+            <svg width="24" height="11" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/><path d="M23.5 4v4c1-.3 1.5-1 1.5-2s-.5-1.7-1.5-2z" fill="currentColor" opacity=".4"/></svg>
+          </span></div>
+          <div class="m-auth">
+            <div class="ttl" style="font-size:19px">验证码已发送至 hi@chenyu.cn</div>
+            <div class="sub">验证码 5 分钟内有效</div>
+            <div class="otp-row locked">
+              <span class="otp-cell"></span>
+              <span class="otp-cell"></span>
+              <span class="otp-cell"></span>
+              <span class="otp-cell"></span>
+              <span class="otp-cell"></span>
+              <span class="otp-cell"></span>
+            </div>
+            <div class="inline-err">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+              错误次数过多，已锁定 10 分钟
+            </div>
+            <div class="resend-row">
+              <span>没收到验证码？</span>
+              <span class="resend-btn off">重新获取</span>
+            </div>
+            <div class="btn-primary" style="margin-top:20px;opacity:.45;box-shadow:none">验证并登录</div>
+            <div class="back-link">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+              换个邮箱
+            </div>
+          </div>
+        </div></div>
+        <div class="dev-cap">锁定态：输入区与重发整体禁用</div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ============================================================
+     B 组 · 首次资料与合规（PBI-0002 / PBI-0003）
+     注册完成强制进入，不可跳过、无返回
+     ============================================================ -->
+
+<!-- ===== B1 移动端 · 首次资料收集 ===== -->
+<section class="frame" id="b1">
+  <div class="frame-meta">
+    <span class="fid">B1</span>
+    <h2>移动端 · 首次资料收集</h2>
+    <p>昵称 / 出生年月 / 所报级别三字段，最小集采集。本帧定格「缺项提交」拦截瞬间：级别未选，红字定位缺项，不弹窗、不跳页。出生年月用途说明随字段展示。</p>
+    <ul class="ac">
+      <li>PBI-0002 AC：首次注册强制完善资料，缺项拦截定位</li>
+      <li>PBI-0002 AC：所报级别 1-8 级 picker</li>
+      <li>PBI-0003 AC：最小集字段（仅邮箱/昵称/出生年月/级别）</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device phone"><div class="scr">
+      <div class="statusbar"><span>9:41</span><span class="sic">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="24" height="11" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/><path d="M23.5 4v4c1-.3 1.5-1 1.5-2s-.5-1.7-1.5-2z" fill="currentColor" opacity=".4"/></svg>
+      </span></div>
+      <div class="m-auth" style="padding-top:36px">
+        <div class="ttl" style="font-size:21px">还差一步，认识一下你</div>
+        <div class="sub">以下信息用于匹配讲解深度，可随时在设置页修改。</div>
+        <div class="field">
+          <div class="lb"><span>昵称</span></div>
+          <div class="inbox">小鱼儿</div>
+        </div>
+        <div class="field">
+          <div class="lb"><span>出生年月</span></div>
+          <div class="inbox">2013 年 5 月</div>
+          <div class="note-line">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".5" fill="currentColor"/></svg>
+            出生年月用于判断是否需要监护人同意，不会展示给他人
+          </div>
+        </div>
+        <div class="field">
+          <div class="lb"><span>我在备考 GESP</span><span class="err-text">还差一项：所报级别</span></div>
+          <div class="lvl-picker" style="margin-top:0">
+            <span class="opt">一级</span><span class="opt">二级</span><span class="opt">三级</span><span class="opt">四级</span>
+            <span class="opt">五级</span><span class="opt">六级</span><span class="opt">七级</span><span class="opt">八级</span>
+          </div>
+        </div>
+        <div class="agree-row">
+          <span class="cbx on"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+          <span>我已阅读并同意<span class="link">《用户协议》</span>和<span class="link">《隐私政策》</span></span>
+        </div>
+        <div class="btn-primary" style="margin-top:22px">完成</div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ===== B2 移动端 · 未成年分层（<14 周岁条款卡） ===== -->
+<section class="frame" id="b2">
+  <div class="frame-meta">
+    <span class="fid">B2</span>
+    <h2>移动端 · 未成年分层</h2>
+    <p>仅按出生年月保守判定：14 岁生日月及此前追加展开《未成年人个人信息保护条款》卡（摘要 + 全文链接 + 监护人同意勾选）。本帧定格「未勾选提交」拦截瞬间：勾选框 danger 描边 + 行内红字，焦点移至勾选行。</p>
+    <ul class="ac">
+      <li>PBI-0003 AC：&lt;14 周岁须展示条款并取得监护人同意</li>
+      <li>PBI-0003 AC：未勾选拦截并定位</li>
+      <li>BR-CMP：协议版本留痕（版本号在设置页 B3 展示）</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device phone"><div class="scr">
+      <div class="statusbar"><span>9:41</span><span class="sic">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="24" height="11" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/><path d="M23.5 4v4c1-.3 1.5-1 1.5-2s-.5-1.7-1.5-2z" fill="currentColor" opacity=".4"/></svg>
+      </span></div>
+      <div class="flow" style="padding-top:24px">
+        <div style="padding:0 20px">
+          <div class="m-auth" style="padding:0">
+            <div class="ttl" style="font-size:21px">还差一步，认识一下你</div>
+            <div class="field" style="margin-top:14px">
+              <div class="lb"><span>昵称</span></div>
+              <div class="inbox">小宇</div>
+            </div>
+            <div class="field">
+              <div class="lb"><span>出生年月</span></div>
+              <div class="inbox">2015 年 8 月</div>
+            </div>
+          </div>
+        </div>
+        <!-- 未成年条款卡：出生年月判定 <14 后展开 -->
+        <div class="echo-card" style="margin:14px 16px 0">
+          <div class="echo-head">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--ochre)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span class="t" style="font-size:14px">未成年人个人信息保护条款</span>
+          </div>
+          <div style="padding:11px 15px;font-size:12px;color:var(--ink-2);line-height:1.8">
+            根据出生年月，本次需确认监护人同意（14 岁生日月仍需确认）。我们仅在监护人同意下收集最小必要信息（邮箱、昵称、出生年月、所报级别），用于提供讲解服务，不用于其他用途。监护人有权查询、更正、删除你的个人信息。
+            <span class="link">阅读条款全文</span>
+          </div>
+          <div class="agree-row" style="margin:0;padding:0 15px 13px">
+            <span class="cbx miss"></span>
+            <span style="color:var(--ink)">已征得监护人同意</span>
+          </div>
+        </div>
+        <div style="padding:10px 20px 0">
+          <div class="inline-err" style="margin-top:0">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><circle cx="12" cy="16" r=".5" fill="currentColor"/></svg>
+            请先阅读条款并勾选「已征得监护人同意」
+          </div>
+        </div>
+        <div style="padding:0 20px">
+          <div class="m-auth" style="padding:0">
+            <div class="field">
+              <div class="lb"><span>我在备考 GESP</span></div>
+              <div class="lvl-picker" style="margin-top:0">
+                <span class="opt">一级</span><span class="opt">二级</span><span class="opt sel">三级</span><span class="opt">四级</span>
+                <span class="opt">五级</span><span class="opt">六级</span><span class="opt">七级</span><span class="opt">八级</span>
+              </div>
+            </div>
+            <div class="btn-primary" style="margin-top:18px">完成</div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ===== B3 桌面端 · 设置页 ===== -->
+<section class="frame" id="b3">
+  <div class="frame-meta">
+    <span class="fid">B3</span>
+    <h2>桌面端 · 设置页</h2>
+    <p>左导航 200px + 右内容 640px。id-card 承载三区：资料（级别可改，附次日生效提示）、协议与隐私（名称 + 已同意版本号 + 查看链接）、账号（注销 danger 文字按钮）。</p>
+    <ul class="ac">
+      <li>PBI-0002 AC：级别修改保存即提示「次日 0 点起新会话生效」</li>
+      <li>PBI-0003 AC：协议名称与已同意版本号留痕可查</li>
+      <li>BR-LVL-4：历史会话按当时级别保留展示</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/settings</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="settings-wrap">
+        <aside class="set-nav">
+          <div style="padding:0 14px 14px;font-family:var(--f-display);font-weight:700;font-size:16px;color:var(--ink)">设置</div>
+          <div class="ni on">资料</div>
+          <div class="ni">协议与隐私</div>
+          <div class="ni">账号</div>
+        </aside>
+        <div class="set-main"><div class="col">
+          <div class="set-sec-t">资料</div>
+          <div class="id-card">
+            <div class="id-row"><span class="k">NICKNAME</span><span class="v"><span class="nm">小鱼儿</span></span><span class="act">修改</span></div>
+            <div class="id-row"><span class="k">BIRTH</span><span class="v">2013 年 5 月</span><span class="act">修改</span></div>
+            <div class="id-row"><span class="k">GESP LEVEL</span><span class="v">三级<span class="ver">修改后次日 0 点起生效</span></span><span class="act">修改</span></div>
+            <div class="id-row"><span class="k">EMAIL</span><span class="v">hi@chenyu.cn</span></div>
+          </div>
+          <div class="note-line">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".5" fill="currentColor"/></svg>
+            新级别将于次日 0 点起生效，历史会话保留当时级别
+          </div>
+          <div class="set-sec-t">协议与隐私</div>
+          <div class="id-card">
+            <div class="id-row"><span class="k">AGREED</span><span class="v">《用户协议》<span class="ver">已同意 v1.2</span></span><span class="act">查看</span></div>
+            <div class="id-row"><span class="k">AGREED</span><span class="v">《隐私政策》<span class="ver">已同意 v1.1</span></span><span class="act">查看</span></div>
+            <div class="id-row"><span class="k">AGREED</span><span class="v">《未成年人个人信息保护条款》<span class="ver">已同意 v1.0</span></span><span class="act">查看</span></div>
+          </div>
+          <div class="set-sec-t">账号</div>
+          <div class="id-card">
+            <div class="id-row"><span class="k">DANGER</span><span class="v">注销账号</span><span class="act danger">注销</span></div>
+          </div>
+        </div></div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ===== B4 桌面端 · 注销二次确认模态 ===== -->
+<section class="frame" id="b4">
+  <div class="frame-meta">
+    <span class="fid">B4</span>
+    <h2>桌面端 · 注销二次确认</h2>
+    <p>模态焦点圈定：后果清单逐条列出，「确认注销」danger 实底按钮需显式点击，不回车默认触发。背景为设置页账号区，遮罩压暗。</p>
+    <ul class="ac">
+      <li>PBI-0003 AC：注销需二次确认</li>
+      <li>PBI-0003 AC：明示个人数据 15 个工作日内删除、历史不可恢复</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar">
+        <span class="dots"><i></i><i></i><i></i></span>
+        <span class="url">tutor.gesp-ai.cn/settings</span>
+        <span style="width:52px"></span>
+      </div>
+      <div class="settings-wrap">
+        <aside class="set-nav">
+          <div style="padding:0 14px 14px;font-family:var(--f-display);font-weight:700;font-size:16px;color:var(--ink)">设置</div>
+          <div class="ni">资料</div>
+          <div class="ni">协议与隐私</div>
+          <div class="ni on">账号</div>
+        </aside>
+        <div class="set-main"><div class="col">
+          <div class="set-sec-t">账号</div>
+          <div class="id-card">
+            <div class="id-row"><span class="k">EMAIL</span><span class="v">hi@chenyu.cn</span></div>
+            <div class="id-row"><span class="k">DANGER</span><span class="v">注销账号</span><span class="act danger">注销</span></div>
+          </div>
+        </div></div>
+      </div>
+      <!-- 二次确认模态：焦点圈定，确认需显式点击 -->
+      <div class="modal-mask">
+        <div class="modal">
+          <div class="md-t">确认注销账号？</div>
+          <div class="md-list">
+            <div class="md-li"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4"/><circle cx="12" cy="16" r=".5" fill="currentColor"/><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>注销后账号不可登录</div>
+            <div class="md-li"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4"/><circle cx="12" cy="16" r=".5" fill="currentColor"/><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>个人数据将在 15 个工作日内删除</div>
+            <div class="md-li"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4"/><circle cx="12" cy="16" r=".5" fill="currentColor"/><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>历史会话与错题记录不可恢复</div>
+          </div>
+          <div class="btn-danger">确认注销</div>
+          <div class="btn-text" style="margin-top:8px">取消</div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ============================================================
+     C 组 · 体验模式（PBI-0012）
+     完整体验 L1-L3 + 追问 + 变式，整体计 1 次，会话内不再计次
+     ============================================================ -->
+
+<!-- ===== C1 移动端 · 未登录首页 ===== -->
+<section class="frame" id="c1">
+  <div class="frame-meta">
+    <span class="fid">C1</span>
+    <h2>移动端 · 未登录首页（体验模式入口）</h2>
+    <p>复用 FEAT-002 A1 空态骨架，三处差异：顶栏 C1 槽位替换为 guest-chip「体验模式」（非按钮）；粘贴区上方追加体验说明条；底部追加「登录」文字按钮。获客落地承接帧。</p>
+    <ul class="ac">
+      <li>PBI-0012 AC：未登录可从首页发起体验</li>
+      <li>PBI-0012 AC：每日 1 次免费体验，口径明示</li>
+      <li>FEAT-005 关联：guest-chip 替代 C1 用量指示器</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device phone"><div class="scr">
+      <div class="statusbar"><span>9:41</span><span class="sic">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="24" height="11" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/><path d="M23.5 4v4c1-.3 1.5-1 1.5-2s-.5-1.7-1.5-2z" fill="currentColor" opacity=".4"/></svg>
+      </span></div>
+      <div class="appbar">
+        <span class="title">GESP AI 辅导</span>
+        <span class="spacer"></span>
+        <!-- guest-chip：体验态替代 C1 用量指示器，非按钮，点击无交互 -->
+        <span class="guest-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+          体验模式
+        </span>
+      </div>
+      <div class="flow">
+        <div class="exp-note" style="margin:0 20px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>
+          每日 1 次免费体验，含完整阶梯讲解与变式检验
+        </div>
+        <div class="home-hero" style="padding-top:22px">
+          <div class="hi">把题目<em>贴进来</em>，<br>我们一步步讲。</div>
+        </div>
+        <div class="paste-hint">
+          支持 <kbd>Ctrl</kbd> + <kbd>V</kbd> 粘贴截图，或点左下角回形针选图<br>
+          图片 ≤ 10MB · 文字 ≤ 10000 字
+        </div>
+        <div class="sample-sec">
+          <div class="ss-t">没题可贴？选一道示例题体验</div>
+          <div class="sample-grid">
+            <div class="sample-item"><div class="lv">一级 · 顺序结构</div><div class="tt">交换两个变量的值</div></div>
+            <div class="sample-item"><div class="lv">三级 · 循环结构</div><div class="tt">数字之和</div></div>
+            <div class="sample-item"><div class="lv">五级 · 一维数组</div><div class="tt">成绩统计</div></div>
+            <div class="sample-item"><div class="lv">七级 · 字符串</div><div class="tt">回文串判定</div></div>
+          </div>
+        </div>
+        <div class="btn-text" style="margin-top:6px">已有账号？<span class="link" style="font-weight:600">登录</span></div>
+        <div style="height:14px"></div>
+      </div>
+      <div class="composer">
+        <div class="row">
+          <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15V19a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+          <div class="input-box"><span class="ph">粘贴题目，开始今日体验…</span></div>
+          <span class="send-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+        </div>
+        <div class="tips"><span>体验会话整体计 1 次，含完整讲解与变式</span><span>0/10000</span></div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== C2 移动 · 内置示例题 ==================== -->
+<section class="frame" id="c2">
+  <div class="frame-meta">
+    <div class="fm-id">C2 · 移动 · 内置示例题</div>
+    <h3>没题可贴？1–8 级各备一道</h3>
+    <p>从 C1 示例题入口进入。每行 = 级别章 + 考点标签 + 题干摘要；点击即发起体验并计 1 次额度，顶部以赭石说明条明示「使用今日体验额度」，不做隐藏计次。</p>
+    <ul class="ac">
+      <li>PBI-0012 AC：内置示例题 1–8 级各 1 道</li>
+      <li>PBI-0012 AC：发起前明示计入体验额度</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device phone"><div class="scr">
+      <div class="statusbar"><span>9:41</span><span class="sic">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="24" height="11" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/><path d="M23.5 4v4c1-.3 1.5-1 1.5-2s-.5-1.7-1.5-2z" fill="currentColor" opacity=".4"/></svg>
+      </span></div>
+      <div class="appbar">
+        <span class="back"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+        <span class="title">选一道示例题</span>
+        <span class="spacer"></span>
+        <span class="guest-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+          体验模式
+        </span>
+      </div>
+      <div class="exp-note">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+        <span>点击任意一题即<b>使用今日体验额度</b>，含完整阶梯讲解与变式检验</span>
+      </div>
+      <div style="padding:16px 20px;flex:1">
+        <div class="sample-row"><span class="lv-badge">一级</span><div class="mid"><div class="tt">交换两个变量的值</div><div class="tp">顺序结构 · 输入两个整数，交换后输出</div></div><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span></div>
+        <div class="sample-row"><span class="lv-badge">二级</span><div class="mid"><div class="tt">成绩等级判定</div><div class="tp">分支结构 · 输入分数，输出 A/B/C/D 等级</div></div><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span></div>
+        <div class="sample-row"><span class="lv-badge">三级</span><div class="mid"><div class="tt">数字之和</div><div class="tp">循环结构 · 输入正整数，求各位数字之和</div></div><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span></div>
+        <div class="sample-row"><span class="lv-badge">四级</span><div class="mid"><div class="tt">九九乘法表</div><div class="tp">循环进阶 · 嵌套循环输出乘法口诀表</div></div><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span></div>
+        <div class="sample-row"><span class="lv-badge">五级</span><div class="mid"><div class="tt">成绩统计</div><div class="tp">一维数组 · 输入 n 个成绩，求最高分与平均分</div></div><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span></div>
+        <div class="sample-row"><span class="lv-badge">六级</span><div class="mid"><div class="tt">素数判定</div><div class="tp">函数 · 判断一个正整数是否为素数</div></div><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span></div>
+        <div class="sample-row"><span class="lv-badge">七级</span><div class="mid"><div class="tt">回文串判定</div><div class="tp">字符串 · 判断一个字符串是否正读反读相同</div></div><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span></div>
+        <div class="sample-row"><span class="lv-badge">八级</span><div class="mid"><div class="tt">爬楼梯</div><div class="tp">递推 · n 级台阶每次走 1 或 2 级，求方案数</div></div><span class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span></div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== C3 桌面 · 体验会话中 ==================== -->
+<section class="frame" id="c3">
+  <div class="frame-meta">
+    <div class="fm-id">C3 · 桌面 · 体验会话中</div>
+    <h3>体验会话：完整阶梯，不再计次</h3>
+    <p>复用 FEAT-002 会话页骨架，按 6.3 槽位表覆盖：顶栏右槽为 guest-chip；解锁卡<b>不渲染消耗预告行</b>（体验会话整体已计 1 次）；输入区占位改为「继续追问这道题（不单独扣体验次数）…」。</p>
+    <ul class="ac">
+      <li>PBI-0012 AC：体验含完整 L1–L3 阶梯与变式</li>
+      <li>BR-LMT-4：会话内解锁与追问不再消耗次数</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar"><span class="bb-dot"></span><span class="bb-dot"></span><span class="bb-dot"></span><span class="bb-url">gesp.example.com/session</span></div>
+      <div class="appbar">
+        <span class="title">GESP AI 辅导</span><span class="spacer"></span>
+        <span class="guest-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+          体验模式
+        </span>
+      </div>
+      <div class="desk-body">
+        <aside class="desk-side">
+          <div class="ds-head">本次体验</div>
+          <div class="ds-list">
+            <div class="hist-item sel"><div class="row1"><span class="qt">数字之和</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag">循环结构</span></div></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="flow"><div class="inner">
+            <div class="msg-user"><div class="bub">输入一个正整数，求它各位数字之和。比如输入 123，输出 6。<div class="meta">09:41 · 示例题 · 三级</div></div></div>
+            <div class="msg-ai"><div class="card">
+              <div class="card-head">
+                <span class="lvl-chip lv1">L1 · 思路提示</span>
+                <span class="ai-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z"/></svg>AI 生成</span>
+              </div>
+              <div class="card-body">
+                <p>这题的关键，是把一个整数的每一位「拆」出来相加。先不急着写代码。</p>
+                <p>想一想：给你 12345，对它做 <b>% 10</b> 会得到什么？再做 <b>/ 10</b> 又剩下什么？</p>
+              </div>
+            </div></div>
+            <!-- 体验态：解锁卡不渲染 uc-cost 消耗预告行 -->
+            <div class="unlock-card">
+              <div class="uc-q">想看看关键步骤吗？</div>
+              <div class="uc-sub">L2 会给你分步伪代码，还不是完整代码</div>
+              <span class="btn-unlock"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 017.7-1.5"/></svg>解锁 L2 关键步骤</span>
+            </div>
+          </div></div>
+          <div class="composer"><div class="inner">
+            <div class="row">
+              <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15V19a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+              <div class="input-box"><span class="ph">继续追问这道题（不单独扣体验次数）…</span></div>
+              <span class="send-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+            </div>
+            <div class="tips"><span>体验会话已计 1 次 · 会话内不再扣次</span><span>0/10000</span></div>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== C4 移动 · 人机验证 ==================== -->
+<section class="frame" id="c4">
+  <div class="frame-meta">
+    <div class="fm-id">C4 · 移动 · 人机验证</div>
+    <h3>频繁体验拦截：先过滑块</h3>
+    <p>同 IP 当日第 4 次及以后发起体验前弹出。验证只放行当前一次请求，不产生当日白名单；背景为首页输入区虚化压暗。</p>
+    <ul class="ac">
+      <li>PBI-0012 AC：同 IP 当日第4次起单次验证，验证失败不可发起</li>
+      <li>文案口径：检测到频繁体验，请先完成验证</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device phone"><div class="scr">
+      <div class="statusbar"><span>9:41</span><span class="sic">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="24" height="11" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/><path d="M23.5 4v4c1-.3 1.5-1 1.5-2s-.5-1.7-1.5-2z" fill="currentColor" opacity=".4"/></svg>
+      </span></div>
+      <div class="appbar">
+        <span class="title">GESP AI 辅导</span><span class="spacer"></span>
+        <span class="guest-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+          体验模式
+        </span>
+      </div>
+      <div class="home-hero" style="flex:1;filter:blur(1px);opacity:.55">
+        <div class="hi">哪道题卡住了？</div>
+      </div>
+      <!-- 滑块验证模态：验证通过前不可发起体验 -->
+      <div class="modal-mask">
+        <div class="slide-card">
+          <div class="sv-t">检测到频繁体验，请先完成验证</div>
+          <div class="sv-p">为保障服务质量，同一网络环境当日多次体验前需完成一次人机验证。</div>
+          <div class="slide-track">
+            <span class="slide-knob"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span>
+            按住滑块，拖动到最右端
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== C5 移动 · 注册墙 ==================== -->
+<section class="frame" id="c5">
+  <div class="frame-meta">
+    <div class="fm-id">C5 · 移动 · 注册墙</div>
+    <h3>额度用尽：整页替换，而非弹窗</h3>
+    <p>体验额度用尽后，输入区整态替换为注册墙（非模态）：ochre 图标 + 主文案 + 价值清单 + indigo 主按钮 + 次文案。与 FEAT-005 超限卡区分：超限卡是注册态会话内联消息，注册墙是体验入口页整态替换。</p>
+    <ul class="ac">
+      <li>PBI-0012 AC：额度用尽展示注册引导</li>
+      <li>BR-LMT-5：无付费口径，不使用紧迫感文案</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device phone"><div class="scr">
+      <div class="statusbar"><span>9:41</span><span class="sic">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+        <svg width="24" height="11" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="currentColor"/><path d="M23.5 4v4c1-.3 1.5-1 1.5-2s-.5-1.7-1.5-2z" fill="currentColor" opacity=".4"/></svg>
+      </span></div>
+      <div class="appbar">
+        <span class="title">GESP AI 辅导</span><span class="spacer"></span>
+        <span class="guest-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+          体验模式
+        </span>
+      </div>
+      <!-- 注册墙整页替换输入区 -->
+      <div class="guest-wall">
+        <span class="gw-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+        <div class="gw-main">今日免费体验已用完</div>
+        <div class="value-list">
+          <div class="vi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>每日 15 次完整讲解额度</div>
+          <div class="vi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>错因诊断，定位薄弱考点</div>
+          <div class="vi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>错题本，自动归集随时重练</div>
+        </div>
+        <span class="btn-primary" style="width:100%;justify-content:center">注册继续用</span>
+        <div class="gw-sub">明天 0 点后可再体验 1 次；注册立即可用</div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== D1 桌面 · 体验结果页（转注册） ==================== -->
+<section class="frame" id="d1">
+  <div class="frame-meta">
+    <div class="fm-id">D1 · 桌面 · 体验结果页</div>
+    <h3>讲解完成，顺势引导注册</h3>
+    <p>消息流末尾 = 变式判读结果卡（复用 FEAT-002 B8 judge-ok）+ 注册引导卡。引导卡为系统消息属性、不挂 AI 角标；indigo 实底主按钮，不使用印章朱，不发明「限时」话术。</p>
+    <ul class="ac">
+      <li>PBI-0013 AC：体验完成后展示注册引导</li>
+      <li>清单口径：每日 15 次 · 错因诊断 · 错题本</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar"><span class="bb-dot"></span><span class="bb-dot"></span><span class="bb-dot"></span><span class="bb-url">gesp.example.com/session</span></div>
+      <div class="appbar">
+        <span class="title">GESP AI 辅导</span><span class="spacer"></span>
+        <span class="guest-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+          体验模式
+        </span>
+      </div>
+      <div class="desk-body">
+        <aside class="desk-side">
+          <div class="ds-head">本次体验</div>
+          <div class="ds-list">
+            <div class="hist-item sel"><div class="row1"><span class="qt">数字之和</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag ladder-ok">已听懂</span></div></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="flow"><div class="inner">
+            <div class="msg-user"><div class="bub">循环里把每位拆出来，if (d % 2 == 0) cnt++;<div class="meta">09:52 · 变式作答</div></div></div>
+            <div class="judge-ok">
+              <span class="jc-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+              <div>
+                <div class="jc-t">变式通过</div>
+                <div class="jc-p">能独立写出偶数位统计逻辑，取位与循环已经掌握。本次体验讲解到此完成。</div>
+              </div>
+            </div>
+            <!-- 注册引导卡：系统消息属性，不使用印章朱 -->
+            <div class="signup-card">
+              <div class="sc-t">讲解已完成，注册解锁完整额度</div>
+              <div class="sc-sub">免费注册，立即获得：</div>
+              <div class="value-list">
+                <div class="vi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>每日 15 次完整讲解额度</div>
+                <div class="vi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>错因诊断，定位薄弱考点</div>
+                <div class="vi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>错题本，自动归集随时重练</div>
+              </div>
+              <span class="btn-primary">注册解锁完整额度</span>
+            </div>
+          </div></div>
+          <div class="composer"><div class="inner">
+            <div class="row">
+              <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15V19a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+              <div class="input-box"><span class="ph">继续追问这道题（不单独扣体验次数）…</span></div>
+              <span class="send-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+            </div>
+            <div class="tips"><span>体验会话已计 1 次 · 会话内不再扣次</span><span>0/10000</span></div>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+<div class="frame-end"><hr></div>
+
+<!-- ==================== D2 桌面 · 注册完成回流 ==================== -->
+<section class="frame" id="d2">
+  <div class="frame-meta">
+    <div class="fm-id">D2 · 桌面 · 注册完成回流</div>
+    <h3>回到结果页，额度已就位</h3>
+    <p>注册完成后回到原结果页：顶栏 guest-chip 替换为正式 C1 用量指示器「今日剩余 15 次」；引导卡替换为竹绿成功条「已解锁正式额度，体验不抵扣今日次数」。历史讲解内容完整保留。</p>
+    <ul class="ac">
+      <li>PBI-0013 AC：注册后回流原会话</li>
+      <li>BR-LMT-4：当日体验不抵扣注册后额度</li>
+    </ul>
+  </div>
+  <div class="frame-stage">
+    <div class="device desktop"><div class="scr">
+      <div class="browser-bar"><span class="bb-dot"></span><span class="bb-dot"></span><span class="bb-dot"></span><span class="bb-url">gesp.example.com/session</span></div>
+      <div class="appbar">
+        <span class="title">GESP AI 辅导</span><span class="spacer"></span>
+        <span class="usage-pill">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12L13 2z"/></svg>
+          今日剩余 <b>15</b> 次
+        </span>
+      </div>
+      <div class="desk-body">
+        <aside class="desk-side">
+          <div class="ds-head">历史会话</div>
+          <div class="ds-list">
+            <div class="hist-item sel"><div class="row1"><span class="qt">数字之和</span></div><div class="row2"><span class="mini-tag lv">三级</span><span class="mini-tag ladder-ok">已听懂</span></div></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="flow"><div class="inner">
+            <!-- 回流成功条：替换 D1 注册引导卡 -->
+            <div class="success-bar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              <span>已解锁正式额度，今日体验不抵扣次数</span>
+            </div>
+            <div class="msg-user"><div class="bub">循环里把每位拆出来，if (d % 2 == 0) cnt++;<div class="meta">09:52 · 变式作答</div></div></div>
+            <div class="judge-ok">
+              <span class="jc-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+              <div>
+                <div class="jc-t">变式通过</div>
+                <div class="jc-p">能独立写出偶数位统计逻辑，取位与循环已经掌握。本次体验讲解到此完成。</div>
+              </div>
+            </div>
+          </div></div>
+          <div class="composer"><div class="inner">
+            <div class="row">
+              <span class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15V19a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg></span>
+              <div class="input-box"><span class="ph">继续追问…</span></div>
+              <span class="send-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></span>
+            </div>
+            <div class="tips"><span>追问消耗 1 次 · 今日剩余 15 次</span><span>0/10000</span></div>
+          </div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+</section>
+
+<footer class="gallery-foot">GESP AI 辅导 · FEAT-001 账号与合规 · 高保真原型 14 帧 · 共享 design-system.css · 离线可开</footer>
+
+</body>
+</html>
