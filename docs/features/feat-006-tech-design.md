@@ -69,9 +69,10 @@ class EventRecorder(Protocol):
 
 @dataclass
 class Event:
+    source_event_id: str       # 生产者稳定幂等键，重试不变
     event_type: str            # 事件目录内注册的类型名
-    owner_type: Literal["user", "guest"]
-    owner_id: str              # user_id 或访客指纹 hash
+    owner_type: Literal["user", "guest", "anonymous"]
+    owner_id: str | None       # user_id/guest_key；匿名化后为 None
     session_id: str | None     # 会话域事件必填（AC3 对账依据）
     module: str | None         # tut / dia / exa_review / acc / lmt / ops / shr（取值对齐 §5.1 枚举）
     level_band: Literal["1-4", "5-8"] | None
@@ -81,7 +82,7 @@ class Event:
 写入纪律：
 
 - 同步插入；写失败仅记日志与 `event_record_failures` 计数指标，**不阻断业务流**（度量完整性让位于用户旅程，失败率入 Grafana 监控）。
-- 会话域事件的 `module` / `level_band` 由会话框架统一填充（取 ai_sessions.type 与 level_snapshot 派生），调用方不传；账号域事件由 acc 模块按 users 所报级别填充；访客事件允许 level_band 为空。
+- 会话域事件的 module 取 ai_sessions.type，level_band 取确认后的 questions.final_level（1–4/5–8），确认前或考纲外为空；调用方不传，账号域事件按账号当前生效级别派生。level_snapshot 仅审计，不覆盖本次确认级别。
 - 事件类型必须先登记入目录再发射，record 对未登记类型拒绝并告警——目录即契约，防止各特性私造事件导致日报口径漂移。
 
 事件目录（本特性定义的契约；生产者分布于各特性，FEAT-002 §6.3 清单全部继承）：
@@ -92,11 +93,20 @@ class Event:
 | recognition_succeeded(route) / recognition_failed(reason) / echo_corrected / reidentify_used / ladder_compliance_violation(level) / ocr_fallback | core/session | route / reason / level | 质量过程指标 |
 | landing_page_viewed | web 落地页（beacon 上报，接口见 §4） | utm_source? / referrer?；module 为空 | 体验漏斗首步 |
 | guest_experience_started / guest_experience_completed | core/session（FEAT-001 体验模式编排按本契约发射） | sample_question? | 体验漏斗中间两步 |
-| user_registered | acc（FEAT-001，PBI-0013 承接） | guest_fingerprint?（归因） | 漏斗终点 |
+| user_registered | acc（首次建号，重复登录不发） | attribution_guest_id?（服务端 guest_key） | 漏斗终点；7 日归因 |
+| auth_code_sent / auth_code_send_failed / auth_verify_failed / auth_locked | acc | attempts_left? / reason?（不含邮箱或验证码） | 认证质量，不计学习活跃 |
+| onboarding_completed / level_changed / account_deactivated | acc | requires_guardian_consent? / level? | 账号行为，不计学习活跃 |
+| guest_captcha_shown / guest_captcha_passed / guest_captcha_failed / guest_wall_shown / signup_card_shown / signup_card_clicked / guest_session_migrated | acc | count? / reason? | 体验过程与归属迁移 |
+| generation_failed / resource_budget_rejected | core/session | operation_id / reason | 生成与资源保护质量，不计成功学习活跃 |
+| learning_response_completed | core/session | operation_id / action | 有效讲解/追问/判读成功发布后的唯一学习活跃信号；按操作去重 |
 | quota_rejected(action) | modules/lmt（FEAT-005） | action | 触顶率、触顶次日留存 |
 | safety_blocked(stage, category) / safety_truncated(category) | core/safety / core/llm | stage=input/output、命中类别 | 安全拦截率 |
 
 `ladder_unlocked`、`variant_answered`、`understood_marked` 等关键事件必须携带 session_id，保证与盲评导出数据可对账（PBI-0019 AC3）。
+
+- 体验发起在 guest confirm 放行时发射；识别失败或仅创建会话不算发起完整体验。体验完成在 understood_marked 或首次 variant_answered 首次出现时幂等发射，事件有唯一 source_event_id，重试不重复入表。
+- 注册归因字段统一为 props.attribution_guest_id，来源为服务端绑定的 guest_key；不使用独立 guest_key 列或旧事件别名。归因窗口为体验开始后 7×24h，注册归于窗口内最近的体验 cohort，每个账号一次；快照归属迁移不修改历史事件身份。
+- 客户端 beacon 仅可发送 landing_page_viewed，不允许借“目录已注册”伪造 user_registered、variant_answered 等服务端学习事件。全部新事件先加入本目录再发射。
 
 ### 3.2 内容安全（core/safety 薄接口 + 输出滑窗送检器）
 
@@ -115,10 +125,10 @@ class SafetyVerdict:
 - 首期实现：阿里云内容安全（同 region 内网 endpoint，基线集成节既定）；切换厂商 = 新增接口实现类 + 配置，应用代码零改动。
 - `scene` 枚举：`tut_input / dia_input / followup / variant_answer / llm_output / image_recognition`，用于拦截日志归因与分类统计。
 - 超时与失败口径：输入检测 3s 超时，输出滑窗检测 2s 超时；**均 fail-closed**——输入超时按拦截处理（提示稍后重试），输出检测超时/不可用按命中处理（截断）。理由：NFR-SAFE-01 是未成年人产品的合规底线，不可 fail-open；代价是内容安全服务不可用即 AI 会话不可用，与基线告警表"内容安全服务不可用 = P1 立即"一致。置信度 80。
-- 输出滑窗送检器（位于 core/llm，对 SSE 分片流工作）：
-  - 累积分片，每满 W=200 字符且在句读边界切窗，相邻窗保留一句重叠（防跨窗断词漏检）；逐窗异步送检。
-  - 命中 → 立即中止上游 LLM 流 → 下发 `safety_truncated` 事件 → 已发分片落库并标记 `safety.truncated=true`；尾包在流结束时终结送检。
-  - W=200 为初始值，联调期按误拦率与"截断前上屏量"权衡校准（§10-D4），校准只改配置。
+- 输出送检器（位于 core/llm）：累积待发布片段至 W=200 字符或句读边界（先到即切），相邻窗带一句已批准上下文重叠；待检片段留服务端，检测通过后才发布到 SSE、续传缓存与历史正文。尾包同样先检后发。
+  - 命中/超时 → 停止上游，丢弃待检片段，发 safety_truncated 终态；已通过检测的早先片段可保留。命中片段仅进入受控 safety_blocks，不通过 trace 自动变成用户可读消息。
+  - L1/L2 还须先完成 FEAT-002 §3.1 的整轮答案边界校验；输出安全检测不替代阶梯语义检查。
+  - W 为可配置初值；联调验证 TTFT 含全部缓冲/检测时间，不能通过提前上屏未检内容换取性能达标。
 - 输入侧接入点（FEAT-002 §6.1 已定，本文确认不变）：所有用户文本与截图经 check_text / check_image 前置，命中 → 422 `safety_blocked`，不计数，写 safety_blocks。
 - 申诉入口：拦截与截断提示组件固定展示申诉邮箱 mailto 链接（配置 `OPS_APPEAL_EMAIL`），文案含拦截时间与类别说明以便核查；无后端接口（FR-OPS-03 证据 = UI 检查）。
 
@@ -134,7 +144,7 @@ docker compose exec api python -m modules.ops.blind_eval sample \
 docker compose exec api python -m modules.ops.blind_eval sync    # 评分回写 + 仲裁
 ```
 
-- 候选集：存在 L1 讲解消息（ladder_l1）且自上次 iteration 抽样之后创建的 ai_sessions；`--mode iteration` 按 级别段（1-4/5-8）× 模块（tut/dia）四层分层随机，每层 ≥6，余量由各层按比例补齐至 30；某层不足 6 个则全取并在批次元数据记 `shortfall`（导出清单证据中可见）。同一会话不重复入 iteration 批次。
+- 候选集：自上次 iteration 抽样之后创建、至少有一个成功完成且可见的 L1 消息、且抽样时无活动生成操作的会话；不要求已标“听懂”或已答对变式，避免仅抽成功学习者。按 final_level 级别段 × 模块四层抽样，每层 ≥6、总数30；不足记录 shortfall。记录抽样时点与候选/完成/排除数，无变式的会话仍可评价讲解组，变式组标 not_applicable，不伪填评分。同一会话不重复入 iteration 批次。
 - 导出动作：对每个样本，按字段白名单（§5.2）从会话域表捞取评分所需完整上下文，快照写入 `blind_eval_samples.context`，同一份内容写入该会话各 Langfuse trace 的 metadata 并将 trace 加入标注队列。会话 ↔ trace 经 session_messages.llm_trace_id 关联（FEAT-002 §5.1 已建该字段）。
 - 评分录入：教练在 Langfuse 标注队列打分（基线可观测性节既定入口）；`sync` 经 Langfuse API 拉取 scores 写入 blind_eval_scores。Langfuse 具体 API 端点与队列对象为部署版本相关实现细节，任务分解时按所部署版本文档定稿，不构成本文契约变更。
 - 评分模型（PBI-0020 AC 两维度独立计分 与 BR-EVA-3/BR-VAR-2 的整合）：
@@ -157,7 +167,7 @@ docker compose exec api python -m modules.ops.blind_eval sync    # 评分回写 
 
 | 入口 | 形态 | 说明 |
 |---|---|---|
-| 落地页 beacon | `POST /api/ops/events`（无鉴权；防护见 §7） | web 落地页上报 `landing_page_viewed`；仅接受事件目录注册类型；客户端指纹上送后服务端 hash 落 events.owner_id，不存原文 |
+| 落地页 beacon | `POST /api/ops/events`（产品免登录，内测环境仍受访问边界保护） | 仅接受 landing_page_viewed；owner_id 由服务端 guest 身份绑定，不允许调用方指定 user 身份 |
 | Grafana 效果日报看板 | dashboard JSON provisioning（api 仓 `deploy/grafana/`） | PG 只读数据源账号；看板 = NFR-REL-02 全指标 + 盲评组（§5.4） |
 | 日报留档 CLI | `python -m modules.ops.daily_report --date <d>` | 复用看板同一组 SQL，渲染 markdown 快照，供"日报输出样例核对"（PBI-0019 AC1 证据）与复盘留档；每日产出动作初期人工/cron 触发 |
 | 盲评 CLI | §3.3 | sample / sync |
@@ -173,8 +183,9 @@ docker compose exec api python -m modules.ops.blind_eval sync    # 评分回写 
 | id | uuid PK | |
 | occurred_at | timestamptz | 默认 now()；日报按日聚合依据 |
 | event_type | text | §3.1 目录内注册类型 |
-| owner_type | enum(user,guest) | |
-| owner_id | text | user_id 或访客指纹 hash（不存原始指纹） |
+| source_event_id | text unique | 生产者的稳定幂等标识，重发不重复写入 |
+| owner_type | enum(user,guest,anonymous) | anonymous 仅由删除流程写入 |
+| owner_id | text? | user_id 或 guest_key；匿名化后必须为空 |
 | session_id | uuid? | 会话域事件必填；关联 ai_sessions |
 | module | enum(tut,dia,exa_review,acc,lmt,ops,shr)? | 模块维度（AC2 交叉查询一轴）；会话域事件取值对齐 ai_sessions.type 枚举 |
 | level_band | enum('1-4','5-8')? | 级别段快照（AC2 另一轴），发射时派生固化为列，避免日报查询回联 users/ai_sessions |
@@ -202,7 +213,7 @@ docker compose exec api python -m modules.ops.blind_eval sync    # 评分回写 
 `context` 白名单字段（PBI-0020 AC2 评分上下文 + AC4 字段审计证据）：
 
 ```
-session_id, level_snapshot, module,
+session_id, level_snapshot, final_level, module, question_text, knowledge_points,
 steps[]      阶梯解锁留痕（ladder_level, unlocked_at）
 messages[]   逐轮内容（seq, role, kind, content, ladder_level, prompt_version）
 variant      变式题题面 / 首次作答 / 判读对错 / validated
@@ -216,13 +227,17 @@ variant      变式题题面 / 首次作答 / 判读对错 / validated
 | id | uuid PK | |
 | sample_id | uuid FK→blind_eval_samples | |
 | evaluator | text | 教练标识（Langfuse 账号名；仲裁人同列区分） |
+| source_score_id / source_version | text | 来源评分及修订版本，组合唯一用于同步去重 |
+| is_arbitrator | bool | 第三人仲裁标记，与初始两名教练区分 |
 | dimension | enum(guidance,correctness,level_fit,expression_safety,variant_difficulty) | 前四为引导效果组（数值），末为变式题质量组（档位） |
 | score_num | smallint? | 1–5，引导效果组 |
 | score_label | enum(on_par,too_easy,too_hard)? | 变式题质量组；展示层映射 相当/偏易/偏难 |
 | comment | text? | 自由评语 |
 | synced_at | timestamptz | 回写时间 |
 
-终值不物化，由 SQL 视图 `blind_eval_final` 计算：每 sample × dimension，无仲裁取 2 人均值，有仲裁取 3 人中位数；变式题质量组取多数档。仅终值可计算的样本（数值组与档位组均 ≥2 人评分）进入视图结果，评分未齐样本不参与日报聚合。日报与 Grafana 直接查视图，避免回写计算状态与原始评分漂移。
+终值不物化，由 SQL 视图 blind_eval_final 计算：每 sample × dimension 两名不同教练分差 ≤1 才取均值；分差 >1 必须等待第三名仲裁，取三人中位数，不能在等待仲裁时把两人均值算成终值。变式档位一致取该档，不一致等待第三人取多数。讲解组与变式组分别计算覆盖率和终值，无变式为 not_applicable，不排除已有完整讲解评分；评分未齐/待仲裁为 pending，均值旁报告有效/抽样/待评分样本数。
+
+评分同步按 Langfuse score_id + 源版本/更新时间唯一去重，同一来源重试不能新增一票；只追加的修订保留 history，终值视图每 evaluator × sample × dimension 仅选最新有效版本。第三人身份与仲裁触发状态显式记录，不能把同一人修改评分误当独立教练。
 
 ### 5.3 safety_blocks（core/safety 所有）
 
@@ -245,16 +260,19 @@ variant      变式题题面 / 首次作答 / 判读对错 / validated
 
 | 指标 | 数据源与口径 |
 |---|---|
-| 活跃用户（按天去重） | events：当日 distinct (owner_type='user', owner_id) |
+| 活跃用户（按天去重） | 当日 user 且有 learning_response_completed 的 distinct owner_id。动作事件echo_confirmed/followup_asked、认证失败、被限流及纯登录不算成功学习活跃 |
 | 会话数 | ai_sessions 按 created_at 日聚合，按 type 分列 |
 | 阶梯解锁深度分布 | session_steps：每会话 max(ladder_level) 的当日分布 |
-| 变式题首次做对率 | variant_attempts.first_correct 当日均值 |
+| 变式题首次做对率 | 按 answered_at（Asia/Shanghai）统计 first_correct 非空的首答；分母为成功判读首答数，分子为其中 correct=true。失败/待判读/未提交均不计错，单列数量 |
+| 变式触达/提交/判读覆盖 | 同一会话创建 cohort：已发布变式数/成功L1会话数、首答数/已发布变式数、有效判读数/首答数；按 final_level/模块/prompt/模型版本分组，同时报告分子分母和待完成数。迟到结果回补原 cohort，避免跨日错配 |
 | 听懂标记率 | 当日完成 L1 的会话中 understood_at 非空占比 |
 | 会话轮次分布 | session_messages 中 role='user' 且 kind∈(followup_q, variant_answer) 的每会话计数分布 |
 | 限额触顶率 | 当日有 quota_rejected 的 distinct 注册用户 / 当日活跃用户（访客额度触顶属漏斗范畴，另列） |
-| 触顶用户次日留存率 | D 日触顶用户中 D+1 有任一事件者占比；同看板并置"当日活跃未触顶用户次日留存"对照（NFR-REL-02 回审 O3 的判据） |
+| 触顶用户次日留存率 | D 日触顶用户中 D+1 有成功学习事件者占比；与同日学习活跃未触顶者对照，不能用认证失败等任意事件代表留存 |
 | 体验转化漏斗 | 当日 landing_page_viewed（指纹去重）→ guest_experience_started → guest_experience_completed → 同批指纹 7 日内 user_registered 归因转化（归因窗口见 §10-D2；首步数据源决策见 §10-D5） |
 | 盲评均分 / 偏易占比 | blind_eval_final 视图按 batch/iteration_tag 聚合（PBI-0020 AC"进日报"） |
+
+指标解释：首次做对率是已提交且成功判读样本的检验信号，单独不证明全部学生学会或引导优于其他教学方式。日报同时展示覆盖、样本量、判读正确性人工抽检（抽检有效首答的原题/变式/答案/判读依据，记录同意/异议及复核终值）；小样本、shortfall、数据写入失败须标质量提示，不以缺失填0或提高百分比。30人抽检不构成因果对照实验。
 
 级别段 × 模块交叉查询（AC2 证据形态，Grafana 同构 panel）：
 
@@ -283,7 +301,7 @@ WHERE e.event_type = 'ladder_unlocked' AND e.occurred_at >= current_date - 1;
 模块调用 LLM 网关
  → 输入内容安全前置（core/safety.check_text / check_image，命中即拒，写 safety_blocks + safety_blocked 事件）
  → 生成（流式）
- → 输出滑窗送检（命中截断，写 safety_blocks + safety_truncated 事件）
+ → 阶梯答案边界检查 + 待发布片段送检（通过才发布，失败终结）
  → 落库（safety 记录入 session_messages.safety，FEAT-002 §5.1 字段已预留）
  → Langfuse trace + token 计量
 ```
@@ -304,9 +322,10 @@ AI 内容渲染唯一入口 AiContent（§3.4），标识为渲染默认行为�
 
 - 盲评导出最小化：白名单字段（§5.2）不含任何身份字段；导出访问受控——Langfuse 邀请制账号（基线身份/安全节），样本数据落库可审计（exported_by）。字段白名单由测试强制（§9），防止后续迭代混入身份字段。
 - safety_blocks 仅经 DB / 日志后台访问，无用户侧接口；申诉核查动作为人工查询，不留自动化数据出口。
-- beacon 接口防护（无鉴权写入口）：仅接受事件目录注册类型，props 白名单（utm_source / referrer，其余拒收）；按 IP + 指纹限流防灌水；指纹服务端 hash 落库，不存原文。
+- beacon 接口仅接受 landing_page_viewed，props 白名单 utm_source/referrer；按 IP + 指纹限流，拒绝伪造服务端事件。内测期间该入口同样位于访问边界内，落地页暂缓时不部署公开采集入口。
 - 未成年人：本特性不新增个人信息收集；events / safety_blocks 中的 owner_id 访客侧为指纹 hash，不可逆。
 - 数据保留：events / safety_blocks / blind_eval_* 对齐 NFR-DATA-02（保留至 2027-01 考后复盘完成，之后按隐私政策执行）。
+- 注销删除优先于一般保留期：ops.purge_owner(uid) 清除 blind_eval context/评分/导出文件及 Langfuse 副本引用，events 按 FEAT-001 §4.3 去关联；safety.purge_owner 清除关联片段/对象引用。逐存储核验完成回执，不能只删除邮箱或主业务表；备份与恢复按同一删除清单执行。
 - 密钥：内容安全 / Langfuse API 凭据环境变量注入，不入仓（基线纪律）。
 
 ## 8. 失败行为矩阵
@@ -326,7 +345,7 @@ AI 内容渲染唯一入口 AiContent（§3.4），标识为渲染默认行为�
 ## 9. 测试策略
 
 - 单测（api，pytest）：
-  - 事件信封校验：未登记类型拒绝；会话域事件缺 session_id 拒绝；level_band 派生（level_snapshot 1/4/5/8 边界）。
+  - 事件信封校验：未登记类型拒绝；source_event_id重试去重；level_band由final_level的1/4/5/8边界派生；客户端伪造学习成功事件拒绝。
   - 滑窗送检器：窗口切分（句读边界、重叠）、命中截断时序、尾包终结送检、检测超时按截断处理。
   - 抽样分层：构造数据集验证四层各 ≥6、余量补齐至 30、shortfall 标记、同会话不重复入批次。
   - 仲裁与终值视图：分差 ≤1 取均值、>1 三人中位数、变式档位不一致取多数档的 SQL 视图用例。
@@ -343,9 +362,9 @@ AI 内容渲染唯一入口 AiContent（§3.4），标识为渲染默认行为�
 | 编号 | 事项 | 建议 | 路由 | 置信度 |
 |---|---|---|---|---|
 | D1 | BR-EVA-4 未定仲裁终值规则 | 终值取三人中位数（确定性、抗极端分）；变式档位不一致取多数档 | PO 确认（非阻塞，规则已按本建议写入 §3.3/§5.2） | 75 |
-| D2 | 漏斗"体验完成"与注册归因窗口口径 | 体验完成 = 会话内出现 understood_marked 或 variant_answered 之一（质量信号明确）；注册归因窗口 7 日（同日注册为主，留跨日余量） | PO 确认（非阻塞；PBI-0012/0013 发射事件时按本口径） | 70 |
+| D2 | 漏斗体验完成与注册归因 | 2026-11-11 修订统一 §3.1/§5.4 与 FEAT-001：完成是行为信号，注册归因最近一次窗口内体验，7×24h；非因果学习效果结论 | 当前设计口径，G3 检查一致性 | 95 |
 | D3 | 分享卡片角标与 EXIF/XMP 隐式标识（随 FEAT-004 恢复时落地） | 卡片图生成时写入 XMP 元数据 AIGC 标记（隐式）+ 图片右下角"AI 生成"角标（显式，FR-OPS-04 含分享卡片位）；由 FEAT-004 技术设计承接，本文不建 | 登记，FEAT-004 恢复时生效 | 85（与基线集成节既定方案一致） |
-| D4 | 输出滑窗 W=200 初始值 | 联调期按误拦率与截断前上屏量实测校准，只改配置 | 任务分解定稿 | 70 |
+| D4 | 输出待检窗口 W=200 初始值 | 联调按检测延迟/误拦率调参，未检片段绝不上屏；TTFT 包含等待 | 联调验证 | 90 |
 | D5 | 漏斗首步"落地页"数据源 | beacon 上报 `landing_page_viewed` 入 events：四步同一指纹身份可设备级归因、UTM 渠道入场即采集、JS 执行天然滤爬虫；Loki 访问日志保留基础设施职责并作 beacon 数据质量对照（§6.3），不进漏斗口径 | 已定（2026-10-23 架构评审定论） | 80 |
 
 ## 11. G3 追踪

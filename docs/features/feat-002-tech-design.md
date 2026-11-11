@@ -74,7 +74,7 @@ class LlmGateway(Protocol):
 | 槽位 | 内容 | 来源 |
 |---|---|---|
 | system | 角色设定 + BR-GUD 阶梯定义 + BR-LVL 级别约束 + 语气规则（BR-GUD-5） | 模板固定 |
-| level_syllabus | 所报级别考纲知识点摘要（1–8 级考纲表内置 api 配置） | ai_sessions.level_snapshot |
+| level_syllabus | 本会话确认级别的考纲摘要；0 表示考纲外，不套用 1–8 级考纲 | questions.final_level（确认后冻结） |
 | ladder_state | 当前阶梯与"允许输出边界"（L1 禁步骤禁代码；L2 禁完整代码；L3 全量） | 状态机当前态 |
 | question_context | 识别后题目文本 + 考点 + 代码片段/疑问点（如有） | questions + 会话创建输入 |
 | history | 会话内逐轮消息（图片首轮已转文本，后续轮次不带图，NFR-COST-03） | session_messages，超窗口截断策略见 3.4 |
@@ -84,7 +84,8 @@ class LlmGateway(Protocol):
 
 1. **识别结果**（structured_chat）：schema = `{question_text, knowledge_points[], judged_level(1-8 | "out_of_syllabus"), confidence(0-1), completeness("complete"|"partial"|"failed")}`。校验失败重试 1 次 → 仍失败触发 VL 升级（截图路径）或判定识别失败（文本路径/VL 已失败）。
 2. **变式题**（structured_chat）：schema = `{stem, ref_answer, ref_solution_code, test_data[{input, expected_output}], judge_mode("ai_read"|"exact_match")}`。校验失败重试 1 次 → 仍失败则本次变式生成失败（不计数，见 6.2）。
-3. **L1/L2 阶梯输出合规校验**（stream_chat 后置）：流式输出落库前经合规校验器——检出代码围栏块、完整可编译代码特征（连续多行含 `#include`/`int main` 等启发式）即判定违规；违规处理 = 丢弃该轮、以"输出边界违规"重生成 1 次，仍违规则放行 L 级重试耗尽内容中"去代码化"截断版本并记录质量事件 `ladder_compliance_violation`（入 events，纳入 L1/L2 合规失败率指标）。L3 不校验代码存在性。
+3. **L1/L2 用户可见前校验**：L1/L2 正文及同阶梯追问先完整缓冲候选，不向 SSE、续传缓存或历史消息发布未经校验的候选。校验 L1 无实现步骤、L1/L2 无完整可提交代码；代码特征规则只作为防线，须用答案泄露评测集验证，不能宣称启发式可证明语义正确。违规丢弃候选并重生成 1 次；仍违规时只返回预置的无答案提示，写质量事件 `ladder_compliance_violation`，不放行截断的违规候选。L3 可含代码，仍须内容安全检测。
+4. L1/L2 校验通过后按片段 SSE 交付；每个片段须内容安全检查通过才发布。L3 可以边生成边检查片段，检查通过再发布。候选重试和缓冲时间均计入用户首个可见正文字延迟，不以 meta/占位事件代替 TTFT；NFR-PERF-01 的 P75 ≤5s 不变，若实测不达标须优化或提交显式变更，不以内部模型首 token 冒充达标。
 
 ### 3.2 识别管线编排（OCR-first + VL 升级）
 
@@ -116,44 +117,50 @@ ocr 服务不可用/超时（10s）→ 降级 VL 通道 + 记录 ocr_fallback �
 
 规则：
 - 解锁仅允许相邻逐级（l1→l2→l3），禁止跳级（BR-GUD-3 与计数口径"L1→L2、L2→L3 各计 1 次"一致）；重复解锁同级拒绝。
-- 纠正重识别不限次数：同会话第 1 次免费（Redis reidentify 键放行），第 2 次起各计 1 次（BR-LMT-3，2026-10-24 PO 裁决细化）。
-- 追问不改变阶梯状态；回答深度按 level_snapshot 适配（BR-LVL-1）。
+- 纠正重识别不限次数：同会话第 1 次免费，由会话持久化计数原子认领；第 2 次起各计 1 次。Redis 仅缓存，跨日/重启不恢复免费次数（BR-LMT-3，2026-10-24 PO 裁决细化）。
+- 追问不改变阶梯状态；讲解与追问按冻结的 questions.final_level 适配（BR-LVL-1/3），仍遵守当前阶梯输出边界。
 - `out_of_syllabus=true` 的会话走同一状态机，system 槽位注入"通用讲解，不针对考级"标注要求（BR-LVL-5）。
 - 变式题每会话限 1 道（BR-VAR-3）；variant_pending 由"听懂标记"或用户主动 CTA 触发，未触发不推送。
 - 状态持久化在 ai_sessions.state；session_steps 记录每次解锁留痕（时间、解锁后级别、操作者），session_messages 记录逐轮内容。
+- `level_snapshot` 仅是创建时账号所报级别的审计快照。confirm 原子保存用户确认的 final_level 与 out_of_syllabus，之后该会话不可再改级别；生成、追问、变式与 level_band 统计均取 final_level，历史界面分别标明“创建时所报级别”和“本次讲解级别”。
 
 ### 3.4 上下文窗口与成本纪律
 
 - history 组装上限：优先保留 question_context + 最近 N 轮（初始 N=10），超出丢弃最早追问轮；GLM 上下文缓存命中以"前缀稳定"为原则组装（system + 题目上下文前置不变）。
 - 追问轮次不带图（基线 NFR-COST-03 落实点）：图片仅识别轮使用，识别结果文本化后进 history。
 - token 计量：每次调用 usage 写 session_messages.token_in/token_out，阶梯级聚合写 session_steps，Langfuse 按 trace 聚合成本（对照 NFR-COST-02 基线）。
+- 用户额度之外独立执行资源保护（包括不计次的识别、内部重试和访客追问）：单会话同一时刻仅 1 个生成操作，单调用输入 ≤16000 tokens、输出 ≤4096 tokens、执行 ≤120s；访客会话累计最多 40 次模型调用（含识别/重试）及 64000 输出 tokens。均为初始可配置保护值，联调须证明正常完整体验可完成；保护值不等于新增收费次数。
+- 每次真实模型调用前原子预留该调用最大 token 预算，结束后按 usage 结算、释放未用预留；异常无法取得 usage 时保守结算预留，不因失败回滚而无限重试。预算状态持久化到 session_resource_usage；Redis 缓存丢失不重置预算。识别尚无 session_id 时先创建内部会话与预算记录，失败不消耗产品日额度。
+- 所有生成入口执行 owner/IP 频率保护：初始 owner 每分钟 6 次、IP 每分钟 30 次、全局模型并发上限由部署配置明确；不计次入口同样受控。超频返回 429 resource_rate_limited + retry_after，不扣日额度；会话预算耗尽返回 409 session_resource_exhausted，不再调用模型，已生成内容可回看。
 
 ## 4. REST / SSE 接口（tut 模块对外契约）
 
 统一约定：
 - 认证：登录态（FEAT-001 交付的会话凭证）；访客会话接口同一组，以 `owner_type` 区分（见 5.3）。
 - 流式接口一律 POST + SSE（`text/event-stream`），前端 fetch + ReadableStream 消费（EventSource 不支持 POST）。
-- SSE 事件类型：`meta`（prompt_version、ladder_level、message_id）→ `chunk* {delta}` → 终结三选一：`done {usage}` / `safety_truncated {reason}` / `error {code, message}`。
-- 断连续传：已发分片缓冲于 Redis `stream:{message_id}`（TTL 至本轮结束后 10 分钟）；客户端重连带 `Last-Event-ID`/游标补发后继续。
+- SSE 事件类型：`meta`（operation_id、prompt_version、ladder_level、message_id）→ `chunk* {delta}` → 唯一终态：`done {usage}` / `safety_truncated {reason}` / `error {code, message}`。每事件有单调 event_id，只有已通过两类检查的用户可见内容才能进入续传缓存。
+- 业务 POST 必带 Idempotency-Key，键作用域为 owner + session + action；同键同请求返回原 operation_id/流，不再次扣次、生成或推进状态，同键不同请求体返回 409。终态失败需用户显式“重新生成”使用新键，按既有失败不退次规则计次；网络自动重连禁止换键。
+- 断连续传使用 `GET /api/tut/operations/{operation_id}/events?after={event_id}`，校验当前 owner 后补发再跟随；不重发业务 POST。断开连接不取消已受理操作，由 FastAPI 生命周期管理的执行任务在超时内继续；进程退出后持久化的未完操作标为 interrupted，不自动重放计费动作。缓存过期：完成态从消息正文恢复，未完成/失败态显示明确终态，禁止把半条内容当完成。
+- 每会话通过 PG 行锁 + 唯一活动操作约束认领，状态校验、操作记录及额度决策可恢复；成功发布正文后才提交阶梯升级。Redis 日额度扣减用 operation_id 幂等账本与原子脚本，PG quota_usage 以 operation_id 唯一补记；崩溃重试先核对账本，避免双扣。阶梯失败维持原级别，日额度仍按已放行扣减。
 - 超限响应：`429 {code:"quota_exhausted", reset_at}`（次日 0 点）；进行中的流不中断（BR-LMT-5）。
 
 | 接口 | 说明 | 计数 |
 |---|---|---|
 | POST /api/uploads | 签发 OSS 私有桶签名 PUT URL（类型白名单 image/*，≤10MB） | 不计 |
 | POST /api/tut/sessions | 创建会话并同步执行识别管线；入参 `{text? \| image_oss_key?, code_snippet?(≤5000), question_note?}`；返回 `{session_id, echo}` 或 422（无效输入/识别失败） | 不计 |
-| POST /api/tut/sessions/{id}/reidentify | 同会话重识别不限次数：第 1 次免费（Redis `reidentify:{session_id}` SET NX 放行），第 2 次起走 consume；走 VL 通道 | 第 1 次不计，第 2 次起各计 1 次（BR-LMT-3，2026-10-24 PO 裁决细化） |
+| POST /api/tut/sessions/{id}/reidentify | 仅 pending_confirm 可用；持久化计数原子认领首次免费，第 2 次起走 consume；走 VL 通道，受独立资源预算保护 | 第 1 次不计，第 2 次起各计 1 次 |
 | POST /api/tut/sessions/{id}/confirm | 提交确认/纠正（question_text/knowledge_points/level）→ 记录纠正 → SSE 流式输出 L1 | **计 1 次**（发起讲题口径） |
 | POST /api/tut/sessions/{id}/unlock | `{target:2\|3}`，校验相邻逐级 → SSE 流式输出 L2/L3 | 各计 1 次 |
 | POST /api/tut/sessions/{id}/followups | `{question}` → SSE 流式回答 | 计 1 次 |
 | POST /api/tut/sessions/{id}/understood | 听懂标记（幂等） | 不计 |
-| POST /api/tut/sessions/{id}/variant | 生成 + 校验变式题，同步返回 `{stem}`（超时 60s，内含校验重试） | 生成+判读合计计 1 次，在生成成功时计 |
-| POST /api/tut/sessions/{id}/variant/answer | `{answer}` → AI 判读 `{correct, feedback}` | 不另计（已含于上） |
+| POST /api/tut/sessions/{id}/variant | 预留日额度 → 生成并真实运行校验 → 返回 `{stem}`；超时 60s；同会话单操作，校验器未就绪返回 503 validation_unavailable | 成功发布题面时将预留转为扣减，失败释放预留，不下发未校验题 |
+| POST /api/tut/sessions/{id}/variant/answer | `{answer}` → 判读 `{correct, feedback}`；首份合法作答原子写入，重复请求返回原判读，不覆盖 first_answer/first_correct | 不另计（已含于生成动作）；判读失败保留原作答、幂等重试同一任务 |
 | GET /api/tut/sessions?cursor= | 历史列表，按最后活跃倒序，分页 | 不计 |
 | GET /api/tut/sessions/{id} | 完整回看：echo + messages + steps + variant + understood | 不计 |
 
 说明：
 - 创建会话时不计数、确认后首轮 L1 生成才计数——这是"识别失败/无效输入不计数"（PBI-0006/0007 AC）与"发起=识别+首轮讲解计 1 次"（BR-LMT-2）两条规则的相容解：计数点落在 confirm 触发的 L1 生成动作上；生成失败（LLM 错误）已计次数不退还、重试按新请求计次（2026-10-24 PO 裁决：先计后调防失败重试绕过，故障损失由运营个案兜底）。
-- 计数判定前置：每个计费动作先经 lmt 接口 `consume()` 检查+扣减，超限时动作被拒绝、会话状态不推进；仅"输出被安全截断"场景计数照计（已发生推理成本，记录支撑申诉，FR-OPS-03）。
+- 计数判定前置：一般计费动作先 `consume()` 放行并扣减；变式题例外，先 `reserve()` 保证额度再生成，成功发布时 `commit()`，生成/校验失败 `release()`。同 owner 的所有放行都检查 used + reserved，防并发绕过；预留按 operation_id 幂等，失联由操作终态恢复任务结算，不能在任务仍运行时仅靠 TTL 自动释放。内部资源消耗仍计入资源预算。
 
 ## 5. 数据设计（字段级）
 
@@ -185,7 +192,8 @@ ocr 服务不可用/超时（10s）→ 降级 VL 通道 + 记录 ocr_fallback �
 | owner_id | text | user_id 或 guest 指纹 hash |
 | type | enum(tut,dia,exa_review) | 本特性仅 tut；枚举为框架共用预留 |
 | state | enum | 见 3.3 状态机 |
-| level_snapshot | smallint? | 创建时所报级别快照（BR-LVL-4）；考纲外会话为 null |
+| level_snapshot | smallint? | 创建时所报级别审计快照（BR-LVL-4）；未提供则null，不因判定考纲外覆写 |
+| reidentify_count | int default 0 | 会话生命周期内已放行的重识别次数，事务内递增；跨日不重置 |
 | out_of_syllabus | bool | 通用讲解模式标注 |
 | question_id | uuid FK→questions | |
 | understood_at | timestamptz? | 听懂标记（幂等，重复标记不更新） |
@@ -234,21 +242,25 @@ ocr 服务不可用/超时（10s）→ 降级 VL 通道 + 记录 ocr_fallback �
 
 索引：`ai_sessions(owner_type, owner_id, last_active_at desc)`、`session_messages(session_id, seq)`、`session_steps(session_id, ladder_level)`、`variant_attempts(first_correct)`（金标准聚合）、`questions(created_at)`（A-Q6 抽样）。
 
+**generation_operations / session_resource_usage**（core/session 所有）：前者记录 id、session_id、owner、action、idempotency_key、request_hash、message_id、status（accepted/running/succeeded/failed/interrupted）、前后阶梯、终态错误及开始/结束时间；唯一约束 `(owner, session_id, action, idempotency_key)`，同会话仅一个活动生成操作。后者记录 session_id、model_calls_used/reserved、output_tokens_used/reserved；预算结算以 operation_id + 内部调用序号唯一，重试不能重复结算。
+
+用户删除时一并清除操作、预算、消息和变式记录；quota_usage 通过所属模块清理。operation 状态是恢复事实源，连接状态不代表业务终态。首次作答以 session_id 唯一行 + 条件写入锁定，判读失败为 pending/error，不能写 first_correct=false。
+
 ### 5.2 Redis 键（在基线已列键之外的新增项）
 
 | 键 | 结构/TTL | 用途 |
 |---|---|---|
 | quota:user:{uid}:{yyyymmdd} | counter，至次日 0 点 | 基线已列，判定源 |
 | quota:guest:{fp}:{yyyymmdd} | counter，至次日 0 点 | 基线已列，体验额度 |
-| reidentify:{session_id} | flag，至次日 0 点 | 同会话第 1 次重识别免费放行标记；第 2 次起走 consume 计次 |
+| reidentify:{session_id} | 可淘汰缓存，非判定源 | 免费次数以 ai_sessions.reidentify_count 为准，缓存跨日失效不影响权益 |
 | stream:{message_id} | list，TTL=轮次结束+10min | SSE 分片缓冲与断连续传 |
 
-计数口径：Redis 计数器为超限判定源（INCR 原子），quota_usage 表同步写流水（动作明细，支撑触顶率与次日留存日报）。扣减后 LLM 调用失败/中断不退还（无 DECR 回退路径），流水标 `failed`；重试按新请求计次（2026-10-24 PO 裁决）。
+计数口径：Redis 脚本原子检查 used+reserved 并以 operation_id 幂等放行，quota_usage 以 operation_id 唯一补记流水。一般扣减后 LLM 失败不退还；变式未发布仅释放预留（见§4）。额度日固定于受理时的 Asia/Shanghai 日期，跨日恢复不向新日期重复扣次；操作与结算账本保留至本次恢复完成，不能随日计数零点清理。
 
 ### 5.3 访客会话承载（FEAT-001 接口点，本特性仅预留）
 
 - `owner_type=guest` 时 owner_id = 设备指纹+浏览器标识的 hash；体验额度判定走 quota:guest 键。
-- BR-LMT-4 口径：guest 会话创建即计 1 次体验（在 confirm/L1 生成点扣减，与登录口径同点），会话内 unlock/followup/variant 动作**跳过计数**（lmt.consume 对 owner_type=guest 且当日已有体验记录的动作直接放行）。
+- BR-LMT-4 口径：guest 在 confirm/L1 生成点扣减 1 次体验；仅该已确认会话内 unlock/followup/variant 跳过产品日额度计次。服务端验证 owner、该 session 的体验放行记录及资源预算；仅有同 owner 其他体验记录不能放行新会话。
 - 体验转注册（PBI-0013）时的会话归属迁移在 FEAT-001 技术设计中定稿；本设计保证 owner 字段可更新即可。
 
 ## 6. 横切集成
@@ -256,24 +268,28 @@ ocr 服务不可用/超时（10s）→ 降级 VL 通道 + 记录 ocr_fallback �
 ### 6.1 内容安全（NFR-SAFE-01，core/safety）
 
 - 输入：所有用户文本（题目文本/疑问点/代码片段/追问/变式作答）同步 check_text 前置；截图经 check_image 前置。命中 → 422 `safety_blocked`，不计数，写拦截日志流（独立日志，FR-OPS-03 申诉核查上下文）。
-- 输出：LLM 网关在 SSE 分片上做滑窗送检（对齐基线：命中即截断，不整体送检）；截断 → `safety_truncated` 事件 + 会话页提示 + 记录；该次计数照计（见 4 说明）。
-- 残余风险承基线结论：截断前少量分片可能上屏，拦截记录支撑申诉。
+- 输出：LLM 网关对待发布片段送检，检测通过才写 SSE/续传缓存；命中或超时不发布待检片段，终结为 safety_truncated。已通过检测的早先片段可保留，该次计数照计。语义漏检仍是需真实样例回归验证的残余风险，不能用事后撤回补救提前上屏。
 
 ### 6.2 限额服务（modules/lmt 进程内接口）
 
 ```python
 class QuotaService(Protocol):
-    def consume(self, owner: OwnerRef, action: QuotaAction, session_id: str) -> ConsumeResult: ...
+    def consume(self, owner: OwnerRef, action: QuotaAction, session_id: str, operation_id: str) -> ConsumeResult: ...
+    def reserve(self, owner: OwnerRef, session_id: str, operation_id: str) -> ConsumeResult: ...
+    def commit(self, operation_id: str) -> None: ...
+    def release(self, operation_id: str) -> None: ...  # 仅释放未提交预留，不是失败退款
     def remaining(self, owner: OwnerRef) -> int: ...
 ```
 
-`QuotaAction = session_create | unlock | followup | variant`（dia/exa 动作由对应特性扩展）。ConsumeResult 含 allowed / remaining / reset_at。框架层在每个计费动作调用；guest 跳过规则内置于 consume（见 5.3）。无 refund 路径：放行后 LLM 失败/中断不退还，重试按新请求计次（2026-10-24 PO 裁决）。用量展示（FR-LMT-02）经 GET /api/lmt/usage（lmt 模块自有路由，FEAT-005 定稿，本文不展开）。
+`QuotaAction = session_create | unlock | followup | variant | reidentify`（dia/exa 动作由对应特性扩展）。ConsumeResult 含 allowed / remaining / reset_at，其中 remaining 扣除有效预留。guest 免费内部动作仍校验会话所属与首次 confirm 已放行记录，再检查资源预算，不能仅凭“当日有任意体验记录”放行其他未确认会话。无 refund 路径：一般动作放行后 LLM 失败/中断不退还；变式失败仅释放尚未提交的预留。GET /api/lmt/usage 展示可用额度并区分短暂处理中预留。
 
 ### 6.3 埋点（modules/ops 进程内接口）
 
 本特性产生的事件类型（写 events 表，供 FR-OPS-01 日报取数）：
 
 `session_started, recognition_succeeded(route), recognition_failed(reason), echo_confirmed, echo_corrected, reidentify_used, ladder_unlocked(level), ladder_compliance_violation(level), followup_asked, understood_marked, variant_pushed, variant_answered(correct), quota_rejected(action), safety_blocked(stage), ocr_fallback`
+
+成功学习另发 learning_response_completed：仅在 confirm/unlock/followup 的有效正文发布成功，或 variant/answer 判读成功后按 operation_id 幂等发射。echo_confirmed/followup_asked 是动作事件，不能用来代替成功学习活跃；失败/只有占位/安全终止无有效结果不发成功事件。
 
 金标准指标取数路径：变式题首次做对率 = variant_attempts.first_correct 聚合；听懂标记率 = ai_sessions.understood_at 聚合；解锁深度分布 = session_steps 聚合。
 
@@ -302,10 +318,10 @@ class QuotaService(Protocol):
 | GLM 429/5xx/超时 | 网关内重试 1 次（指数退避）；仍失败 → SSE error 事件 | 已扣额度不退还，流水标 `failed`（2026-10-24 PO 裁决） |
 | 输入安全命中 | 422 safety_blocked + 申诉入口提示 | 不计 |
 | 输出安全命中 | 流截断 + safety_truncated 事件 + 提示 | 照计（记录支撑申诉） |
-| L1/L2 合规校验违规 | 重生成 1 次；再违规 → 去代码化截断版本 + 质量事件 | 照计 |
-| 变式生成/校验失败（重试 2 次后） | 失败提示，可稍后重试 | 不计 |
+| L1/L2 合规校验违规 | 候选不上屏，重生成 1 次；再违规 → 预置无答案提示 + 质量事件，状态不升级 | 照计 |
+| 变式生成/校验失败（最多2次候选，含首次） | 失败提示、校验记录留痕，不下发题面 | 释放未提交预留；内部调用消耗资源预算 |
 | 限额超限 | 429 quota_exhausted + 次日恢复提示 + 非 AI 功能引导；进行中流不中断 | — |
-| SSE 断连 | Redis 缓冲续传（Last-Event-ID）；缓冲过期则客户端重拉该轮完整消息 | — |
+| SSE 断连 | GET 操作流游标续传，不重执行 POST；缓存过期按操作终态恢复，进程中断显式 interrupted | 同操作不再扣次 |
 
 ## 9. 测试策略
 
@@ -320,21 +336,24 @@ class QuotaService(Protocol):
 - 接口测试：J1 全旅程 API 级（LLM 网关注入 fake，确定性输出）；SSE 事件序列断言（meta→chunk*→done）；429/422 分支；断连续传。
 - 评测集（A-Q6 承接）：开发期收集真实 OJ 题面/评测截图建回归集，统计 OCR 命中率、VL 升级率、识别准确率；阈值 TH_OCR 据实测定稿。
 - 性能：TTFT 埋点在联调环境对 GLM 实测，验证 NFR-PERF-01（P75 ≤ 5s）；结果入 A-Q 跟踪。
+- 评审回归：捕获 SSE/续传/历史三条用户可见路径，注入首轮与重试均含完整代码的 L1/L2 候选，均不得泄露；TTFT 包含全候选校验时间。确认级别与账号快照不同时，prompt/追问/变式/日报均取 final_level。
+- 故障与并发：双击同键、同键不同体、不同键并发解锁、断连续传、扣额度后进程退出、变式预留后崩溃恢复、首答并发与判读重试；同操作最多一次扣次/升级/首答写入，错误不能被误记为答错。
+- 资源保护：访客无限追问、仅创建不 confirm、免费重识别跨日、Redis 缓存丢失、内部重试超预算；保护生效不消耗额外产品次数，正常完整体验仍可完成。
 - Mock 边界：LLM 网关可注入 fake（契约级 mock）；ocr/内容安全/OSS 以本地容器或 stub。
 
 ## 10. 基线缺口与开放决策
 
-### D1（阻塞 PBI-0010，路由 PO + 可能 GB/ADR）：变式题"运行校验"与 judge0 时序冲突
+### D1（阻塞 PBI-0010，路由 GB）：保留运行校验，申请 judge0 校验能力前置
 
-PBI-0010 AC / BR-VAR-3 要求"参考解在构造测试数据上**运行通过**"才可下发；但基线将 judge0 服务组排在 P1（2026-12 上旬），P0 内测期无代码执行能力。两者不可兼得，须在 PBI-0010 启动前决策：
+PBI-0010 AC 要求参考解在构造测试数据上真实运行通过。2026-11-11 评审修订保留该要求，不采用双 LLM 代替运行的过渡实现；基线仍将 judge0 排在 P1，故提出 [ADR-001](../architecture/adr/ADR-001-p0-variant-validation.md) 申请仅将变式题校验所需 judge0 能力前置，模考产品范围与 P1 节奏不变。该 ADR 为 draft，未获 GB 人工 go 前不得改写已批准基线或放行依赖该能力的 PBI-0010。
 
 | 方案 | 内容 | 代价/风险 | 推荐度 |
 |---|---|---|---|
-| A | judge0 最小部署提前到 P0，仅用于变式题校验 | 与 A-Q1（沙箱参数调优未定）、A-Q2（单机容量评审未做）冲突，提前承担运维与容量风险 | 置信度 35，不推荐 |
-| B（推荐） | P0 过渡期校验降级为"双 LLM 交叉校验 + 题型约束"：变式题约束为答案唯一可判读题型（输出预测/结果填空），生成器产出后由独立第二调用（不同 prompt 角色）交叉验证参考解在构造数据上的预期输出，双通道一致才下发；P1 judge0 上线后切换为真实运行校验（validated 字段与校验接口已预留，切换只改校验器实现） | 质量防线弱于真实运行；以题型约束与 BR-EVA 盲评难度校准对冲；需 PO 修订 BR-VAR-3 增加 P0 过渡条款并同步 PBI-0010 AC | 置信度 70，推荐 |
+| A（待 GB） | judge0 最小部署提前到 P0，仅用于变式题校验 | 提前完成 A-Q1 隔离验证与 A-Q2 容量验证，不能在 api 进程直接执行生成代码 | 保留既定 AC；可行性待验证 |
+| B（不采用） | 双 LLM 交叉判断替代真实运行 | 不满足已定“运行通过”AC，不得置 validated=true | 不作为当前实现 |
 | C | PBI-0010 整体延后至 P1 | 金标准"变式题首次做对率"在 P0 内测期无数据源，"效果闭环前置"决议（2026-10-22）落空 | 置信度 20，不推荐 |
 
-按纪律：方案 B 涉及 PRD 业务规则文本修订（BR-VAR-3 过渡条款），属 PO 决策，不构成本基线变更；方案 A 属架构时序变更，须走 GB/ADR。本文按方案 B 编写数据与接口设计（validated/validation_detail 字段兼容两种校验器），待 PO 裁决后回填本节结论并更新 PBI-0010 AC。
+运行校验契约：独立沙箱中参考解对全部构造数据编译/执行成功且输出匹配才置 validated=true；记录验证器版本、代码/测试数据摘要及逐用例结果。编译错误、超时、输出不匹配或校验器不可用均不下发、不提交日额度预留。运行通过只能证明这些用例一致，不能代替教练对题意与难度的抽检。
 
 ### D2（非阻塞，随任务分解定稿）：TH_OCR 初始阈值
 

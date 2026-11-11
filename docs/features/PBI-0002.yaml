@@ -17,3 +17,5 @@ dependencies: [PBI-0001]
 references:
   - "docs/product/prd/03-functional-requirements.md (FR-ACC-02)"
   - "docs/product/prd/04-business-rules.md (BR-LVL)"
+  - "docs/features/feat-001-ux-ui-design.md"
+  - "docs/features/feat-001-tech-design.md"

@@ -10,6 +10,7 @@ user_story:
   i_want: "在结果页看到注册能解锁什么，并一键进入注册"
   so_that: "顺理成章地成为正式用户"
 acceptance_criteria:
+  - "体验发起、完成与注册按统一事件目录记录；首次注册在体验开始后7×24小时内归因于最近一次合格体验，重复登录不算注册，跨日归因与会话归属迁移不重复计数（证据：同日/跨日/多次体验/重复登录漏斗回归）"
   - "体验会话结果页（变式题反馈 + 讲解回顾）内嵌注册引导，文案锚定“注册解锁每日 15 次额度 + 错因诊断 + 错题本”（FR-ACC-07）（证据：UI 检查）"
   - "从结果页进入并完成注册的用户，当日即可按正式 15 次额度使用（证据：流程测试）"
   - "体验转化漏斗（体验发起→体验完成→注册）各环节计数可统计、可分日查询（证据：埋点数据检查）"
@@ -17,3 +18,5 @@ dependencies: [PBI-0012, PBI-0001]
 references:
   - "docs/product/prd/03-functional-requirements.md (FR-ACC-07)"
   - "docs/product/prd/02-user-journeys.md (J0)"
+  - "docs/features/feat-001-ux-ui-design.md"
+  - "docs/features/feat-001-tech-design.md"

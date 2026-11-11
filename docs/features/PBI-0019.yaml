@@ -9,12 +9,34 @@ user_story:
   as_a: "产品负责人"
   i_want: "每天看到核心效果指标的日报"
   so_that: "用数据判断 H1/H6/H8 是否成立、限额值是否合理"
+# 范围：埋点事件契约（目录制信封）、events 表与索引、日报取数口径（SQL）、Grafana 看板与日报快照 CLI、关键事件与盲评导出对账抽查
+# 非范围：埋点事件的生产动作（各特性 PBI 按事件目录契约发射：FEAT-002 会话事件归 PBI-0006~0011、quota_rejected 归 PBI-0005、注册与体验漏斗事件归 PBI-0012/0013）；盲评抽样/评分/仲裁（PBI-0020）；内容安全过滤（PBI-0021）；AI 显式标识（PBI-0022）；分享回流指标数据源随 FEAT-004 暂缓（feat-006-tech-design 1）
+# UX/UI：无用户可见面；运营面为 Grafana 看板（工具自带 UI + provisioning JSON）与日报 markdown 快照 CLI，无自研 UI——G3 design-ready 不适用
 acceptance_criteria:
-  - "以下指标可按日产出日报：活跃用户（按天去重）、会话数、阶梯解锁深度分布、变式题首次做对率、听懂标记率、会话轮次分布、限额触顶率、触顶用户次日留存率、体验转化漏斗（体验发起→体验完成→注册）（FR-OPS-01, NFR-REL-02）（证据：日报输出样例核对）"
-  - "埋点数据支持按所报级别段（1-4 / 5-8）× 模块（讲题 / 诊断）交叉查询（BR-EVA 分层抽样需要）（证据：查询示例）"
-  - "解锁留痕、变式首次作答等关键事件带会话标识，可与盲评导出数据对得上（证据：数据一致性抽查）"
-dependencies: []
+  - "日报同板报告变式触达率、首答提交率、有效判读覆盖、首次正确率及各自分子分母；未提交/待判读/判读失败不得填为答错，迟到结果回补原cohort，小样本与缺数明确提示（证据：跨日、缺失、失败样本的日报对拍）"
+  - "学习活跃与次日留存仅按成功学习事件统计，纯登录、认证失败与限流不计；客户端beacon不能伪造注册或学习成功事件（证据：事件白名单和日报口径测试）"
+  # 正常路径：日报产出（FR-OPS-01、NFR-REL-02；逐指标取数口径映射见 feat-006-tech-design 5.4）
+  - "以下指标可按日产出日报：活跃用户（按天去重）、会话数、阶梯解锁深度分布、变式题首次做对率、听懂标记率、会话轮次分布、限额触顶率、触顶用户次日留存率、体验转化漏斗（体验发起→体验完成→注册）、盲评均分与变式题偏易占比（FR-OPS-01, NFR-REL-02）（证据：日报 CLI 输出样例核对 + Grafana 看板 panel）"
+  - "触顶用户次日留存率与同日活跃未触顶用户次日留存同板并置对照（NFR-REL-02 回审 O3 限额值的判据；feat-006-tech-design 5.4）（证据：看板 panel 核对）"
+  - "日报首版可先覆盖已上线特性指标，其余随生产者特性上线逐步补全，不阻塞本 PBI 交付；每指标上线时取数口径同步登记（证据：看板 panel 清单演进记录）"
+  # 交叉查询：BR-EVA 分层抽样的数据前提（feat-006-tech-design 5.1）
+  - "埋点数据支持按级别段（1-4 / 5-8）× 模块（讲题 / 诊断）交叉查询：module 与 level_band 在事件发射时派生固化为列，日报查询不回联业务表（BR-EVA 分层需要）（证据：交叉查询 SQL 示例）"
+  # 事件契约：目录制防口径漂移（feat-006-tech-design 3.1）
+  - "事件类型必须先登记入目录再发射，record 对未登记类型拒绝并告警——目录即契约（证据：未登记类型拒绝的单测）"
+  - "会话域事件必须携带 session_id；module / level_band 由会话框架统一填充，调用方不传（证据：单测 + 事件记录抽查）"
+  - "访客事件 owner_id 为设备指纹 hash（不可逆、不存原文），注册用户为 user_id（未成年人保护；feat-006-tech-design 4/7）（证据：数据记录检查）"
+  # 对账：与盲评导出双侧一致（PBI-0020 对账依据；feat-006-tech-design 5.4 一致性抽查 SQL）
+  - "解锁留痕、变式首次作答等关键事件带会话标识，与盲评导出数据经 session_id join 双侧一致（证据：数据一致性抽查 SQL 执行记录）"
+  # 异常路径：度量完整性让位于用户旅程（feat-006-tech-design 3.1 写入纪律 / 8 失败行为矩阵）
+  - "events 写入失败仅记日志与 event_record_failures 计数指标，不阻断业务流；失败率入 Grafana 监控（证据：故障注入测试 + 指标检查）"
+  - "落地页beacon仅接受landing_page_viewed及utm_source/referrer白名单，不能发送其他目录事件；按IP+指纹限流，内测环境访问边界同样有效（证据：伪造事件拒绝、接口限流与访问边界测试）"
+  - "Grafana 或 PG 只读账号异常导致日报不可用时按 P2 告警当日处理（feat-006-tech-design 8）（证据：告警规则配置检查）"
+  # 边界与合规
+  - "events 等用户行为数据保留至 2027-01 考后复盘完成，之后按隐私政策执行（NFR-DATA-02）（证据：保留策略配置检查）"
+dependencies: [PBI-0008]
 references:
   - "docs/product/prd/03-functional-requirements.md (FR-OPS-01)"
-  - "docs/product/prd/05-nfr.md (NFR-REL-02, NFR-DATA-01)"
+  - "docs/product/prd/05-nfr.md (NFR-REL-02, NFR-DATA-01, NFR-DATA-02)"
   - "docs/product/prd/04-business-rules.md (BR-EVA)"
+  - "docs/architecture/architecture-baseline.md (可观测性：Grafana/Langfuse)"
+  - "docs/features/feat-006-tech-design.md (3.1 事件契约 / 4 对外接口 / 5.1 events 表 / 5.4 日报取数口径 / 8 失败行为)"

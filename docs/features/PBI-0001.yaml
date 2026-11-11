@@ -19,3 +19,5 @@ dependencies: []
 references:
   - "docs/product/prd/03-functional-requirements.md (FR-ACC-01)"
   - "docs/product/prd/02-user-journeys.md (J0)"
+  - "docs/features/feat-001-ux-ui-design.md"
+  - "docs/features/feat-001-tech-design.md"
