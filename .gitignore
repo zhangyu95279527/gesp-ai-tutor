@@ -13,3 +13,6 @@ coverage/
 
 # 本机依赖查询缓存
 .cache/
+
+# 本机生成的 HTML 分享压缩包，设计源文件已入仓
+.trae-html-share-packages/

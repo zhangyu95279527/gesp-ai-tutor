@@ -57,3 +57,10 @@ House rules:
 - Commit durable artifacts and completed increments.
 - Never commit secrets or private data.
 - Instance naming overrides live in `.agent/local/project-context.md`; platform-side git policy (branch protection, reviewer mapping, direct-push exceptions) lives in `.agent/local/git-policy.yaml`. `.agent/local/` and `docs/` belong to the product instance and are never overwritten by template updates.
+
+## Large file chunked writing
+A single reply has a hard output-length limit. To avoid truncation ("output too long, type continue"):
+- Never write more than ~300 lines (or ~50KB) of content in one tool call. Write the first chunk, then append the rest with multiple Edit calls; keep each chunk under ~300 lines.
+- Chain the chunks continuously within the same turn. Do not pause between chunks and do not ask the user to confirm or type "continue".
+- Prefer extracting shared assets (common CSS, components, constants, SVG sprites) so individual files stay small.
+- Keep prose to the user minimal during long writes; spend the output budget on file content.
