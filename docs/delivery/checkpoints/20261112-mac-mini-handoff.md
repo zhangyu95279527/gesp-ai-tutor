@@ -9,7 +9,8 @@
 ## Verified
 
 - GitHub账号/仓库权限核对通过；两个新组件仓均private。
-- API/Web推送main和全部本地分支成功，远端ref应与本地逐条核对后结束迁移准备。
+- 已用git ls-remote逐条核对全部本地分支：交付仓5个、API13个、Web11个，远端SHA均一致；三仓工作区干净，default_branch均为main，Mac克隆需显式选择换机分支。
+- GitHub API读取时，三仓换机分支均未返回工作流运行记录；没有将远端CI标为通过。
 - 受跟踪文件的常见令牌/私钥模式与.env文件检查未发现命中（不等于完整安全审计），忽略目录未加入提交。
 - API ruff包含src/tests/migrations通过；SMTP启动参数按本机已安装aiosmtpd帮助确认。前一轮业务基线API227/Web109，不将其标成Mac运行证据。
 
