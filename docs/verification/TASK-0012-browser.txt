@@ -1,0 +1,46 @@
+- main:
+  - link "GESP AI 辅导":
+    - /url: /
+  - link "资料与备考级别":
+    - /url: /settings
+  - complementary:
+    - paragraph: 一起把题读明白
+    - heading "从一道题， 开始理清思路。" [level=1]:
+      - text: 从一道题，
+      - text: 开始理清思路。
+    - paragraph: 粘贴题干或截图，附上你的代码和疑问。
+    - paragraph: 识别后先确认题目，再一步一步展开讲解。
+  - region "把卡住你的题目放在这里":
+    - paragraph: 题目输入
+    - heading "把卡住你的题目放在这里" [level=2]
+    - paragraph: 识别服务暂未开放，目前可以在本页整理和预览题目。内容仅保留在当前页面，刷新后会清空。
+    - generic: 题目文本或截图
+    - textbox "题目文本或截图":
+      - /placeholder: 在这里 Ctrl+V 粘贴题目文字或一张截图，也可以点击下方选择图片。
+      - text: 输入一个正整数 n，求出 n 的各位数字之和并输出结果。
+    - generic: 28 / 10000 字符
+    - text: 选择截图
+    - button "选择截图"
+    - button "清除题目"
+    - paragraph: 文字最多 10000 字符；单张 PNG / JPEG / WebP 图片最多 10MB。文字和截图选其一。
+    - generic: 你的代码 （选填）
+    - textbox "你的代码 （选填）": "int n; cin >> n; while (n > 0) { n /= 10; }"
+    - paragraph: 43 / 5000 字符
+    - generic: 哪里没想明白？ （选填）
+    - textbox "哪里没想明白？ （选填）":
+      - /placeholder: 例如：不明白为什么循环在这里结束。
+      - text: 怎样取到每一位数字？
+    - alert
+    - button "预览输入"
+    - generic: 整理与预览不计次数
+    - region "输入预览":
+      - heading "输入预览" [level=2]
+      - paragraph: 这是你提供的原始内容。识别服务开放后，将回显题目、考点和级别供你确认。
+      - paragraph: 输入一个正整数 n，求出 n 的各位数字之和并输出结果。
+      - heading "附加代码" [level=3]
+      - generic: "int n; cin >> n; while (n > 0) { n /= 10; }"
+      - heading "疑问点" [level=3]
+      - paragraph: 怎样取到每一位数字？
+      - button "识别暂未开放" [disabled]
+- button "Open Next.js Dev Tools":
+- alert

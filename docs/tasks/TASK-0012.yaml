@@ -1,0 +1,32 @@
+id: TASK-0012
+pbi_id: PBI-0006
+status: in-verification
+owner_role: Developer
+objective: "实现PC统一题目输入与浏览器本地预览基础"
+depends_on: []
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0006.yaml"
+  - "docs/features/feat-002-ux-ui-design.md"
+  - "docs/features/feat-002-tech-design.md"
+  - "docs/features/pbi-0006-input-implementation.md"
+  - "docs/tasks/TASK-0012.yaml"
+affected_repositories: [gesp-tutor-web]
+affected_components: [web/tutor-input]
+allowed_scope:
+  - "gesp-tutor-web/src/components/tutor/**"
+  - "gesp-tutor-web/src/lib/tutor/**"
+  - "gesp-tutor-web/src/app/session/**"
+  - "gesp-tutor-web/tests/input*.test.ts*"
+  - "gesp-tutor-web/AGENTS.md"
+verification:
+  - "Unicode题干/代码边界、空/超大/不支持图片拒绝"
+  - "图文来源互斥、附件清除和预览；无网络/扣次/假识别"
+  - "PC浏览器输入/粘贴/文件选择/错误恢复；同页基础响应式"
+acceptance_criteria: ["PBI-0006 AC1", "PBI-0006 AC2", "PBI-0006 AC3", "PBI-0006 AC4", "PBI-0006 AC5"]
+scope_limits: "只交付客户端基础；即贴即传、语义/模糊识别及真实提交由TASK-0013补齐。"
+executor: {mode: agent, adapter: codex}
+code_branch: "task-0012-unified-input"
+code_commit: "8d4ce81"
+evidence:
+  - "docs/verification/PBI-0006-local-input.md"

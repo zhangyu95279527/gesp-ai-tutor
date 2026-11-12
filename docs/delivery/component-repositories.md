@@ -25,3 +25,8 @@
 - API: task-0006-profile-level / 87f81b4；Web: task-0007-profile-settings / 851bfc2；工作区已提交，未合main、未创建远端。
 - 本机/settings已验证，缺资料账号由/login自动进入/onboarding。协议和内容安全仍为开发验证边界，生产入口未开放。
 - 研发与验收口径改为PC优先，移动仅同页基础自适应；总体进度见docs/delivery/development-progress.md。
+
+## 限额与统一输入基础 — 2026-11-12
+
+- API最新：task-0009-daily-quota / 4e971d4；Web最新：task-0012-unified-input / 8d4ce81，包含此前task-0010限额增量90878ad。两仓均未合main、未推送。
+- /session开发页已具备本地图文输入及预览，真实上传/安全/识别未接入；不会生成假识别或扣次。详见最新输入检查点及验证记录。

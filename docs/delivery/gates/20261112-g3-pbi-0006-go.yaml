@@ -1,0 +1,12 @@
+id: GATE-RECORD-0008
+gate: G3
+artifact: PBI-0006
+decision: go
+criteria_met: [ac-verifiable, design-ready, tech-design-ready, tasks-decomposed, dependencies-confirmed]
+criteria_failed: []
+decided_by: Codex
+role: product-owner-and-architect
+date: "2026-11-12"
+recycle_target: ""
+follow_up: ["TASK-0013真实依赖就绪后细化执行；本次只放行TASK-0012独立客户端基础切片"]
+notes: "承接用户先基础功能、真实服务稍后配置的明确约定，依赖确认仅限TASK-0012。完整PBI的上传/安全/识别依赖仍未就绪；本记录不表示外部依赖或G4通过。"

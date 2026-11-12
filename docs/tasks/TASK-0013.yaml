@@ -1,0 +1,27 @@
+id: TASK-0013
+pbi_id: PBI-0006
+status: draft
+owner_role: Developer
+objective: "接入真实上传/安全/识别并完成统一输入全链路验证"
+depends_on: [TASK-0012]
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0006.yaml"
+  - "docs/features/feat-002-tech-design.md"
+  - "docs/features/pbi-0006-input-implementation.md"
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [core/session, core/safety, web/tutor-input]
+allowed_scope:
+  - "gesp-tutor-api/src/**"
+  - "gesp-tutor-api/tests/**"
+  - "gesp-tutor-api/migrations/**"
+  - "gesp-tutor-web/src/components/tutor/**"
+  - "gesp-tutor-web/src/lib/tutor/**"
+  - "gesp-tutor-web/tests/**"
+acceptance_criteria: ["PBI-0006 AC1", "PBI-0006 AC2", "PBI-0006 AC3", "PBI-0006 AC4", "PBI-0006 AC5"]
+verification:
+  - "图文即贴即传、私有对象归属和字节类型/大小校验"
+  - "安全/模糊/无效输入不计次，附件和疑问点真实接口保留"
+  - "PC端到端与基础响应式，产物落库与保留/删除边界"
+scope_limits: "真实依赖配置后细化；不得用固定答案/测试替身宣布识别验收。"
+executor: {mode: agent, adapter: codex}

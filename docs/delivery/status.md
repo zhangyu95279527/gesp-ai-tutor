@@ -11,15 +11,14 @@ Generated: 2026-11-12
 | Discovery (G1) | done | go (2026-10-22) |
 | PRD (G2) | done | go (2026-10-22) |
 | Architecture baseline (GA) | done | go (2026-10-23) |
-| Backlog & refinement (G3) | active | 26 PBIs (draft: 22, in-progress: 4); G3 passed: 4 |
-| Implementation & verification (G4) | active | executable: 4; done: 0; G4 passed: 0 |
+| Backlog & refinement (G3) | active | 26 PBIs (draft: 21, in-progress: 5); G3 passed: 5 |
+| Implementation & verification (G4) | active | executable: 5; done: 0; G4 passed: 0 |
 | Release (G5) | pending | no release yet |
 
 ## Next actions by role
 
 ### PO
 - PBI-0003 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
-- PBI-0006 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0007 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0008 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0009 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
@@ -45,6 +44,7 @@ Generated: 2026-11-12
 - PBI-0001 实现中
 - PBI-0002 实现中（blocked by PBI-0001）
 - PBI-0005 实现中
+- PBI-0006 实现中
 - PBI-0022 实现中
 
 ## Product
@@ -64,7 +64,7 @@ Generated: 2026-11-12
 
 ## PBIs
 
-Total: 26 — draft: 22, in-progress: 4
+Total: 26 — draft: 21, in-progress: 5
 
 | PBI | Type | Feature | Status | Latest gate decision |
 |---|---|---|---|---|
@@ -72,7 +72,7 @@ Total: 26 — draft: 22, in-progress: 4
 | PBI-0002 | user-story | FEAT-001 | in-progress | go (2026-11-12) |
 | PBI-0003 | user-story | FEAT-001 | draft | — |
 | PBI-0005 | user-story | FEAT-005 | in-progress | go (2026-11-12) |
-| PBI-0006 | user-story | FEAT-002 | draft | — |
+| PBI-0006 | user-story | FEAT-002 | in-progress | go (2026-11-12) |
 | PBI-0007 | user-story | FEAT-002 | draft | — |
 | PBI-0008 | user-story | FEAT-002 | draft | — |
 | PBI-0009 | user-story | FEAT-002 | draft | — |
@@ -103,6 +103,7 @@ No sprints yet.
 
 | Date | Gate | Artifact | Decision | Record |
 |---|---|---|---|---|
+| 2026-11-12 | G3 | PBI-0006 | go | 20261112-g3-pbi-0006-go.yaml |
 | 2026-11-12 | G3 | PBI-0005 | go | 20261112-g3-pbi-0005-go.yaml |
 | 2026-11-12 | G3 | PBI-0002 | go | 20261112-g3-pbi-0002-go.yaml |
 | 2026-11-11 | G3 | PBI-0022 | go | 20261111-g3-pbi-0022-go.yaml |
