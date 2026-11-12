@@ -78,3 +78,10 @@
 - 迁移0008_ladder_deadline(head)，API227/Web109测试及生产build通过；到期恢复、旧执行拒发、本人状态、L1内部显式重试/扣次和刷新后状态提示已实现。
 - FastAPI生命周期扫描过期阶梯，公开生成仍503；尚未attach_l1的孤立确认、供应商请求取消、预算/成本、实时SSE及PC真实端到端仍待TASK-0021。
 - 本轮HTTP为ASGI验证、UI为SSR/合同测试；8000/Web服务未重启，无新增浏览器实测。详见20261112-ladder-recovery检查点与PBI-0008-recovery验证记录。
+
+## GitHub保存与Mac mini迁移 — 2026-11-12
+
+- 用户授权将全部仓库保存到GitHub并在Mac mini继续；新增私有远端：`https://github.com/zhangyu95279527/gesp-tutor-api`、`https://github.com/zhangyu95279527/gesp-tutor-web`。交付仓沿用现有公开仓，不更改可见性。
+- 三仓统一换机分支`chore-mac-mini-handoff`，基于TASK-0023。API提交4e98e79、Web提交c20356f已推送，历史任务分支一并保存；不合并main，不发布。交付仓换机说明随同批提交推送。
+- 组件AGENTS改为相邻交付仓相对路径，后端命令统一uv；新增`dev/compose.yaml`与`docs/delivery/mac-mini-handoff.md`，新机重建PG/Redis与依赖，不上传Windows缓存/虚拟环境/测试数据库或密钥。
+- 本轮为指引及开发配置变更，API含migrations的ruff通过；SMTP CLI参数已核对。当前Windows没有Docker，Compose未实际启动，Mac/ARM运行与回归待新机执行；不替代业务验收。
