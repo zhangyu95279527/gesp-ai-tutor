@@ -1,8 +1,8 @@
 id: PBI-0007
 type: user-story
 feature_id: FEAT-002
-status: draft
-owner_role: ""
+status: in-progress
+owner_role: "Developer"
 title: "题目识别与回显确认"
 value: "让学生在进入讲解前确认题目、考点与级别判定无误，避免'讲错题'级别的体验事故（R2/R3 缓解）"
 user_story:
@@ -34,6 +34,10 @@ acceptance_criteria:
   - "题目识别 + 首轮讲解的流式输出首字延迟 P75 不超过 5 秒（NFR-PERF-01）（证据：性能埋点统计）"
 dependencies: [PBI-0006]
 references:
+  - "docs/verification/PBI-0007-session-foundation.md"
+  - "docs/features/pbi-0007-session-foundation.md"
+  - "docs/tasks/TASK-0015.yaml"
+  - "docs/tasks/TASK-0016.yaml"
   - "docs/product/prd/03-functional-requirements.md (FR-TUT-02)"
   - "docs/product/prd/04-business-rules.md (BR-LVL, BR-LMT-2, BR-LMT-3)"
   - "docs/product/prd/05-nfr.md (NFR-PERF-01)"

@@ -1,0 +1,32 @@
+id: TASK-0015
+pbi_id: PBI-0007
+status: in-verification
+owner_role: Developer
+objective: "实现会话与识别回显持久化、幂等和纠正基础合同"
+depends_on: [TASK-0006, TASK-0014]
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0007.yaml"
+  - "docs/features/feat-002-tech-design.md"
+  - "docs/features/feat-002-ux-ui-design.md"
+  - "docs/features/pbi-0007-session-foundation.md"
+  - "docs/tasks/TASK-0015.yaml"
+affected_repositories: [gesp-tutor-api]
+affected_components: [core/session]
+allowed_scope:
+  - "gesp-tutor-api/src/gesp_api/core/**"
+  - "gesp-tutor-api/migrations/versions/0004_sessions.py"
+  - "gesp-tutor-api/tests/test_sessions.py"
+  - "gesp-tutor-api/README.md"
+  - "gesp-tutor-api/AGENTS.md"
+acceptance_criteria: ["PBI-0007 AC1", "PBI-0007 AC2", "PBI-0007 AC3", "PBI-0007 AC7", "PBI-0007 AC8", "PBI-0007 AC9", "PBI-0007 AC10"]
+verification:
+  - "新建/重放/冲突、账号隔离、独立repository恢复原始输入及级别"
+  - "识别产物原子发布及状态校验、纠正逐字段落痕、版本冲突和重试不重复"
+  - "无日额度/模型依赖，pending_recognition无假识别产物"
+scope_limits: "仅内部持久化；不开放HTTP成功入口，不实现真实识别、重识别资格或confirm/L1计次。"
+executor: {mode: agent, adapter: codex}
+code_branch: "task-0015-session-foundation"
+code_commit: "02603a2"
+evidence:
+  - "docs/verification/PBI-0007-session-foundation.md"
