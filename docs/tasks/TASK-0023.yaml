@@ -1,0 +1,40 @@
+id: TASK-0023
+pbi_id: PBI-0008
+status: in-verification
+owner_role: Developer
+objective: "补齐阶梯操作超时恢复、L1失败显式重试与刷新后状态提示"
+depends_on: [TASK-0022]
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0008.yaml"
+  - "docs/features/feat-002-tech-design.md"
+  - "docs/features/pbi-0008-persistent-ladder.md"
+  - "docs/features/pbi-0008-recovery.md"
+  - "docs/tasks/TASK-0023.yaml"
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [core/session, tut, lmt, web/ladder]
+allowed_scope:
+  - "gesp-tutor-api/src/gesp_api/core/session/**"
+  - "gesp-tutor-api/src/gesp_api/tut/session_routes.py"
+  - "gesp-tutor-api/src/gesp_api/app.py"
+  - "gesp-tutor-api/migrations/versions/0008_ladder_deadline.py"
+  - "gesp-tutor-api/tests/test_ladder_recovery.py"
+  - "gesp-tutor-api/AGENTS.md"
+  - "gesp-tutor-web/src/lib/tutor/ladder-client.ts"
+  - "gesp-tutor-web/src/components/tutor/LadderSession.tsx"
+  - "gesp-tutor-web/src/components/tutor/OperationNotice.tsx"
+  - "gesp-tutor-web/tests/ladder-recovery.test.tsx"
+  - "gesp-tutor-web/AGENTS.md"
+acceptance_criteria: ["PBI-0008 AC1", "PBI-0008 AC4", "PBI-0008 AC6", "PBI-0008 AC8", "PBI-0008 AC14", "PBI-0008 AC15", "PBI-0008 AC16"]
+verification:
+  - "到期admitted/running回收一次，活跃/已完成不误回收，不退费不自动生成"
+  - "过期worker迟到结果不能发布；同键/并发重试计一次，失败/超限与事务回滚正确"
+  - "本人状态与关闭重试HTTP，刷新保留失败状态和新计次确认"
+  - "应用生命周期恢复器启动/停止、临时数据库故障重试"
+scope_limits: "真实模型/安全/资源预算、供应商请求取消、运行中SSE与公开生成尚未装配；本轮不作完整AC或G4。"
+executor: {mode: agent, adapter: codex}
+code_branch: "task-0023-ladder-recovery"
+code_commits:
+  gesp-tutor-api: "d87f315"
+  gesp-tutor-web: "9d0ec44"
+evidence: ["docs/verification/PBI-0008-recovery.md"]

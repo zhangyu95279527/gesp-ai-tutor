@@ -39,6 +39,8 @@ acceptance_criteria:
   - "阶梯解锁轮流式输出首字延迟 P75 不超过 5 秒（NFR-PERF-01）（证据：性能埋点统计）"
 dependencies: [PBI-0007, PBI-0005]
 references:
+  - "docs/features/pbi-0008-recovery.md"
+  - "docs/tasks/TASK-0023.yaml"
   - "docs/features/pbi-0008-persistent-ladder.md"
   - "docs/tasks/TASK-0022.yaml"
   - "docs/verification/PBI-0008-pc-ladder.md"

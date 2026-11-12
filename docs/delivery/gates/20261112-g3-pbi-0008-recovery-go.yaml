@@ -1,0 +1,12 @@
+id: GATE-RECORD-0012
+gate: G3
+artifact: PBI-0008
+decision: go
+criteria_met: [ac-verifiable, design-ready, tech-design-ready, tasks-decomposed, dependencies-confirmed]
+criteria_failed: []
+decided_by: Codex
+role: product-owner-and-architect
+date: "2026-11-12"
+recycle_target: ""
+follow_up: ["仅放行TASK-0023操作恢复/重试基础与状态提示；真实生成装配仍待TASK-0021"]
+notes: "沿用用户先完成基础、真实服务后配的开发授权。依赖限定为既有PG阶梯/额度与PC页面，设计和任务DAG已补齐；不将内部测试替身视为生产安全/模型就绪，不产生G4。"

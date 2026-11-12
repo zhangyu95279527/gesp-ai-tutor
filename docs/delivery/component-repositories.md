@@ -71,3 +71,10 @@
 - 迁移0007_ladder(head)，API209项、Web95项及生产build通过。L1承接、相邻解锁/计次、检查后持久消息、steps、质量事件与完成态SSE回放已实现；Web兼容active状态刷新恢复。
 - 公开confirm/unlock仍503不扣次，运行中回放409；未装配生产模型/安全检查器或实时流服务。HTTP为ASGI+本机PG协议验证，API8000未启动/重启，未新增浏览器实测。
 - 真实模型、安全、资源预算/失败成本、L1显式付费重试、进程退出恢复与PC完整链路仍待TASK-0021。见docs/delivery/checkpoints/20261112-persistent-ladder.md及验证记录。
+
+## 阶梯超时恢复与L1重试基础 — 2026-11-12
+
+- API最新task-0023-ladder-recovery / d87f315；Web同名分支 / 9d0ec44，本地提交、工作区干净，未合main/推送。
+- 迁移0008_ladder_deadline(head)，API227/Web109测试及生产build通过；到期恢复、旧执行拒发、本人状态、L1内部显式重试/扣次和刷新后状态提示已实现。
+- FastAPI生命周期扫描过期阶梯，公开生成仍503；尚未attach_l1的孤立确认、供应商请求取消、预算/成本、实时SSE及PC真实端到端仍待TASK-0021。
+- 本轮HTTP为ASGI验证、UI为SSR/合同测试；8000/Web服务未重启，无新增浏览器实测。详见20261112-ladder-recovery检查点与PBI-0008-recovery验证记录。

@@ -3,7 +3,7 @@ pbi_id: PBI-0008
 status: draft
 owner_role: Developer
 objective: "实现真实阶梯引擎、持久输出/steps与PC端到端"
-depends_on: [TASK-0020, TASK-0016, TASK-0022]
+depends_on: [TASK-0020, TASK-0016, TASK-0022, TASK-0023]
 inputs:
   - "AGENTS.md"
   - "docs/features/PBI-0008.yaml"
@@ -15,5 +15,5 @@ affected_components: [core/session, core/llm, lmt, web/ladder]
 allowed_scope: ["gesp-tutor-api/src/**", "gesp-tutor-api/tests/**", "gesp-tutor-api/migrations/**", "gesp-tutor-web/src/**", "gesp-tutor-web/tests/**"]
 acceptance_criteria: ["PBI-0008 AC1", "PBI-0008 AC2", "PBI-0008 AC3", "PBI-0008 AC4", "PBI-0008 AC5", "PBI-0008 AC6", "PBI-0008 AC7", "PBI-0008 AC8", "PBI-0008 AC9", "PBI-0008 AC10", "PBI-0008 AC11", "PBI-0008 AC12", "PBI-0008 AC13", "PBI-0008 AC14", "PBI-0008 AC15", "PBI-0008 AC16", "PBI-0008 AC17"]
 verification: ["全部17条AC真实内容/安全边界/计次/PC流转/steps聚合/性能证据"]
-scope_limits: "持久编排与已完成回放由TASK-0022先行；本任务仍负责真实服务/预算/安全装配、实时SSE、L1付费重试、进程退出恢复与PC完整链路。依赖就绪后细化，不以开发占位或声明的checks替代实测。"
+scope_limits: "持久编排/完成回放由TASK-0022、阶梯过期恢复/L1内部重试由TASK-0023先行；本任务仍负责真实服务/预算/安全装配、供应商取消、孤立确认恢复、公开重试接入、实时SSE与PC完整链路。依赖就绪后细化，不以占位或checks声明替代实测。"
 executor: {mode: agent, adapter: codex}
