@@ -20,7 +20,7 @@ acceptance_criteria:
   - "发起讲题计次触发点：会话创建与识别回显阶段不产生计数；用户 confirm 提交（含纠正）触发首轮 L1 生成时计 1 次（发起讲题口径），计数判定前置、超限时 confirm 被拒绝且会话状态不推进（BR-LMT-2；feat-002-tech-design 4）（证据：计数测试 + 超限拒绝接口测试）"
   # 重识别：行为与计次（PO 2026-10-23 口径：不限次数，第 1 次免费、第 2 次起各计 1 次，防 VL 推理成本刷取）
   - "识别回显阶段可发起同会话重新识别，不限次数；每次重识别结果再次回显，用户确认后才进入讲解（证据：UI 流转测试）"
-  - "同会话内第 1 次重识别不计入日限额，第 2 次起重识别各计 1 次（BR-LMT-3 及 2026-10-23 PO 增补口径，计数矩阵由 PBI-0005 承载）（证据：计数测试）"
+  - "同会话首次放行重识别免费，第2次起预留1次，成功发布有效回显才正式计1次，失败/中断释放；首次失败不重赠免费资格（BR-LMT-3，2026-11-12用户确认，矩阵由PBI-0005承载）（证据：PG资格与预留结算测试）"
   # 异常路径：识别失败
   - "识别失败（无法解析出题目文本）时，界面明确提示识别失败与可操作建议，并提供重新上传图片与改用文字输入两个重试入口（证据：失败用例 UI 测试）"
   - "识别失败的请求不产生计数（证据：计数测试）"
@@ -34,6 +34,9 @@ acceptance_criteria:
   - "题目识别 + 首轮讲解的流式输出首字延迟 P75 不超过 5 秒（NFR-PERF-01）（证据：性能埋点统计）"
 dependencies: [PBI-0006]
 references:
+  - "docs/verification/PBI-0007-reidentify.md"
+  - "docs/features/pbi-0007-reidentify.md"
+  - "docs/tasks/TASK-0018.yaml"
   - "docs/verification/PBI-0007-confirmation.md"
   - "docs/features/pbi-0007-confirmation.md"
   - "docs/tasks/TASK-0017.yaml"

@@ -1,0 +1,33 @@
+id: TASK-0018
+pbi_id: PBI-0007
+status: in-verification
+owner_role: Developer
+objective: "实现同会话重识别持久资格、活动互斥与单次执行/结果恢复基础"
+depends_on: [TASK-0015, TASK-0017]
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0007.yaml"
+  - "docs/features/PBI-0005.yaml"
+  - "docs/features/feat-002-tech-design.md"
+  - "docs/features/pbi-0007-reidentify.md"
+  - "docs/tasks/TASK-0018.yaml"
+affected_repositories: [gesp-tutor-api]
+affected_components: [core/session, lmt]
+allowed_scope:
+  - "gesp-tutor-api/src/gesp_api/lmt/service.py"
+  - "gesp-tutor-api/src/gesp_api/core/session/**"
+  - "gesp-tutor-api/migrations/versions/0006_reidentify.py"
+  - "gesp-tutor-api/tests/test_reidentify.py"
+  - "gesp-tutor-api/README.md"
+  - "gesp-tutor-api/AGENTS.md"
+acceptance_criteria: ["PBI-0007 AC1", "PBI-0007 AC4", "PBI-0007 AC5", "PBI-0007 AC7", "PBI-0007 AC9"]
+verification:
+  - "免费资格持久认领、同键重放/冲突、跨日/清缓存不重赠"
+  - "同会话识别/edit/confirm互斥、账号隔离和单次执行"
+  - "已检VL产物事务发布、收费预留成功提交/失败释放、未就绪无副作用"
+scope_limits: "用户已确认重识别失败不扣次：第二次起预留后结算；不开放HTTP或调用真实模型。"
+executor: {mode: agent, adapter: codex}
+code_branch: "task-0018-reidentify-lifecycle"
+code_commit: "450a06b"
+evidence:
+  - "docs/verification/PBI-0007-reidentify.md"

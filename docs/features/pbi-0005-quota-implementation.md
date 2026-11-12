@@ -19,6 +19,8 @@ Status: approved
 
 ordinal不得来自客户端；本模块不自称已实现跨日重识别免费资格认领。guest OwnerRef保留命名空间，实际访客策略由PBI-0012注入前拒绝，不能给访客误发15次。输出安全截断属于已受理普通动作，保持已计次。
 
+2026-11-12用户确认重识别失败不扣次：TASK-0018在core/session认领首次免费，后续通过reserve_reidentify_in_transaction预留，成功回显后settle_in_transaction(success=True)提交，失败/中断success=False释放，与业务状态共享PG事务。直接consume重识别已拒绝，避免绕过失败结算；普通讲解失败不退。实际模型/安全/预算与生产恢复仍待TASK-0016/0011。
+
 ## 任务与接口
 
 TASK-0009：账本/流水/ops事件最小迁移、Redis计数与配置、consume/reserve/commit/release/usage及行为测试。

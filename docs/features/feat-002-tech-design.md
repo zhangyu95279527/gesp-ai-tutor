@@ -117,7 +117,7 @@ ocr 服务不可用/超时（10s）→ 降级 VL 通道 + 记录 ocr_fallback �
 
 规则：
 - 解锁仅允许相邻逐级（l1→l2→l3），禁止跳级（BR-GUD-3 与计数口径"L1→L2、L2→L3 各计 1 次"一致）；重复解锁同级拒绝。
-- 纠正重识别不限次数：同会话第 1 次免费，由会话持久化计数原子认领；第 2 次起各计 1 次。Redis 仅缓存，跨日/重启不恢复免费次数（BR-LMT-3，2026-10-24 PO 裁决细化）。
+- 纠正重识别不限次数：同会话第1次放行免费，由PG持久计数认领；第2次起预留1次，成功发布有效回显才正式计次，失败/中断释放预留（2026-11-12用户确认）。首次失败不重赠免费资格；跨日/清缓存/重启不重置计数。
 - 追问不改变阶梯状态；讲解与追问按冻结的 questions.final_level 适配（BR-LVL-1/3），仍遵守当前阶梯输出边界。
 - `out_of_syllabus=true` 的会话走同一状态机，system 槽位注入"通用讲解，不针对考级"标注要求（BR-LVL-5）。
 - 变式题每会话限 1 道（BR-VAR-3）；variant_pending 由"听懂标记"或用户主动 CTA 触发，未触发不推送。
@@ -148,7 +148,7 @@ ocr 服务不可用/超时（10s）→ 降级 VL 通道 + 记录 ocr_fallback �
 |---|---|---|
 | POST /api/uploads | 签发 OSS 私有桶签名 PUT URL（类型白名单 image/*，≤10MB） | 不计 |
 | POST /api/tut/sessions | 创建会话并同步执行识别管线；入参 `{text? \| image_oss_key?, code_snippet?(≤5000), question_note?}`；返回 `{session_id, echo}` 或 422（无效输入/识别失败） | 不计 |
-| POST /api/tut/sessions/{id}/reidentify | 仅 pending_confirm 可用；持久化计数原子认领首次免费，第 2 次起走 consume；走 VL 通道，受独立资源预算保护 | 第 1 次不计，第 2 次起各计 1 次 |
+| POST /api/tut/sessions/{id}/reidentify | 仅pending_confirm可用；PG认领首次免费，第2次起reserve→成功回显commit/失败中断release；走VL并受独立资源预算保护 | 首次免费；后续成功回显各计1次 |
 | POST /api/tut/sessions/{id}/confirm | 提交确认/纠正（question_text/knowledge_points/level）→ 记录纠正 → SSE 流式输出 L1 | **计 1 次**（发起讲题口径） |
 | POST /api/tut/sessions/{id}/unlock | `{target:2\|3}`，校验相邻逐级 → SSE 流式输出 L2/L3 | 各计 1 次 |
 | POST /api/tut/sessions/{id}/followups | `{question}` → SSE 流式回答 | 计 1 次 |
@@ -160,7 +160,7 @@ ocr 服务不可用/超时（10s）→ 降级 VL 通道 + 记录 ocr_fallback �
 
 说明：
 - 创建会话时不计数、确认后首轮 L1 生成才计数——这是"识别失败/无效输入不计数"（PBI-0006/0007 AC）与"发起=识别+首轮讲解计 1 次"（BR-LMT-2）两条规则的相容解：计数点落在 confirm 触发的 L1 生成动作上；生成失败（LLM 错误）已计次数不退还、重试按新请求计次（2026-10-24 PO 裁决：先计后调防失败重试绕过，故障损失由运营个案兜底）。
-- 计数判定前置：一般计费动作先 `consume()` 放行并扣减；变式题例外，先 `reserve()` 保证额度再生成，成功发布时 `commit()`，生成/校验失败 `release()`。同 owner 的所有放行都检查 used + reserved，防并发绕过；预留按 operation_id 幂等，失联由操作终态恢复任务结算，不能在任务仍运行时仅靠 TTL 自动释放。内部资源消耗仍计入资源预算。
+- 计数判定前置：普通讲解先consume放行并扣减；变式及第2次起重识别先reserve，成功发布已检题面/回显才commit，失败或中断release。所有计次/预留检查used+reserved；operation_id幂等，失联按持久任务终态恢复，不能仅靠TTL释放运行中预留。内部调用仍消耗资源预算。
 
 ## 5. 数据设计（字段级）
 
@@ -255,7 +255,7 @@ ocr 服务不可用/超时（10s）→ 降级 VL 通道 + 记录 ocr_fallback �
 | reidentify:{session_id} | 可淘汰缓存，非判定源 | 免费次数以 ai_sessions.reidentify_count 为准，缓存跨日失效不影响权益 |
 | stream:{message_id} | list，TTL=轮次结束+10min | SSE 分片缓冲与断连续传 |
 
-计数口径：Redis 脚本原子检查 used+reserved 并以 operation_id 幂等放行，quota_usage 以 operation_id 唯一补记流水。一般扣减后 LLM 失败不退还；变式未发布仅释放预留（见§4）。额度日固定于受理时的 Asia/Shanghai 日期，跨日恢复不向新日期重复扣次；操作与结算账本保留至本次恢复完成，不能随日计数零点清理。
+计数口径：Redis脚本原子检查used+reserved，PG以operation_id记录幂等账本/流水。普通讲解扣减后模型失败不退；变式未发布或重识别失败/中断释放预留（2026-11-12用户确认）。账期固定于受理时上海日期，跨日恢复不向新日期重复扣次，账本保留至恢复完成，不随零点清理。
 
 ### 5.3 访客会话承载（FEAT-001 接口点，本特性仅预留）
 
@@ -315,7 +315,8 @@ class QuotaService(Protocol):
 | 无效输入（文本过短/非题目/图片模糊） | 422 + 重新输入提示 | 不计 |
 | OCR 失败/超时 | 自动升 VL 通道 + ocr_fallback 指标 | 不计 |
 | 识别结构化校验失败（重试 1 次后） | 文本路径→识别失败提示；截图路径→升 VL，VL 再失败→识别失败提示 | 不计 |
-| GLM 429/5xx/超时 | 网关内重试 1 次（指数退避）；仍失败 → SSE error 事件 | 已扣额度不退还，流水标 `failed`（2026-10-24 PO 裁决） |
+| 普通讲解GLM 429/5xx/超时 | 网关内重试1次，仍失败发SSE error | 已扣额度不退，流水标failed |
+| 重识别失败或进程中断 | 保留旧回显，恢复核实后显式释放预留，不自动重跑 | 首次免费资格不重赠，后续失败不计次（2026-11-12用户确认） |
 | 输入安全命中 | 422 safety_blocked + 申诉入口提示 | 不计 |
 | 输出安全命中 | 流截断 + safety_truncated 事件 + 提示 | 照计（记录支撑申诉） |
 | L1/L2 合规校验违规 | 候选不上屏，重生成 1 次；再违规 → 预置无答案提示 + 质量事件，状态不升级 | 照计 |

@@ -45,3 +45,9 @@
 
 - API最新task-0017-confirmation-admission / 2e009fa，承接02603a2；Web仍8d4ce81。未合main/推送。
 - 本机迁移0005_confirmation(head)，160项后端全回归通过。确认通过lmt内部接口共享PG事务，原子冻结级别/扣次、超限不推进，并提供单次执行认领/中断状态；真实生成readiness默认False，无公开confirm或L1输出，8000未重启。
+
+## 重识别资格与结算 — 2026-11-12
+
+- API最新task-0018-reidentify-lifecycle / 450a06b，承接2e009fa；Web仍8d4ce81。未合main/推送。
+- 本机迁移0006_reidentify(head)，178项后端回归通过。首次免费资格PG认领，后续预留成功回显才扣、失败/中断释放；新edit/confirm与活动识别互斥。真实识别readiness默认False，无HTTP/UI接入，8000未重启。
+- 原PG开发服务已停止，本轮用原脚本/数据目录恢复5432→5433回环代理，无重建数据；仍不是生产PG。
