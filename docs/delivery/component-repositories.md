@@ -64,3 +64,10 @@
 - API190项、Web91项测试及生产构建通过。PC手动相邻解锁、断线GET续接/去重、超限保留及安全/失败状态已查；证据见docs/verification/PBI-0008-pc-ladder.md。
 - 新增本人阶梯GET诚实返回空steps/unlock=false；unlock未配置503不扣次。无新迁移，仍0006_reidentify；API8000本轮未启动/重启，HTTP为ASGI+PG验证。
 - Web3000保留/dev/ladder开发协议占位演示，不是真实讲解且不扣真实次数；临时生产3020实际返回404后已停止。真实持久steps、解锁引擎、内容检查与SSE服务待TASK-0021。
+
+## 持久阶梯编排 — 2026-11-12
+
+- API最新task-0022-ladder-persistence / 20bf1aa；Web同名分支 / 5370b26。工作区已提交，未合main/推送。
+- 迁移0007_ladder(head)，API209项、Web95项及生产build通过。L1承接、相邻解锁/计次、检查后持久消息、steps、质量事件与完成态SSE回放已实现；Web兼容active状态刷新恢复。
+- 公开confirm/unlock仍503不扣次，运行中回放409；未装配生产模型/安全检查器或实时流服务。HTTP为ASGI+本机PG协议验证，API8000未启动/重启，未新增浏览器实测。
+- 真实模型、安全、资源预算/失败成本、L1显式付费重试、进程退出恢复与PC完整链路仍待TASK-0021。见docs/delivery/checkpoints/20261112-persistent-ladder.md及验证记录。

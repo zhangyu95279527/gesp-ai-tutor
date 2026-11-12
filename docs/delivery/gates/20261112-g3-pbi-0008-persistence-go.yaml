@@ -1,0 +1,12 @@
+id: GATE-RECORD-0011
+gate: G3
+artifact: PBI-0008
+decision: go
+criteria_met: [ac-verifiable, design-ready, tech-design-ready, tasks-decomposed, dependencies-confirmed]
+criteria_failed: []
+decided_by: Codex
+role: product-owner-and-architect
+date: "2026-11-12"
+recycle_target: ""
+follow_up: ["仅增加放行TASK-0022持久化独立切片；TASK-0021真实服务装配仍draft，完整AC未通过"]
+notes: "依据用户继续MVP功能开发及既有真实服务稍后配置约定；仅确认本机PG协议/fakeredis及测试检查器可支持编排验证，不视为生产依赖就绪。复用既有PC页面，任务DAG与范围见pbi-0008-persistent-ladder.md，不产生G4。"

@@ -103,6 +103,7 @@ No sprints yet.
 
 | Date | Gate | Artifact | Decision | Record |
 |---|---|---|---|---|
+| 2026-11-12 | G3 | PBI-0008 | go | 20261112-g3-pbi-0008-persistence-go.yaml |
 | 2026-11-12 | G3 | PBI-0008 | go | 20261112-g3-pbi-0008-go.yaml |
 | 2026-11-12 | G3 | PBI-0007 | go | 20261112-g3-pbi-0007-go.yaml |
 | 2026-11-12 | G3 | PBI-0006 | go | 20261112-g3-pbi-0006-go.yaml |
@@ -112,4 +113,3 @@ No sprints yet.
 | 2026-11-11 | G3 | PBI-0001 | go | 20261111-g3-pbi-0001-go.yaml |
 | 2026-10-23 | GA | architecture-baseline | go | 20261023-ga-architecture-baseline-go.yaml |
 | 2026-10-22 | G2 | prd | go | 20261022-g2-prd-go.yaml |
-| 2026-10-22 | G1 | product-brief | go | 20261022-g1-product-brief-go.yaml |

@@ -1,0 +1,38 @@
+id: TASK-0022
+pbi_id: PBI-0008
+status: in-verification
+owner_role: Developer
+objective: "实现独立持久阶梯编排、已检正文发布及本人回放读取"
+depends_on: [TASK-0020, TASK-0017]
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0008.yaml"
+  - "docs/features/feat-002-tech-design.md"
+  - "docs/features/pbi-0008-persistent-ladder.md"
+  - "docs/tasks/TASK-0022.yaml"
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [core/session, tut, lmt, ops, web/ladder]
+allowed_scope:
+  - "gesp-tutor-api/src/gesp_api/core/session/**"
+  - "gesp-tutor-api/src/gesp_api/tut/session_routes.py"
+  - "gesp-tutor-api/src/gesp_api/ops/events.py"
+  - "gesp-tutor-api/migrations/versions/0007_ladder.py"
+  - "gesp-tutor-api/tests/test_ladder_engine.py"
+  - "gesp-tutor-api/AGENTS.md"
+  - "gesp-tutor-web/src/lib/tutor/client.ts"
+  - "gesp-tutor-web/src/components/tutor/SessionReview.tsx"
+  - "gesp-tutor-web/tests/ladder-persistence.test.ts"
+  - "gesp-tutor-web/AGENTS.md"
+acceptance_criteria: ["PBI-0008 AC1", "PBI-0008 AC5", "PBI-0008 AC6", "PBI-0008 AC7", "PBI-0008 AC8", "PBI-0008 AC9", "PBI-0008 AC12", "PBI-0008 AC13", "PBI-0008 AC14", "PBI-0008 AC15", "PBI-0008 AC16"]
+verification:
+  - "PG阶梯相邻、幂等、归属隔离、活动互斥、扣次/回滚与失败不退费"
+  - "检查失败不发布，边界违规最多重生成一次并记录质量事件"
+  - "正文/steps/状态同事务发布、本人快照与完成态SSE游标回放"
+  - "Web接受持久active状态、规范/类型/回归/构建"
+scope_limits: "独立基础切片；真实生成网关/安全/资源预算/实时SSE/自动进程恢复未装配，公开confirm/unlock仍503不扣次；不代表完整AC或G4。"
+executor: {mode: agent, adapter: codex}
+code_branch: "task-0022-ladder-persistence"
+code_commits:
+  gesp-tutor-api: "20bf1aa"
+  gesp-tutor-web: "5370b26"
+evidence: ["docs/verification/PBI-0008-persistent-ladder.md"]
