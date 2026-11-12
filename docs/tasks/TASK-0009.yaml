@@ -1,0 +1,54 @@
+id: TASK-0009
+pbi_id: PBI-0005
+status: in-verification
+owner_role: Developer
+objective: "实现日限额原子服务、持久幂等账本与结算"
+depends_on:
+  - "TASK-0003"
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0005.yaml"
+  - "docs/features/feat-002-tech-design.md"
+  - "docs/features/feat-005-ux-ui-design.md"
+  - "docs/features/feat-006-tech-design.md"
+  - "docs/features/pbi-0005-quota-implementation.md"
+  - "docs/tasks/TASK-0009.yaml"
+affected_repositories:
+  - "gesp-tutor-api"
+affected_components:
+  - "lmt"
+  - "ops/events"
+allowed_scope:
+  - "gesp-tutor-api/src/**"
+  - "gesp-tutor-api/tests/**"
+  - "gesp-tutor-api/migrations/**"
+  - "gesp-tutor-api/README.md"
+  - "gesp-tutor-api/AGENTS.md"
+verification:
+  - "计次/免费矩阵、默认15与配置调整、上海跨日"
+  - "重复/冲突操作、最后1次并发、Redis丢失和写后故障恢复"
+  - "变式预留/提交/释放、禁止退款、跨日结算与流水/拒绝事件"
+acceptance_criteria:
+  - "PBI-0005 AC1"
+  - "PBI-0005 AC2"
+  - "PBI-0005 AC3"
+  - "PBI-0005 AC4"
+  - "PBI-0005 AC5"
+  - "PBI-0005 AC6"
+  - "PBI-0005 AC7"
+  - "PBI-0005 AC8"
+  - "PBI-0005 AC9"
+  - "PBI-0005 AC10"
+  - "PBI-0005 AC14"
+  - "PBI-0005 AC15"
+  - "PBI-0005 AC16"
+  - "PBI-0005 AC17"
+scope_limits: "不调用模型，不开放消费/管理员HTTP接口，不将访客/会话集成或测试替身算完整验收。"
+executor:
+  mode: agent
+  adapter: codex
+
+evidence:
+  - "docs/verification/PBI-0005-local-quota.md"
+code_branch: "task-0009-daily-quota"
+code_commit: "4e971d4"

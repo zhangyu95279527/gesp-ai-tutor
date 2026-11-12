@@ -1,0 +1,53 @@
+id: TASK-0011
+pbi_id: PBI-0005
+status: ready
+owner_role: QA
+objective: "核验日限额完整业务与真实基础设施"
+depends_on:
+  - "TASK-0009"
+  - "TASK-0010"
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0005.yaml"
+  - "docs/features/feat-002-tech-design.md"
+  - "docs/features/feat-005-ux-ui-design.md"
+  - "docs/features/feat-006-tech-design.md"
+  - "docs/features/pbi-0005-quota-implementation.md"
+  - "docs/tasks/TASK-0011.yaml"
+affected_repositories:
+  - "gesp-tutor-api"
+  - "gesp-tutor-web"
+affected_components:
+  - "lmt"
+  - "ops/events"
+  - "web/quota"
+allowed_scope:
+  - "gesp-tutor-api/tests/**"
+  - "gesp-tutor-web/tests/**"
+verification:
+  - "真实Redis/PG并发、进程终止及恢复证据"
+  - "会话/访客/首次重识别资格与变式发布边界集成"
+  - "超限当前轮输出不截断、真实历史引导和运营维度取数"
+acceptance_criteria:
+  - "PBI-0005 AC1"
+  - "PBI-0005 AC2"
+  - "PBI-0005 AC3"
+  - "PBI-0005 AC4"
+  - "PBI-0005 AC5"
+  - "PBI-0005 AC6"
+  - "PBI-0005 AC7"
+  - "PBI-0005 AC8"
+  - "PBI-0005 AC9"
+  - "PBI-0005 AC10"
+  - "PBI-0005 AC11"
+  - "PBI-0005 AC12"
+  - "PBI-0005 AC13"
+  - "PBI-0005 AC14"
+  - "PBI-0005 AC15"
+  - "PBI-0005 AC16"
+  - "PBI-0005 AC17"
+  - "PBI-0005 AC18"
+scope_limits: "不调用模型，不开放消费/管理员HTTP接口，不将访客/会话集成或测试替身算完整验收。"
+executor:
+  mode: agent
+  adapter: codex

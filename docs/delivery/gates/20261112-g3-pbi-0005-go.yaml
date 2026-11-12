@@ -1,0 +1,12 @@
+id: GATE-RECORD-0007
+gate: G3
+artifact: PBI-0005
+decision: go
+criteria_met: [ac-verifiable, design-ready, tech-design-ready, tasks-decomposed, dependencies-confirmed]
+criteria_failed: []
+decided_by: Codex
+role: product-owner-and-architect
+date: "2026-11-12"
+recycle_target: ""
+follow_up: []
+notes: "原有计次AC/定稿限额组件与专属恢复契约明确，三任务覆盖基础服务、展示及真实业务验收；既有PG/Redis开发端点实际可达。只确认基础开发切片，无模型/对象存储前置。真实会话/访客/重识别/变式发布和真实基础设施由TASK-0011补验，不代表G4或生产就绪。"

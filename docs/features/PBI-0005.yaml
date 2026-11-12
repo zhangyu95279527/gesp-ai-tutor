@@ -1,7 +1,7 @@
 id: PBI-0005
 type: user-story
 feature_id: FEAT-005
-status: draft
+status: in-progress
 owner_role: ""
 title: "日限额计数、用量展示与超限引导"
 value: "O3 成本红线的执行机制：将单用户日 AI 请求约束在 15 次内，同时让用户对额度可感知"
@@ -49,3 +49,7 @@ references:
   - "docs/architecture/architecture-baseline.md (限额服务、quota_usage 流水、Redis 键口径)"
   - "docs/features/feat-002-tech-design.md (6.2 限额服务契约 / 5.2 计数口径 / 8 失败行为矩阵 / 9 并发竞态)"
   - "docs/features/feat-005-ux-ui-design.md (UX/UI 设计：用量指示器、超限提示与引导)"
+  - "docs/features/pbi-0005-quota-implementation.md"
+  - "docs/tasks/TASK-0009.yaml"
+  - "docs/tasks/TASK-0010.yaml"
+  - "docs/tasks/TASK-0011.yaml"

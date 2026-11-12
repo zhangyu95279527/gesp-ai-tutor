@@ -1,0 +1,50 @@
+id: TASK-0010
+pbi_id: PBI-0005
+status: in-verification
+owner_role: Developer
+objective: "实现本人用量接口与PC共用限额展示"
+depends_on:
+  - "TASK-0007"
+  - "TASK-0009"
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0005.yaml"
+  - "docs/features/feat-002-tech-design.md"
+  - "docs/features/feat-005-ux-ui-design.md"
+  - "docs/features/feat-006-tech-design.md"
+  - "docs/features/pbi-0005-quota-implementation.md"
+  - "docs/tasks/TASK-0010.yaml"
+affected_repositories:
+  - "gesp-tutor-api"
+  - "gesp-tutor-web"
+affected_components:
+  - "lmt"
+  - "ops/events"
+  - "web/quota"
+allowed_scope:
+  - "gesp-tutor-api/src/**"
+  - "gesp-tutor-api/tests/**"
+  - "gesp-tutor-web/src/components/**"
+  - "gesp-tutor-web/src/lib/**"
+  - "gesp-tutor-web/next.config.ts"
+  - "gesp-tutor-web/tests/**"
+  - "gesp-tutor-web/README.md"
+  - "gesp-tutor-web/AGENTS.md"
+verification:
+  - "本人GET鉴权、reserved与used区分、故障不伪造剩余数"
+  - "C1加载/刷新/恢复与C2超限文案，无付费入口；无历史页不造链接"
+  - "PC设置页挂载联调，真实会话/历史页待后续接入"
+acceptance_criteria:
+  - "PBI-0005 AC8"
+  - "PBI-0005 AC12"
+  - "PBI-0005 AC13"
+  - "PBI-0005 AC18"
+scope_limits: "不调用模型，不开放消费/管理员HTTP接口，不将访客/会话集成或测试替身算完整验收。"
+executor:
+  mode: agent
+  adapter: codex
+
+evidence:
+  - "docs/verification/PBI-0005-local-quota.md"
+code_branch: "task-0010-quota-display"
+code_commit: "90878ad"
