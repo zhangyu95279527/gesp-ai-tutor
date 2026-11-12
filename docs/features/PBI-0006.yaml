@@ -17,6 +17,8 @@ acceptance_criteria:
   - "可随题目附加粘贴代码片段（上限 5000 字符）与疑问点文字描述（FR-TUT-03）（证据：提交数据的接口测试）"
 dependencies: []
 references:
+  - "docs/verification/PBI-0006-api-input.md"
+  - "docs/tasks/TASK-0014.yaml"
   - "docs/verification/PBI-0006-local-input.md"
   - "docs/features/pbi-0006-input-implementation.md"
   - "docs/tasks/TASK-0012.yaml"

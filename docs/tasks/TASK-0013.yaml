@@ -3,7 +3,7 @@ pbi_id: PBI-0006
 status: draft
 owner_role: Developer
 objective: "接入真实上传/安全/识别并完成统一输入全链路验证"
-depends_on: [TASK-0012]
+depends_on: [TASK-0012, TASK-0014]
 inputs:
   - "AGENTS.md"
   - "docs/features/PBI-0006.yaml"

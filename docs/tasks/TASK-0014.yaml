@@ -1,0 +1,33 @@
+id: TASK-0014
+pbi_id: PBI-0006
+status: in-verification
+owner_role: Developer
+objective: "实现服务端题目输入合同、图片字节校验与关闭未配置能力的错误响应"
+depends_on: [TASK-0003, TASK-0012]
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0006.yaml"
+  - "docs/features/feat-002-tech-design.md"
+  - "docs/features/pbi-0006-input-implementation.md"
+  - "docs/tasks/TASK-0014.yaml"
+affected_repositories: [gesp-tutor-api]
+affected_components: [tut, core/session]
+allowed_scope:
+  - "gesp-tutor-api/src/gesp_api/tut/**"
+  - "gesp-tutor-api/src/gesp_api/app.py"
+  - "gesp-tutor-api/tests/test_input.py"
+  - "gesp-tutor-api/pyproject.toml"
+  - "gesp-tutor-api/uv.lock"
+  - "gesp-tutor-api/README.md"
+  - "gesp-tutor-api/AGENTS.md"
+acceptance_criteria: ["PBI-0006 AC1", "PBI-0006 AC2", "PBI-0006 AC3", "PBI-0006 AC4", "PBI-0006 AC5"]
+verification:
+  - "服务端题干/代码Unicode边界、来源互斥、严格字段与上传元数据"
+  - "PNG/JPEG/WebP真实字节解码、伪装/损坏/超大/像素炸弹拒绝"
+  - "HTTP鉴权/同源/幂等键/请求体保护及未配置503；拒绝流程不接触额度/创建会话"
+scope_limits: "独立基础任务；不签发上传、不调用真实模型、安全或存储，不宣称完整上传和识别验收。TASK-0013保留真实集成责任。"
+executor: {mode: agent, adapter: codex}
+code_branch: "task-0014-input-contracts"
+code_commit: "05370ed"
+evidence:
+  - "docs/verification/PBI-0006-api-input.md"

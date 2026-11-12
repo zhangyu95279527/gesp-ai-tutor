@@ -19,3 +19,13 @@ Status: approved
 - PBI-0007保留draft；模型回显、纠正留痕及confirm计次不在本切片。
 
 停止条件：TASK-0012通过lint/typecheck/回归/build，提交并落验证记录；外部依赖未就绪不宣布整项G4通过。
+
+## 服务端基础续作（TASK-0014）
+
+- 独立基础切片，不改变TASK-0013真实集成责任。POST /api/uploads只接收content_type与size_bytes；POST /api/tut/sessions沿用text或image_oss_key、code_snippet、question_note。严格字段、字符串不隐式转换；保留原文，长度按码点；来源互斥、text去空白至少10字符。空的非null来源拒绝。
+- 图片键采用服务端生成的uploads/<32位小写hex>.<png|jpg|webp>，只是结构校验，不能证明归属。内部存储接口必须按owner读取并返回实际字节；无存储则503，不接受客户端URL或owner参数。
+- 图片最大10MiB，Pillow识别实际格式并verify/load解码；与声明MIME不符、空/损坏文件拒绝。单图限制2000万像素、单帧，作为技术资源保护假设；多帧需用户导出单张截图。尚不代表截图清晰度/题目语义判定。
+- 两入口要求现有登录态、X-Requested-With及同源Origin，以及1～128位ASCII幂等键；基础阶段不受理成功操作，不写账本、会话或限额。上传固定storage_unavailable；会话校验后缺安全接口为safety_unavailable，缺识别为recognition_unavailable，缺持久会话为session_unavailable，均503。无假成功数据或模型调用。
+- 为避免验证错误回显原题/代码，错误体只含稳定code与白名单fields，不输出Pydantic原始输入或异常。两入口流式读取JSON，256KiB传输上限（含疑问点和JSON编码），超限413；这不是新增疑问点字符上限。
+- storage/safety/recognizer使用进程内Protocol预留，生产装配默认None，不用本机允许所有内容的profile回调充当题目安全检查。
+- 证据计划：AC2/4/5的服务端合同与解码测试；AC1/3仍待真实上传，全部完整AC继续由TASK-0013验收。
