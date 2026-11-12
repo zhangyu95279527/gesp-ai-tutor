@@ -2,7 +2,7 @@
 
 Derived from repository artifacts by `scripts/build-status.py`. Do not edit by hand; regenerate instead.
 
-Generated: 2026-11-11
+Generated: 2026-11-12
 
 ## Stage progress
 
@@ -11,14 +11,13 @@ Generated: 2026-11-11
 | Discovery (G1) | done | go (2026-10-22) |
 | PRD (G2) | done | go (2026-10-22) |
 | Architecture baseline (GA) | done | go (2026-10-23) |
-| Backlog & refinement (G3) | active | 26 PBIs (draft: 24, in-progress: 2); G3 passed: 2 |
-| Implementation & verification (G4) | active | executable: 2; done: 0; G4 passed: 0 |
+| Backlog & refinement (G3) | active | 26 PBIs (draft: 23, in-progress: 3); G3 passed: 3 |
+| Implementation & verification (G4) | active | executable: 3; done: 0; G4 passed: 0 |
 | Release (G5) | pending | no release yet |
 
 ## Next actions by role
 
 ### PO
-- PBI-0002 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0003 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0005 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0006 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
@@ -45,6 +44,7 @@ Generated: 2026-11-11
 
 ### Developer
 - PBI-0001 实现中
+- PBI-0002 实现中（blocked by PBI-0001）
 - PBI-0022 实现中
 
 ## Product
@@ -64,12 +64,12 @@ Generated: 2026-11-11
 
 ## PBIs
 
-Total: 26 — draft: 24, in-progress: 2
+Total: 26 — draft: 23, in-progress: 3
 
 | PBI | Type | Feature | Status | Latest gate decision |
 |---|---|---|---|---|
 | PBI-0001 | user-story | FEAT-001 | in-progress | go (2026-11-11) |
-| PBI-0002 | user-story | FEAT-001 | draft | — |
+| PBI-0002 | user-story | FEAT-001 | in-progress | go (2026-11-12) |
 | PBI-0003 | user-story | FEAT-001 | draft | — |
 | PBI-0005 | user-story | FEAT-005 | draft | — |
 | PBI-0006 | user-story | FEAT-002 | draft | — |
@@ -103,6 +103,7 @@ No sprints yet.
 
 | Date | Gate | Artifact | Decision | Record |
 |---|---|---|---|---|
+| 2026-11-12 | G3 | PBI-0002 | go | 20261112-g3-pbi-0002-go.yaml |
 | 2026-11-11 | G3 | PBI-0022 | go | 20261111-g3-pbi-0022-go.yaml |
 | 2026-11-11 | G3 | PBI-0001 | go | 20261111-g3-pbi-0001-go.yaml |
 | 2026-10-23 | GA | architecture-baseline | go | 20261023-ga-architecture-baseline-go.yaml |

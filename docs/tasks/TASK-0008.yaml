@@ -1,0 +1,39 @@
+id: TASK-0008
+pbi_id: PBI-0002
+status: ready
+owner_role: QA
+objective: "补齐资料与级别的正式依赖和会话集成验收"
+acceptance_criteria:
+  - "PBI-0002 AC1"
+  - "PBI-0002 AC2"
+  - "PBI-0002 AC3"
+depends_on:
+  - "TASK-0006"
+  - "TASK-0007"
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0002.yaml"
+  - "docs/features/PBI-0003.yaml"
+  - "docs/features/feat-001-tech-design.md"
+  - "docs/features/feat-001-ux-ui-design.md"
+  - "docs/features/pbi-0002-profile-implementation.md"
+  - "docs/tasks/TASK-0008.yaml"
+affected_repositories:
+  - "gesp-tutor-api"
+  - "gesp-tutor-web"
+affected_components:
+  - "acc/profile"
+  - "web/onboarding"
+  - "web/settings"
+allowed_scope:
+  - "gesp-tutor-api/tests/**"
+  - "gesp-tutor-web/tests/**"
+verification:
+  - "正式协议与check_text接入后复验，不把测试同意算正式同意"
+  - "AC1-3: 真实PG/Redis与PC完整旅程；会话新旧级别/历史快照实际集成"
+  - "移动仅基础响应式检查，不作为专项开发门槛"
+scope_limits: "不实现模型或注销，不将测试文本/测试同意作为正式合规证据，不静默变更架构。"
+executor:
+  mode: agent
+  adapter: codex
+readiness_notes: "正式协议、真实check_text、真实PG/Redis及学习会话历史集成尚缺；移动仅基础响应式检查，不是专项前置。"

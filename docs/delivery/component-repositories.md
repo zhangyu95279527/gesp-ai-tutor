@@ -18,3 +18,10 @@
 - Web: task-0004-email-login / 1861c52；API: task-0003-email-auth / c0de418。各自工作区已提交，任务分支未合 main，仍无远端。
 - 本机登录入口 http://127.0.0.1:3000/login；API 127.0.0.1:8000；本机测试收件箱127.0.0.1:8025。
 - 验证与待办见 docs/verification/PBI-0001-local-login.md；TASK-0003/0004进入验证，TASK-0005仍待真实依赖和两端验收。
+
+
+## 首次资料与级别 — 2026-11-12
+
+- API: task-0006-profile-level / 87f81b4；Web: task-0007-profile-settings / 851bfc2；工作区已提交，未合main、未创建远端。
+- 本机/settings已验证，缺资料账号由/login自动进入/onboarding。协议和内容安全仍为开发验证边界，生产入口未开放。
+- 研发与验收口径改为PC优先，移动仅同页基础自适应；总体进度见docs/delivery/development-progress.md。

@@ -1,0 +1,48 @@
+id: TASK-0007
+pbi_id: PBI-0002
+status: in-verification
+owner_role: Developer
+objective: "接入PC资料填写与设置页"
+acceptance_criteria:
+  - "PBI-0002 AC1"
+  - "PBI-0002 AC2"
+  - "PBI-0002 AC3"
+depends_on:
+  - "TASK-0004"
+  - "TASK-0006"
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0002.yaml"
+  - "docs/features/PBI-0003.yaml"
+  - "docs/features/feat-001-tech-design.md"
+  - "docs/features/feat-001-ux-ui-design.md"
+  - "docs/features/pbi-0002-profile-implementation.md"
+  - "docs/tasks/TASK-0007.yaml"
+affected_repositories:
+  - "gesp-tutor-web"
+affected_components:
+  - "acc/profile"
+  - "web/onboarding"
+  - "web/settings"
+allowed_scope:
+  - "gesp-tutor-web/src/app/onboarding/**"
+  - "gesp-tutor-web/src/app/settings/**"
+  - "gesp-tutor-web/src/components/auth/**"
+  - "gesp-tutor-web/src/components/profile/**"
+  - "gesp-tutor-web/src/lib/**"
+  - "gesp-tutor-web/next.config.ts"
+  - "gesp-tutor-web/tests/**"
+  - "gesp-tutor-web/README.md"
+  - "gesp-tutor-web/AGENTS.md"
+verification:
+  - "AC1: 登录后缺资料进入填写页、字段错误、测试协议与监护拦截"
+  - "AC2: 设置页8级选择及次日生效反馈"
+  - "AC3: 显示当前与待生效级别；PC浏览器验证，移动仅基础自适应"
+scope_limits: "不实现模型或注销，不将测试文本/测试同意作为正式合规证据，不静默变更架构。"
+executor:
+  mode: agent
+  adapter: codex
+evidence:
+  - "docs/verification/PBI-0002-local-profile.md"
+code_branch: "task-0007-profile-settings"
+code_commit: "851bfc2"

@@ -1,0 +1,44 @@
+id: TASK-0006
+pbi_id: PBI-0002
+status: in-verification
+owner_role: Developer
+objective: "实现首次资料、测试协议留痕与次日级别管理"
+acceptance_criteria:
+  - "PBI-0002 AC1"
+  - "PBI-0002 AC2"
+  - "PBI-0002 AC3"
+depends_on:
+  - "TASK-0003"
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0002.yaml"
+  - "docs/features/PBI-0003.yaml"
+  - "docs/features/feat-001-tech-design.md"
+  - "docs/features/feat-001-ux-ui-design.md"
+  - "docs/features/pbi-0002-profile-implementation.md"
+  - "docs/tasks/TASK-0006.yaml"
+affected_repositories:
+  - "gesp-tutor-api"
+affected_components:
+  - "acc/profile"
+  - "web/onboarding"
+  - "web/settings"
+allowed_scope:
+  - "gesp-tutor-api/src/**"
+  - "gesp-tutor-api/tests/**"
+  - "gesp-tutor-api/migrations/**"
+  - "gesp-tutor-api/README.md"
+  - "gesp-tutor-api/AGENTS.md"
+  - "gesp-tutor-api/.env.example"
+verification:
+  - "AC1: 缺项/非法年月/监护要求/版本与本人权限校验，PG事务无半提交"
+  - "AC2: 严格1-8整数与完整资料前置"
+  - "AC3: 上海跨日、最后修改生效、取消与快照不回写；实际历史集成待TASK-0008"
+scope_limits: "不实现模型或注销，不将测试文本/测试同意作为正式合规证据，不静默变更架构。"
+executor:
+  mode: agent
+  adapter: codex
+evidence:
+  - "docs/verification/PBI-0002-local-profile.md"
+code_branch: "task-0006-profile-level"
+code_commit: "87f81b4"

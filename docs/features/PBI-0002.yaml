@@ -1,7 +1,7 @@
 id: PBI-0002
 type: user-story
 feature_id: FEAT-001
-status: draft
+status: in-progress
 owner_role: ""
 title: "首次注册资料收集与级别管理"
 value: "获取讲解深度控制所需的最小资料（昵称/出生年月/所报级别），使级别适配机制可用"
@@ -19,3 +19,8 @@ references:
   - "docs/product/prd/04-business-rules.md (BR-LVL)"
   - "docs/features/feat-001-ux-ui-design.md"
   - "docs/features/feat-001-tech-design.md"
+  - "docs/features/pbi-0002-profile-implementation.md"
+  - "docs/tasks/TASK-0006.yaml"
+  - "docs/tasks/TASK-0007.yaml"
+  - "docs/tasks/TASK-0008.yaml"
+  - "docs/verification/PBI-0002-local-profile.md"

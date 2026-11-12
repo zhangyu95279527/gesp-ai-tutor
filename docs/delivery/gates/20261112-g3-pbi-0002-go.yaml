@@ -1,0 +1,12 @@
+id: GATE-RECORD-0006
+gate: G3
+artifact: PBI-0002
+decision: go
+criteria_met: [ac-verifiable, design-ready, tech-design-ready, tasks-decomposed, dependencies-confirmed]
+criteria_failed: []
+decided_by: Codex
+role: product-owner-and-architect
+date: "2026-11-12"
+recycle_target: ""
+follow_up: []
+notes: "既有登录代码c0de418/1861c52与本机开发环境可用，已批准账号UI及资料专属设计明确；三任务覆盖3条AC。仅放行资料/级别开发切片，正式协议/check_text与真实会话历史列为TASK-0008验收输入，不宣称这些依赖已生产验收。遵照用户PC优先/移动仅自适应的最新确认。"

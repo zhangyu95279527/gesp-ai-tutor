@@ -30,10 +30,10 @@ allowed_scope:
   - "gesp-tutor-web/tests/**"
 verification:
   - "AC1-5: 真实PostgreSQL/Redis/SMTP及测试邮箱收件证据"
-  - "移动与桌面浏览器两端登录、过期及锁定验证"
+  - "PC浏览器登录、过期及锁定完整验证；移动仅基础响应式检查（2026-11-12用户确认）"
   - "缺少真实服务或正式协议内容则保持待验收，不产生G4 go"
 scope_limits: "不实现或绕过资料/监护同意，不开放模型调用，不批准待审ADR；开发测试替身不得用作生产回退。"
 executor:
   mode: agent
   adapter: codex
-readiness_notes: "真实服务投递、正式协议/资料流程和移动视口证据尚缺；当前不可宣称本任务或PBI完成。"
+readiness_notes: "真实服务投递、正式协议/资料流程及真实服务证据尚缺；移动专项不再阻塞PC推进；当前不可宣称本任务或PBI完成。"
