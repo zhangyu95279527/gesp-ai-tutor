@@ -34,6 +34,9 @@ acceptance_criteria:
   - "题目识别 + 首轮讲解的流式输出首字延迟 P75 不超过 5 秒（NFR-PERF-01）（证据：性能埋点统计）"
 dependencies: [PBI-0006]
 references:
+  - "docs/verification/PBI-0007-pc-review.md"
+  - "docs/features/pbi-0007-pc-review.md"
+  - "docs/tasks/TASK-0019.yaml"
   - "docs/verification/PBI-0007-reidentify.md"
   - "docs/features/pbi-0007-reidentify.md"
   - "docs/tasks/TASK-0018.yaml"

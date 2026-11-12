@@ -51,3 +51,9 @@
 - API最新task-0018-reidentify-lifecycle / 450a06b，承接2e009fa；Web仍8d4ce81。未合main/推送。
 - 本机迁移0006_reidentify(head)，178项后端回归通过。首次免费资格PG认领，后续预留成功回显才扣、失败/中断释放；新edit/confirm与活动识别互斥。真实识别readiness默认False，无HTTP/UI接入，8000未重启。
 - 原PG开发服务已停止，本轮用原脚本/数据目录恢复5432→5433回环代理，无重建数据；仍不是生产PG。
+
+## PC回显与纠正HTTP — 2026-11-12
+
+- API最新task-0019-session-review / 169b50f；Web同名分支 / 6ca6442（主体ad8c1cf）。未合main/推送。
+- API183项、Web71项测试及生产构建通过；PC开发样例三字段修正、考纲外、冲突/连接失败保留已查。正常/session?id读取本人回显、POST echo保存纠正；生产缺安全拒绝，确认/重识别未配置503不扣次。
+- Web3000开发预览已启动；独立/dev/session-review明确合成不写库，生产3019实际返回404后已停临时服务。API本轮为ASGI验证，未启动8000；完整浏览器真实会话E2E仍待联调。

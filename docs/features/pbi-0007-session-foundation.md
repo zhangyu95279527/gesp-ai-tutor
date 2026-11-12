@@ -28,3 +28,5 @@ Status: approved
 TASK-0017新增内部确认/额度共享PG事务及执行认领，契约见[pbi-0007-confirmation.md](pbi-0007-confirmation.md)。仅正式受理时冻结final_level并进入l1_pending；edit仍不等于confirm。该基础已编码，但真实生成readiness默认关闭，未开放HTTP或真实L1。TASK-0016继续承担完整真实集成责任。
 
 TASK-0018新增重识别PG资格/活动互斥及预留结算，见[pbi-0007-reidentify.md](pbi-0007-reidentify.md)。用户确认失败不扣次；首次免费，后续成功发布有效回显才扣、失败/中断释放。内部新识别值替换当前回显，之前AI判定与用户候选保存在操作快照，创建级别和corrections保留；真实服务仍未接入。
+
+TASK-0019新增本人会话读取/纠正HTTP及PC回显表单，见[pbi-0007-pc-review.md](pbi-0007-pc-review.md)。开发local可验证持久纠正，生产缺正式安全时拒绝写入；确认/重识别未配置503不扣次。独立开发样例显式合成，生产404，不作为真实识别验收。

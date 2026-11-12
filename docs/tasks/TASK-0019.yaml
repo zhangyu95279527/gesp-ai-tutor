@@ -1,0 +1,41 @@
+id: TASK-0019
+pbi_id: PBI-0007
+status: in-verification
+owner_role: Developer
+objective: "接通PC会话回显、纠正保存及明确关闭的确认/重识别入口"
+depends_on: [TASK-0012, TASK-0015, TASK-0017, TASK-0018]
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0007.yaml"
+  - "docs/features/feat-002-ux-ui-design.md"
+  - "docs/features/pbi-0007-pc-review.md"
+  - "docs/tasks/TASK-0019.yaml"
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [tut, web/session-review]
+allowed_scope:
+  - "gesp-tutor-api/src/gesp_api/tut/**"
+  - "gesp-tutor-api/src/gesp_api/app.py"
+  - "gesp-tutor-api/tests/test_review_routes.py"
+  - "gesp-tutor-api/README.md"
+  - "gesp-tutor-api/AGENTS.md"
+  - "gesp-tutor-web/src/components/tutor/**"
+  - "gesp-tutor-web/src/lib/tutor/**"
+  - "gesp-tutor-web/src/app/session/**"
+  - "gesp-tutor-web/src/app/dev/session-review/**"
+  - "gesp-tutor-web/next.config.ts"
+  - "gesp-tutor-web/tests/review*.test.ts*"
+  - "gesp-tutor-web/tests/input.test.tsx"
+  - "gesp-tutor-web/AGENTS.md"
+verification:
+  - "本人读取/编辑与404隔离、幂等冲突、写保护、生产安全关闭"
+  - "AI标识、三字段纠正、考纲外提示、保存重试/冲突不丢输入"
+  - "PC浏览器交互与基础响应式；开发样例生产不可访问"
+acceptance_criteria: ["PBI-0007 AC1", "PBI-0007 AC2", "PBI-0007 AC3", "PBI-0007 AC6", "PBI-0007 AC8", "PBI-0007 AC10"]
+scope_limits: "confirm/reidentify未配置时503且不扣次；不接真实识别/生成，不把开发合成样例当完整验收。"
+executor: {mode: agent, adapter: codex}
+code_branch: "task-0019-session-review"
+code_commits:
+  gesp-tutor-api: "169b50f"
+  gesp-tutor-web: "6ca6442"
+evidence:
+  - "docs/verification/PBI-0007-pc-review.md"

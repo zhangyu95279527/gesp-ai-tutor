@@ -1,0 +1,62 @@
+- text: 开发样例保存结果：
+- combobox "开发样例保存结果：":
+  - option "正常保存" [selected]
+  - option "模拟版本冲突"
+  - option "模拟连接失败"
+- main:
+  - link "GESP AI 辅导 · 新题目":
+    - /url: /session
+  - link "资料与备考级别":
+    - /url: /settings
+  - note: 开发交互样例 · 合成题目，不是真实识别 · 保存仅更新本页，不写数据库、不扣次数
+  - complementary:
+    - paragraph: 先核对，再讲解
+    - heading "读对题目， 才好理清思路。" [level=1]:
+      - text: 读对题目，
+      - text: 才好理清思路。
+    - paragraph: 确认题干、考点和级别。发现偏差，可以先保存修正。
+    - paragraph: 创建时备考级别：GESP C++ 3 级
+    - paragraph: 已受理重识别：0 次
+    - paragraph: 同会话首次重识别免费，之后先预留，成功回显才计次；失败或中断不计次。
+  - region "题目回显确认":
+    - paragraph: 待确认题目
+    - region "题目回显（含已保存修正）":
+      - heading "题目回显（含已保存修正）" [level=2]
+      - text: AI 生成
+      - heading "题目" [level=3]
+      - paragraph: 给定一个正整数 n，请计算并输出 n 的所有数位中最大的数字。
+      - heading "考点" [level=3]
+      - paragraph: 数位处理、最大值
+      - heading "本次候选级别" [level=3]
+      - paragraph: 通用编程问题，不针对考级
+    - paragraph: 该题超出 GESP 考纲范围。继续后将按通用编程问题讲解，不针对考级。
+    - group "你的修正 （选填；留空保留当前内容）":
+      - generic: 你的修正 （选填；留空保留当前内容）
+      - generic: 修正题干
+      - textbox "修正题干":
+        - /placeholder: 题干有误时，在这里输入完整修正版。
+      - generic: 修正考点（每行一项）
+      - textbox "修正考点（每行一项）"
+      - checkbox "清空当前考点"
+      - text: 清空当前考点
+      - generic: 修正本次教学级别
+      - combobox "修正本次教学级别":
+        - option "保留当前级别" [selected]
+        - option "GESP C++ 1 级"
+        - option "GESP C++ 2 级"
+        - option "GESP C++ 3 级"
+        - option "GESP C++ 4 级"
+        - option "GESP C++ 5 级"
+        - option "GESP C++ 6 级"
+        - option "GESP C++ 7 级"
+        - option "GESP C++ 8 级"
+        - option "考纲外 · 通用编程问题"
+      - button "保存样例修正"
+    - paragraph: 保存修正不会生成讲解或扣次数。
+    - button "确认题目，开始 L1 讲解" [disabled]
+    - button "重新识别" [disabled]
+    - paragraph: 讲解与重识别服务暂未开放。现在可以核对题目；纠正保存是否可用以当前会话权限为准。
+    - button "重新读取（替换未保存修正）"
+    - status: 样例修正已更新，仅保留在本页。
+- button "Open Next.js Dev Tools":
+- alert
