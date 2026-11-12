@@ -1,0 +1,37 @@
+id: TASK-0020
+pbi_id: PBI-0008
+status: in-verification
+owner_role: Developer
+objective: "实现PC阶梯展示、SSE消费/续接与安全关闭的阶梯HTTP合同"
+depends_on: [TASK-0019]
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0008.yaml"
+  - "docs/features/feat-002-tech-design.md"
+  - "docs/features/feat-002-ux-ui-design.md"
+  - "docs/features/pbi-0008-pc-ladder.md"
+  - "docs/tasks/TASK-0020.yaml"
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [tut, web/ladder, web/sse]
+allowed_scope:
+  - "gesp-tutor-api/src/gesp_api/tut/session_routes.py"
+  - "gesp-tutor-api/tests/test_ladder_routes.py"
+  - "gesp-tutor-api/AGENTS.md"
+  - "gesp-tutor-web/src/lib/tutor/**"
+  - "gesp-tutor-web/src/components/tutor/**"
+  - "gesp-tutor-web/src/app/dev/ladder/**"
+  - "gesp-tutor-web/tests/ladder*.test.ts*"
+  - "gesp-tutor-web/AGENTS.md"
+acceptance_criteria: ["PBI-0008 AC1", "PBI-0008 AC4", "PBI-0008 AC5", "PBI-0008 AC6", "PBI-0008 AC8", "PBI-0008 AC12", "PBI-0008 AC15", "PBI-0008 AC16"]
+verification:
+  - "SSE分片/UTF8/CRLF/重复游标、未检/坏流拒绝、唯一终态及断线续接GET不重POST"
+  - "PC逐级手动解锁、失败不升级、超限保留已完成内容/考纲外标注"
+  - "开发样例生产404、API本人隔离与未配置不扣次"
+scope_limits: "内容/持久steps/真实生成与SSE服务器未交付；客户端检查不替代安全/答案边界评估。"
+executor: {mode: agent, adapter: codex}
+code_branch: "task-0020-pc-ladder-stream"
+code_commits:
+  gesp-tutor-api: "f59aa7e"
+  gesp-tutor-web: "312d9e1"
+evidence:
+  - "docs/verification/PBI-0008-pc-ladder.md"

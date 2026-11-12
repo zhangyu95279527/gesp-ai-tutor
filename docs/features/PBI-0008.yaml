@@ -1,8 +1,8 @@
 id: PBI-0008
 type: user-story
 feature_id: FEAT-002
-status: draft
-owner_role: ""
+status: in-progress
+owner_role: "Developer"
 title: "阶梯式引导引擎（L1/L2/L3 手动解锁）"
 value: "产品核心价值'H1：引导优于直给答案'的机制落点，被讲题、诊断修正、模考讲评三处复用"
 user_story:
@@ -39,6 +39,10 @@ acceptance_criteria:
   - "阶梯解锁轮流式输出首字延迟 P75 不超过 5 秒（NFR-PERF-01）（证据：性能埋点统计）"
 dependencies: [PBI-0007, PBI-0005]
 references:
+  - "docs/verification/PBI-0008-pc-ladder.md"
+  - "docs/features/pbi-0008-pc-ladder.md"
+  - "docs/tasks/TASK-0020.yaml"
+  - "docs/tasks/TASK-0021.yaml"
   - "docs/features/feat-002-ux-ui-design.md"
   - "docs/product/prd/03-functional-requirements.md (FR-TUT-04)"
   - "docs/product/prd/04-business-rules.md (BR-GUD, BR-LVL)"

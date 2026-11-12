@@ -1,0 +1,52 @@
+- text: 开发协议场景：
+- combobox "开发协议场景：":
+  - option "正常完成" [selected]
+  - option "断线后续接"
+  - option "额度用完"
+  - option "安全截断"
+  - option "生成失败"
+  - option "拒绝未检查候选"
+- button "Open Next.js Dev Tools":
+- alert
+- main:
+  - link "GESP AI 辅导 · 新题目" [active]:
+    - /url: /session
+  - link "资料与备考级别":
+    - /url: /settings
+  - paragraph: 开发交互样例 · 正文仅为协议占位，不是真实讲解、不含解题答案、不扣真实次数
+  - complementary:
+    - paragraph: 循着阶梯，自己想明白
+    - heading "先找方向， 再展开步骤。" [level=1]:
+      - text: 先找方向，
+      - text: 再展开步骤。
+    - paragraph: L1 只给思路方向；L2 看关键步骤；L3 才展开完整讲解。
+    - paragraph: 本次教学级别：GESP C++ 3 级
+    - region "已完成层级":
+      - heading "已完成层级" [level=2]
+      - list:
+        - text: L1 · 思路提示
+        - generic: 2026/11/12 16:00:00
+        - text: L2 · 关键步骤
+        - generic: 2026/11/12 18:07:02
+  - region "阶梯讲解":
+    - list "讲解阶梯":
+      - text: L1 · 思路提示
+      - generic: 已完成
+      - text: L2 · 关键步骤
+      - generic: 已完成
+      - text: L3 · 完整讲解
+      - generic: 未解锁
+    - region "L1 · 思路提示":
+      - heading "L1 · 思路提示" [level=2]
+      - text: AI 生成
+      - paragraph: 【开发样例】本卡只验证 L1 卡片渲染，不提供任何题目解法。
+      - paragraph: 实际思路提示须由已检查的服务端输出提供。
+    - region "L2 · 关键步骤":
+      - heading "L2 · 关键步骤" [level=2]
+      - text: AI 生成
+      - paragraph: 【开发样例】L2 协议分片甲。本段仅验证流式渲染和终态，不是解题步骤或参考答案。
+    - heading "需要完整讲解吗？" [level=2]
+    - paragraph: L3 会展开参考代码、复杂度与讲解。
+    - paragraph: 解锁将消耗 1 次今日额度，由你手动决定。
+    - button "解锁 L3（消耗 1 次）"
+    - button "重新读取会话"

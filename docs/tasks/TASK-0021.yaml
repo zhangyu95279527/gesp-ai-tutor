@@ -1,0 +1,19 @@
+id: TASK-0021
+pbi_id: PBI-0008
+status: draft
+owner_role: Developer
+objective: "实现真实阶梯引擎、持久输出/steps与PC端到端"
+depends_on: [TASK-0020, TASK-0016]
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0008.yaml"
+  - "docs/features/feat-002-tech-design.md"
+  - "docs/features/feat-002-ux-ui-design.md"
+  - "docs/features/pbi-0008-pc-ladder.md"
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [core/session, core/llm, lmt, web/ladder]
+allowed_scope: ["gesp-tutor-api/src/**", "gesp-tutor-api/tests/**", "gesp-tutor-api/migrations/**", "gesp-tutor-web/src/**", "gesp-tutor-web/tests/**"]
+acceptance_criteria: ["PBI-0008 AC1", "PBI-0008 AC2", "PBI-0008 AC3", "PBI-0008 AC4", "PBI-0008 AC5", "PBI-0008 AC6", "PBI-0008 AC7", "PBI-0008 AC8", "PBI-0008 AC9", "PBI-0008 AC10", "PBI-0008 AC11", "PBI-0008 AC12", "PBI-0008 AC13", "PBI-0008 AC14", "PBI-0008 AC15", "PBI-0008 AC16", "PBI-0008 AC17"]
+verification: ["全部17条AC真实内容/安全边界/计次/PC流转/steps聚合/性能证据"]
+scope_limits: "真实服务/预算/安全就绪后细化，不以开发占位内容或声明的checks替代实测。"
+executor: {mode: agent, adapter: codex}

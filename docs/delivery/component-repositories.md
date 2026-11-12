@@ -57,3 +57,10 @@
 - API最新task-0019-session-review / 169b50f；Web同名分支 / 6ca6442（主体ad8c1cf）。未合main/推送。
 - API183项、Web71项测试及生产构建通过；PC开发样例三字段修正、考纲外、冲突/连接失败保留已查。正常/session?id读取本人回显、POST echo保存纠正；生产缺安全拒绝，确认/重识别未配置503不扣次。
 - Web3000开发预览已启动；独立/dev/session-review明确合成不写库，生产3019实际返回404后已停临时服务。API本轮为ASGI验证，未启动8000；完整浏览器真实会话E2E仍待联调。
+
+## PC阶梯与流式客户端 — 2026-11-12
+
+- API最新task-0020-pc-ladder-stream / f59aa7e；Web同名分支 / 312d9e1。两仓工作区已提交，未合main/推送。
+- API190项、Web91项测试及生产构建通过。PC手动相邻解锁、断线GET续接/去重、超限保留及安全/失败状态已查；证据见docs/verification/PBI-0008-pc-ladder.md。
+- 新增本人阶梯GET诚实返回空steps/unlock=false；unlock未配置503不扣次。无新迁移，仍0006_reidentify；API8000本轮未启动/重启，HTTP为ASGI+PG验证。
+- Web3000保留/dev/ladder开发协议占位演示，不是真实讲解且不扣真实次数；临时生产3020实际返回404后已停止。真实持久steps、解锁引擎、内容检查与SSE服务待TASK-0021。

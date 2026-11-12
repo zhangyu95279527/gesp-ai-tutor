@@ -1,0 +1,12 @@
+id: GATE-RECORD-0010
+gate: G3
+artifact: PBI-0008
+decision: go
+criteria_met: [ac-verifiable, design-ready, tech-design-ready, tasks-decomposed, dependencies-confirmed]
+criteria_failed: []
+decided_by: Codex
+role: product-owner-and-architect
+date: "2026-11-12"
+recycle_target: ""
+follow_up: ["仅放行TASK-0020客户端/关闭服务合同；TASK-0021真实引擎和全部AC仍draft"]
+notes: "承接用户继续PC主链路开发授权；现有UI、AiContent、用量组件及会话读取已可复用。确认依赖仅限独立客户端/当前服务关闭合同，不表示PBI-0007完整通过或真实生成/安全就绪；不产生G4。"
