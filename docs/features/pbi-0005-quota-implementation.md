@@ -34,3 +34,9 @@ GET /api/lmt/usage返回limit/used/reserved/remaining/billing_date/reset_at（As
 设计保留每owner持久化行锁，增加PG往返以换确定的恢复边界；当前规模合理，延迟与生产吞吐仍须实测。异常停机后的悬挂预留安全占用直至业务恢复，不虚构自动释放成功。
 
 任务AC编号按PBI acceptance_criteria从1开始：TASK-0009覆盖AC1–10、14–17的服务合同；TASK-0010覆盖AC8、12、13、18的展示合同；TASK-0011补齐全部18条真实业务证据。当前仅有合同/组件通过，不代表对应完整AC通过；逐条差距见验证记录。Redis配置自身丢失会恢复默认15，配置持久化/恢复由部署保障。
+
+## TASK-0017 共享事务补充
+
+新增consume_in_transaction供内部确认编排使用，要求已开启的非autocommit PG连接。限额模块拥有全部账本/流水/Lua操作；返回的事务内决定尚未提交，调用方必须外层commit成功后才放行生成。锁顺序为单session→quota owner，不得在该外层事务再锁其他session。普通consume/reserve等原有独立事务接口保持不变。
+
+确认、纠正、教学级别冻结及计次账本由同一PG事务提交；回滚后Redis计数沿用下次从已提交账本重建的恢复机制。确认operation_id在PG提交时随业务记录持久化，提交响应丢失时读回，不另扣。TASK-0017仅验证内部合同，不取代TASK-0011真实基础设施或TASK-0016实际生成/SSE验收。

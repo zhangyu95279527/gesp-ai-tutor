@@ -40,3 +40,8 @@
 
 - API最新task-0015-session-foundation / 02603a2，承接05370ed；Web仍8d4ce81。未合main、未推送。
 - 本机迁移0004_sessions(head)，内部SessionStore已验证输入/级别快照、隔离、状态、识别产物与逐字段纠正、持久幂等/版本及事务恢复基础；145项后端回归通过。8000未重启、公开创建入口未接仓储，真实识别/confirm额度与UI仍待后续任务。
+
+## 确认受理基础 — 2026-11-12
+
+- API最新task-0017-confirmation-admission / 2e009fa，承接02603a2；Web仍8d4ce81。未合main/推送。
+- 本机迁移0005_confirmation(head)，160项后端全回归通过。确认通过lmt内部接口共享PG事务，原子冻结级别/扣次、超限不推进，并提供单次执行认领/中断状态；真实生成readiness默认False，无公开confirm或L1输出，8000未重启。

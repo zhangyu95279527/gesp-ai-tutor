@@ -22,3 +22,7 @@ Status: approved
 - TASK-0016：依赖TASK-0015及TASK-0013；真实识别与回显UI、纠正提交、级别冻结、重识别持久资格及计次、confirm原子额度和L1、故障重试/性能；覆盖全部11条完整AC。未配置真实依赖前draft，不产生G4。
 
 停止条件：迁移在本机PG协议环境成功，隔离/重放/冲突/版本/恢复/纠正测试通过，全回归通过并保存证据。基础合同通过不等于完整AC、生产并发或G4通过。
+
+## 确认基础续作
+
+TASK-0017新增内部确认/额度共享PG事务及执行认领，契约见[pbi-0007-confirmation.md](pbi-0007-confirmation.md)。仅正式受理时冻结final_level并进入l1_pending；edit仍不等于confirm。该基础已编码，但真实生成readiness默认关闭，未开放HTTP或真实L1。TASK-0016继续承担完整真实集成责任。

@@ -1,0 +1,34 @@
+id: TASK-0017
+pbi_id: PBI-0007
+status: in-verification
+owner_role: Developer
+objective: "实现确认受理、级别冻结与额度共享PG事务及单次执行认领基础"
+depends_on: [TASK-0015, TASK-0009]
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0007.yaml"
+  - "docs/features/pbi-0007-session-foundation.md"
+  - "docs/features/pbi-0007-confirmation.md"
+  - "docs/features/pbi-0005-quota-implementation.md"
+  - "docs/tasks/TASK-0017.yaml"
+affected_repositories: [gesp-tutor-api]
+affected_components: [core/session, lmt]
+allowed_scope:
+  - "gesp-tutor-api/src/gesp_api/core/session/**"
+  - "gesp-tutor-api/src/gesp_api/lmt/service.py"
+  - "gesp-tutor-api/migrations/versions/0005_confirmation.py"
+  - "gesp-tutor-api/tests/test_confirmation.py"
+  - "gesp-tutor-api/README.md"
+  - "gesp-tutor-api/AGENTS.md"
+acceptance_criteria: ["PBI-0007 AC1", "PBI-0007 AC2", "PBI-0007 AC3", "PBI-0007 AC8", "PBI-0007 AC10"]
+verification:
+  - "确认/额度同事务提交，超限保持会话版本/纠正/级别不变"
+  - "同键恢复、换payload冲突、跨日重放不二次扣次"
+  - "事务失败账本/会话回滚，Redis下一次从账本修复"
+  - "执行仅一次认领、运行中断不重领/不退款、缺生成能力不扣次"
+scope_limits: "内部协调合同，不开放HTTP、不调用模型或发布L1；资源预算/安全/真实执行编排由TASK-0016接入。"
+executor: {mode: agent, adapter: codex}
+code_branch: "task-0017-confirmation-admission"
+code_commit: "2e009fa"
+evidence:
+  - "docs/verification/PBI-0007-confirmation.md"
