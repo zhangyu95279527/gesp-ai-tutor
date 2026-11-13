@@ -1,36 +1,36 @@
 {
   "updated": "2026-11-13",
-  "task": "TASK-0026",
-  "checkpoint": "docs/delivery/checkpoints/20261113-session-followup.md",
+  "task": "TASK-0027",
+  "checkpoint": "docs/delivery/checkpoints/20261113-diagnosis-input.md",
   "snapshot_branch": "chore-mac-mini-handoff",
   "repositories": {
     "gesp-ai-tutor": {
       "path": ".",
-      "branch": "task-0026-session-followup",
+      "branch": "task-0027-diagnosis-input",
       "commit_source": "本文件所在的交付仓提交"
     },
     "gesp-tutor-api": {
       "path": "../gesp-tutor-api",
-      "branch": "task-0026-session-followup",
-      "commit": "4d5f979412690e97e1fee58df57554bf1efc8068"
+      "branch": "task-0027-diagnosis-input",
+      "commit": "80d3798356c84858af6ef49e63e4f3d030d9d5d5"
     },
     "gesp-tutor-web": {
       "path": "../gesp-tutor-web",
-      "branch": "task-0026-session-followup",
-      "commit": "128ae596d4ec6e3f62fa66d88f38104e59c703da"
+      "branch": "task-0027-diagnosis-input",
+      "commit": "dbcec3e7c98fde1dab52e7b3f503f55b06107407"
     }
   },
   "database_migration": "0010_followup",
   "verification": {
-    "api_tests": 269,
-    "web_tests": 141,
-    "pc_followup_view": "saved synthetic QA thread, in-page draft and refresh checked"
+    "api_tests": 287,
+    "web_tests": 156,
+    "pc_diagnosis_input": "missing fields, 5001 paste/file preservation, invalid UTF8 retains code, local image and disabled recognition checked"
   },
   "real_generation_configured": false,
   "remaining": [
     "真实模型/输入输出安全/答案边界/资源预算装配",
     "运行中SSE与供应商取消/用量刷新",
-    "变式检验与诊断三件套",
+    "变式检验、三件套真实上传/OCR与错因输出",
     "更早追问分页与PC真实生成全链路/Mac验证"
   ]
 }

@@ -1,0 +1,19 @@
+id: TASK-0027
+pbi_id: PBI-0014
+status: in-verification
+owner_role: Developer
+objective: "实现PC诊断三件套本地输入/预览、代码文件保留与服务端严格输入合同"
+depends_on: [TASK-0012, TASK-0014]
+inputs: ["AGENTS.md", "docs/features/PBI-0014.yaml", "docs/features/feat-003-ux-ui-design.md", "docs/features/pbi-0014-input.md"]
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [dia, tut/images, web/diagnosis]
+allowed_scope: ["gesp-tutor-api/src/**", "gesp-tutor-api/tests/**", "gesp-tutor-api/AGENTS.md", "gesp-tutor-web/src/**", "gesp-tutor-web/tests/**", "gesp-tutor-web/next.config.ts", "gesp-tutor-web/AGENTS.md"]
+acceptance_criteria: ["PBI-0014 AC1", "PBI-0014 AC2", "PBI-0014 AC3", "PBI-0014 AC5"]
+verification: ["三件套缺项/互斥/长度和5001字符原文保留", "UTF8代码文件/图片本地预览与像素/类型校验", "服务端归属/真实图片字节/安全检查与未配置拒绝无扣次", "PC表单/预览/更正保留、规范/类型/测试/构建、Git同步"]
+scope_limits: "仅输入基础；即贴即传/对象存储/真实OCR评测状态识别与诊断未配置，图片仅本地预览，生产新诊断关闭。不作完整AC或G4。"
+executor: {mode: agent, adapter: codex}
+code_branch: task-0027-diagnosis-input
+code_commits:
+  gesp-tutor-api: 80d3798356c84858af6ef49e63e4f3d030d9d5d5
+  gesp-tutor-web: dbcec3e7c98fde1dab52e7b3f503f55b06107407
+evidence: ["docs/verification/PBI-0014-input.md", "docs/verification/TASK-0027-diagnosis.jpg"]

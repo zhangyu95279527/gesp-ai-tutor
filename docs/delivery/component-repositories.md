@@ -106,3 +106,10 @@
 - API269项、mypy41源文件/ruff与Web141项/生产build通过。共享活动操作/计次、冻结级别/阶梯、已检答案发布/完成回放与当前页草稿/已保存问答已实现。
 - PC用明确合成QA问答验证刷新恢复和阶梯保持L1，重新读取状态保留当前页草稿；公开POST仍503，无真实新回答/模型安全验收。
 - 3000/8000开发服务已按本轮代码重启，本机Redis/SMTP保留。三仓任务及固定换机分支按workspace-sync同步，最新状态见current-work.json和20261113-session-followup检查点。
+
+## 诊断三件套输入基础 — 2026-11-13
+
+- API task-0027-diagnosis-input / 80d3798；Web同名分支 / dbcec3e，迁移仍0010_followup。
+- API287项、mypy45源文件/ruff与Web156项/生产build通过；新增三件套严格合同、本人图片实际字节/安全检查、PC本地材料预览与UTF8文件导入。
+- PC缺项、5001粘贴/文件保留、错误编码保留旧代码、评测截图预览及修改后重新核对已实测；无真实上传/OCR/诊断结果，公开POST503、生产表单关闭。
+- 3000/8000已重启，开发Redis/SMTP保留。三仓任务与固定换机快照按workspace-sync同步；版本与接续入口见current-work.json及20261113-diagnosis-input检查点。

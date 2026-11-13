@@ -1,0 +1,12 @@
+id: GATE-RECORD-0016
+gate: G3
+artifact: PBI-0014
+decision: go
+criteria_met: [ac-verifiable, design-ready, tech-design-ready, tasks-decomposed, dependencies-confirmed]
+criteria_failed: []
+decided_by: Codex
+role: product-owner-and-architect
+date: "2026-11-13"
+recycle_target: ""
+follow_up: ["仅放行TASK-0027本地输入和服务端准备合同；真实上传/OCR/诊断待配置"]
+notes: "沿用用户基础功能优先、真实服务后配约定；依赖限定已实现PC输入/字节校验，复用定稿A1～A4设计，无人工架构门改变，不产生G4。"

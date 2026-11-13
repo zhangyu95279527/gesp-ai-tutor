@@ -1,8 +1,8 @@
 id: PBI-0014
 type: user-story
 feature_id: FEAT-003
-status: draft
-owner_role: ""
+status: in-progress
+owner_role: "Developer"
 title: "错因诊断三件套上传"
 value: "让判分后不知错因的学生以最顺手的粘贴方式一次给全诊断输入（进阶段画像 B 的核心场景）"
 user_story:
@@ -17,6 +17,8 @@ acceptance_criteria:
   - "学生代码支持粘贴文本（上限 5000 字符）或文件上传（证据：接口测试）"
 dependencies: [PBI-0006]
 references:
+  - "docs/tasks/TASK-0027.yaml"
+  - "docs/features/pbi-0014-input.md"
   - "docs/features/feat-003-ux-ui-design.md"
   - "docs/product/prd/03-functional-requirements.md (FR-DIA-01)"
   - "docs/product/prd/04-business-rules.md (BR-DIA)"
