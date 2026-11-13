@@ -1,8 +1,8 @@
 id: PBI-0015
 type: user-story
 feature_id: FEAT-003
-status: draft
-owner_role: ""
+status: in-progress
+owner_role: "Developer"
 title: "六类错因定位输出"
 value: "诊断模块的核心交付：让学生知道'错在哪'，且结论有依据、置信可辨"
 user_story:
@@ -17,6 +17,9 @@ acceptance_criteria:
   - "发起一次错因诊断（识别 + 首轮诊断）计 1 次日限额（BR-LMT-2）（证据：计数测试）"
 dependencies: [PBI-0014, PBI-0007]
 references:
+  - "docs/tasks/TASK-0028.yaml"
+  - "docs/features/pbi-0015-output.md"
+  - "docs/features/feat-003-ux-ui-design.md"
   - "docs/product/prd/03-functional-requirements.md (FR-DIA-02, FR-DIA-03)"
   - "docs/product/prd/04-business-rules.md (BR-DIA)"
   - "docs/product/prd/02-user-journeys.md (J2)"

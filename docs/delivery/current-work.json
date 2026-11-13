@@ -1,36 +1,37 @@
 {
   "updated": "2026-11-13",
-  "task": "TASK-0027",
-  "checkpoint": "docs/delivery/checkpoints/20261113-diagnosis-input.md",
+  "task": "TASK-0028",
+  "checkpoint": "docs/delivery/checkpoints/20261113-diagnosis-output.md",
   "snapshot_branch": "chore-mac-mini-handoff",
   "repositories": {
     "gesp-ai-tutor": {
       "path": ".",
-      "branch": "task-0027-diagnosis-input",
+      "branch": "task-0028-diagnosis-output",
       "commit_source": "本文件所在的交付仓提交"
     },
     "gesp-tutor-api": {
       "path": "../gesp-tutor-api",
-      "branch": "task-0027-diagnosis-input",
-      "commit": "80d3798356c84858af6ef49e63e4f3d030d9d5d5"
+      "branch": "task-0028-diagnosis-output",
+      "commit": "f07ffe34bfcf297ab1566f7d60086c2fc908e85d"
     },
     "gesp-tutor-web": {
       "path": "../gesp-tutor-web",
-      "branch": "task-0027-diagnosis-input",
-      "commit": "dbcec3e7c98fde1dab52e7b3f503f55b06107407"
+      "branch": "task-0028-diagnosis-output",
+      "commit": "19c19b08c33dad262190fa41806d03a57ed43e4f"
     }
   },
   "database_migration": "0010_followup",
   "verification": {
-    "api_tests": 287,
-    "web_tests": 156,
-    "pc_diagnosis_input": "missing fields, 5001 paste/file preservation, invalid UTF8 retains code, local image and disabled recognition checked"
+    "api_tests": 324,
+    "web_tests": 183,
+    "pc_diagnosis_result": "explicit protocol fixture, ordered causes, source quotes, AI badges, static-analysis notice and disabled guidance checked",
+    "production_diagnosis_demo": "404 with no fixture content; temporary server stopped"
   },
   "real_generation_configured": false,
   "remaining": [
     "真实模型/输入输出安全/答案边界/资源预算装配",
-    "运行中SSE与供应商取消/用量刷新",
-    "变式检验、三件套真实上传/OCR与错因输出",
-    "更早追问分页与PC真实生成全链路/Mac验证"
+    "诊断确认/计次/持久发布与本人读取、三件套真实上传/OCR",
+    "真实诊断20例重复一致性与盲评、变式检验",
+    "运行中SSE/供应商取消/用量刷新、更早追问分页与PC全链路/Mac验证"
   ]
 }

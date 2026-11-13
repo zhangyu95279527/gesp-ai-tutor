@@ -1,0 +1,19 @@
+id: TASK-0028
+pbi_id: PBI-0015
+status: in-verification
+owner_role: Developer
+objective: "实现六类错因输出合同、原文定位/安全检查及PC只读结果卡基础"
+depends_on: [TASK-0027, TASK-0001]
+inputs: ["AGENTS.md", "docs/features/PBI-0015.yaml", "docs/features/pbi-0015-output.md", "docs/features/feat-003-ux-ui-design.md", "docs/architecture/architecture-baseline.md"]
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [dia/output, web/diagnosis-result, web/ai]
+allowed_scope: ["gesp-tutor-api/src/gesp_api/dia/**", "gesp-tutor-api/tests/**", "gesp-tutor-api/AGENTS.md", "gesp-tutor-web/src/**", "gesp-tutor-web/tests/**", "gesp-tutor-web/AGENTS.md"]
+acceptance_criteria: ["PBI-0015 AC1", "PBI-0015 AC3"]
+verification: ["六分类/候选上限与唯一性/非空严格合同", "代码行号与代码/题干/评测原文引用核对", "缺安全/语义检查或拒绝不得产生已检结果", "PC首选/次候选、AI标识与静态分析提示，生产样例404", "API/Web回归与三仓Git同步"]
+scope_limits: "输出独立基础切片；不新增诊断会话/确认/计次/持久化HTTP，不假设输入已实际确认。真实模型与不少于20例两次一致性、盲评及完整链路仍待后续。"
+executor: {mode: agent, adapter: codex}
+code_branch: task-0028-diagnosis-output
+code_commits:
+  gesp-tutor-api: f07ffe34bfcf297ab1566f7d60086c2fc908e85d
+  gesp-tutor-web: 19c19b08c33dad262190fa41806d03a57ed43e4f
+evidence: ["docs/verification/PBI-0015-output.md", "docs/verification/TASK-0028-diagnosis-result.jpg"]

@@ -1,0 +1,12 @@
+id: GATE-RECORD-0017
+gate: G3
+artifact: PBI-0015
+decision: go
+criteria_met: [ac-verifiable, design-ready, tech-design-ready, tasks-decomposed, dependencies-confirmed]
+criteria_failed: []
+decided_by: Codex
+role: product-owner-and-architect
+date: "2026-11-13"
+recycle_target: ""
+follow_up: ["仅放行TASK-0028输出合同/检查器与只读卡片；真实确认/计次/持久化/模型一致性待后续"]
+notes: "沿用用户先基础功能后配置真实服务约定；只依赖已批准B3视觉与三件套边界，无新架构决策，不产生G4。"
