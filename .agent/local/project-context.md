@@ -37,3 +37,9 @@
 ## 跨平台工作区
 - 三仓保持同级目录；组件AGENTS以`../gesp-ai-tutor/AGENTS.md`定位交付仓。Windows登记路径仅作历史证据，Mac可放在`~/Developer/`。
 - 换机环境与Git续接见`docs/delivery/mac-mini-handoff.md`。不搬运Windows虚拟环境/依赖目录，不把本机测试数据或密钥提交Git。
+
+## 2026-11-13 持续同步约定
+- 用户决定继续本机开发，同时保持Git同步并随时可换电脑；此授权适用于后续完成增量的提交/推送，无需重复询问。
+- 开工先fetch并检查三仓工作区与远端；不覆盖另一台电脑提交，不强推。每个完成增量验证后提交，更新`docs/delivery/current-work.json`与最新检查点，组件先于交付仓推送。
+- 使用`scripts/workspace-sync.py --push`同步当前任务分支与固定换机入口`chore-mac-mini-handoff`；后者只快进作续接快照，不代表合入main或发布。
+- 三仓有脏树/远端较新或分叉时停止推送并说明；网络失败明确标未同步，不能仅凭本地commit声称可换机。其他电脑接续前必须pull --ff-only并读取current-work.json。

@@ -1,0 +1,12 @@
+id: GATE-RECORD-0013
+gate: G3
+artifact: PBI-0008
+decision: go
+criteria_met: [ac-verifiable, design-ready, tech-design-ready, tasks-decomposed, dependencies-confirmed]
+criteria_failed: []
+decided_by: Codex
+role: product-owner-and-architect
+date: "2026-11-13"
+recycle_target: ""
+follow_up: ["仅放行TASK-0024原子受理与孤立记录恢复；真实生成装配仍待TASK-0021"]
+notes: "用户要求本机继续且持续Git同步；本切片复用已验证PG/额度/恢复，不新增UI或真实服务依赖。可独立验证事务/幂等/恢复，无人工架构门变更，不产生G4。"

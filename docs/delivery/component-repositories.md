@@ -85,3 +85,10 @@
 - 三仓统一换机分支`chore-mac-mini-handoff`，基于TASK-0023。API提交4e98e79、Web提交c20356f已推送，历史任务分支一并保存；不合并main，不发布。交付仓换机说明随同批提交推送。
 - 组件AGENTS改为相邻交付仓相对路径，后端命令统一uv；新增`dev/compose.yaml`与`docs/delivery/mac-mini-handoff.md`，新机重建PG/Redis与依赖，不上传Windows缓存/虚拟环境/测试数据库或密钥。
 - 本轮为指引及开发配置变更，API含migrations的ruff通过；SMTP CLI参数已核对。当前Windows没有Docker，Compose未实际启动，Mac/ARM运行与回归待新机执行；不替代业务验收。
+
+## 原子受理与每轮Git同步 — 2026-11-13
+
+- API最新task-0024-atomic-admission / c65dccb；Web无修改，仍chore-mac-mini-handoff / c20356f。
+- 后端237项、ruff/mypy38源文件通过；新增确认冻结/扣次/L1操作/steps原子受理，以及旧孤立确认中断恢复，无新迁移。公开生成仍关闭，真实模型/安全/预算和实时SSE待装配。
+- 用户要求后续每轮完成增量均保持Git同步。current-work.json固定记录当前任务、组件SHA与最新检查点，workspace-sync.py在干净/无远端分叉条件下推送任务与固定换机分支并核验。
+- 固定远端chore-mac-mini-handoff随完成进度快进；三仓同步仍不代表main合并或发布。下一台电脑从该分支拉取并按Mac手册重建依赖，先读current-work.json。

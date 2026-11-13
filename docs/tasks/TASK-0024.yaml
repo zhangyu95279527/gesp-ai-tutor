@@ -1,0 +1,33 @@
+id: TASK-0024
+pbi_id: PBI-0008
+status: in-verification
+owner_role: Developer
+objective: "消除确认扣次与L1操作分离提交缺口，恢复旧孤立确认，保持三仓可同步续接"
+depends_on: [TASK-0017, TASK-0022, TASK-0023]
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0008.yaml"
+  - "docs/features/PBI-0007.yaml"
+  - "docs/features/pbi-0008-atomic-admission.md"
+  - "docs/features/pbi-0008-recovery.md"
+affected_repositories: [gesp-tutor-api, gesp-ai-tutor]
+affected_components: [core/session, lmt, delivery/sync]
+allowed_scope:
+  - "gesp-tutor-api/src/gesp_api/core/session/**"
+  - "gesp-tutor-api/tests/test_ladder_admission.py"
+  - "gesp-tutor-api/AGENTS.md"
+  - "gesp-ai-tutor/scripts/workspace-sync.py"
+  - "gesp-ai-tutor/tests/test_workspace_sync.py"
+  - "gesp-ai-tutor/docs/delivery/**"
+acceptance_criteria: ["PBI-0008 AC2", "PBI-0008 AC6", "PBI-0008 AC14", "PBI-0008 AC16"]
+verification:
+  - "新确认的冻结级别/扣次/确认/L1操作/steps在同一PG事务；故障全回滚"
+  - "幂等重放无二次计费，超限与未配置无操作副作用"
+  - "过期孤立确认只恢复中断记录，不退费、不自动生成；可显式新计次重试"
+  - "同步脚本拒绝脏工作区与远端分叉，推送并校验任务/换机分支SHA"
+scope_limits: "仅内部原子受理和旧记录恢复；公开生成、安全/预算、实时SSE尚未装配。换机分支是备份入口，不是发布或G4。"
+executor: {mode: agent, adapter: codex}
+code_branch: "task-0024-atomic-admission"
+code_commits:
+  gesp-tutor-api: "c65dccb"
+evidence: ["docs/verification/PBI-0008-atomic-admission.md"]
