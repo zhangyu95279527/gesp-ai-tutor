@@ -92,3 +92,10 @@
 - 后端237项、ruff/mypy38源文件通过；新增确认冻结/扣次/L1操作/steps原子受理，以及旧孤立确认中断恢复，无新迁移。公开生成仍关闭，真实模型/安全/预算和实时SSE待装配。
 - 用户要求后续每轮完成增量均保持Git同步。current-work.json固定记录当前任务、组件SHA与最新检查点，workspace-sync.py在干净/无远端分叉条件下推送任务与固定换机分支并核验。
 - 固定远端chore-mac-mini-handoff随完成进度快进；三仓同步仍不代表main合并或发布。下一台电脑从该分支拉取并按Mac手册重建依赖，先读current-work.json。
+
+## 历史回看与听懂 — 2026-11-13
+
+- API task-0025-history-understood / 151f471；Web同名分支 / aac2957。迁移0009_understood，API248/Web126及生产build通过。
+- 本人历史分页/搜索/筛选、只读已检阶梯回看和幂等听懂标记已接真实HTTP；PC登录/回看/标记/刷新/筛选已实测，PG确认仍1次扣费和1条听懂事件。
+- 本机3000前端已重启、8000API及6379/1025/8025开发服务保留。QA数据明确合成且仅验证交互，不代表真实讲解；真实模型/变式/追问尚未接入。
+- 最新续接以current-work.json与20261113-history-understood检查点为准，三仓任务与固定换机分支通过workspace-sync同步，不合main、不发布。

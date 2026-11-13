@@ -1,0 +1,3 @@
+Browser tab: 1, Title: "GESP AI 辅导", URL: "http://127.0.0.1:3000/history".
+There has been no change in the accessibility tree.
+The focused UI element is 1 AXWebArea GESP AI 辅导, URL: 127.0.0.1:3000/history

@@ -1,27 +1,36 @@
 {
   "updated": "2026-11-13",
-  "task": "TASK-0024",
-  "checkpoint": "docs/delivery/checkpoints/20261113-atomic-admission.md",
+  "task": "TASK-0025",
+  "checkpoint": "docs/delivery/checkpoints/20261113-history-understood.md",
   "snapshot_branch": "chore-mac-mini-handoff",
   "repositories": {
     "gesp-ai-tutor": {
       "path": ".",
-      "branch": "task-0024-atomic-admission",
+      "branch": "task-0025-history-understood",
       "commit_source": "本文件所在的交付仓提交"
     },
     "gesp-tutor-api": {
       "path": "../gesp-tutor-api",
-      "branch": "task-0024-atomic-admission",
-      "commit": "c65dccb4e37508764bd38abae31056498a254feb"
+      "branch": "task-0025-history-understood",
+      "commit": "151f47139d0e776976f18ed0f1c205aafc5ec47b"
     },
     "gesp-tutor-web": {
       "path": "../gesp-tutor-web",
-      "branch": "chore-mac-mini-handoff",
-      "commit": "c20356f9f8872619b18e7addd2da41c8261ceb06"
+      "branch": "task-0025-history-understood",
+      "commit": "aac2957aca02ff28340345e057e8f501878d50d9"
     }
   },
-  "database_migration": "0008_ladder_deadline",
-  "verification": {"api_tests": 237, "sync_tests": 7, "web_changed_this_increment": false},
+  "database_migration": "0009_understood",
+  "verification": {
+    "api_tests": 248,
+    "web_tests": 126,
+    "pc_history_flow": "passed with explicit synthetic fixture"
+  },
   "real_generation_configured": false,
-  "remaining": ["真实模型/安全/预算装配", "新原子确认入口和重试HTTP接入", "供应商取消和实时SSE", "PC真实端到端及Mac实测"]
+  "remaining": [
+    "会话内追问及历史继续追问",
+    "变式结果接入历史",
+    "真实模型/安全/预算与实时SSE",
+    "PC真实生成全链路及Mac验证"
+  ]
 }

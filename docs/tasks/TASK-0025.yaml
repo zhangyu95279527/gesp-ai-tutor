@@ -1,0 +1,24 @@
+id: TASK-0025
+pbi_id: PBI-0011
+status: in-verification
+owner_role: Developer
+objective: "实现本人历史分页搜索、已发布阶梯只读回看与听懂幂等标记的PC页面"
+depends_on: [TASK-0022, TASK-0023]
+inputs:
+  - "AGENTS.md"
+  - "docs/features/PBI-0011.yaml"
+  - "docs/features/feat-002-tech-design.md"
+  - "docs/features/feat-002-ux-ui-design.md"
+  - "docs/features/pbi-0011-history.md"
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [core/session, tut, ops, web/history]
+allowed_scope: ["gesp-tutor-api/src/**", "gesp-tutor-api/tests/**", "gesp-tutor-api/migrations/**", "gesp-tutor-api/AGENTS.md", "gesp-tutor-web/src/**", "gesp-tutor-web/tests/**", "gesp-tutor-web/AGENTS.md"]
+acceptance_criteria: ["PBI-0011 AC1", "PBI-0011 AC2"]
+verification: ["本人隔离/稳定分页/搜索/只读不计次", "听懂仅完成讲解可标记、并发幂等/跨刷新保持", "PC列表/回看/标记与API错误状态、AI标识", "规范/类型/回归/构建与Git同步"]
+scope_limits: "先覆盖已实现的讲题会话与已检阶梯正文；变式结果与继续追问待真实服务和对应PBI，不宣称全部AC/G4。"
+executor: {mode: agent, adapter: codex}
+code_branch: "task-0025-history-understood"
+code_commits:
+  gesp-tutor-api: "151f471"
+  gesp-tutor-web: "aac2957"
+evidence: ["docs/verification/PBI-0011-history.md"]
