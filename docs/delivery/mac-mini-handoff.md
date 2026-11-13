@@ -64,7 +64,7 @@ uv run mypy src
 uv run pytest -q
 ```
 
-预期迁移以current-work.json为准（当前`0009_understood (head)`）；当前Windows基线248项后端测试无skip。Mac结果需重新记录，出现skip不能当完整集成验证通过。AUTH_SECRET为本地独立生成，若需要重启后保留登录可保存在本机未跟踪.env中；不要写入Git。测试夹具法律文本仅限local，生产生成仍关闭。
+预期迁移以current-work.json为准（当前`0010_followup (head)`）；当前Windows基线269项后端测试无skip。Mac结果需重新记录，出现skip不能当完整集成验证通过。AUTH_SECRET为本地独立生成，若需要重启后保留登录可保存在本机未跟踪.env中；不要写入Git。测试夹具法律文本仅限local，生产生成仍关闭。
 
 在当前已导出环境变量的终端启动API：
 
@@ -90,7 +90,7 @@ npm run check
 npm run dev
 ```
 
-当前基线126项Web测试、生产build通过。默认API_ORIGIN为http://127.0.0.1:8000，浏览器使用http://127.0.0.1:3000/login，避免与localhost混用造成Origin不匹配。
+当前基线141项Web测试、生产build通过。默认API_ORIGIN为http://127.0.0.1:8000，浏览器使用http://127.0.0.1:3000/login，避免与localhost混用造成Origin不匹配。
 
 当前真实模型、对象存储、OCR、正式安全尚未配置，confirm/unlock/retry-l1仍返回503且不扣新次数。开发演示不是真实讲解，不能把换机启动成功记成MVP验收通过。
 

@@ -1,8 +1,8 @@
 id: PBI-0009
 type: user-story
 feature_id: FEAT-002
-status: draft
-owner_role: ""
+status: in-progress
+owner_role: "Developer"
 title: "会话内追问与级别适配"
 value: "让学生针对不懂的点继续发问且回答不超纲，是引导式讲解闭环的必要组成"
 user_story:
@@ -16,6 +16,8 @@ acceptance_criteria:
   - "考纲外会话中追问照常可用，回答遵守不直给完整代码规则并持续标注“通用讲解，不针对考级”（BR-LVL-5）（证据：会话输出检查）"
 dependencies: [PBI-0008, PBI-0005]
 references:
+  - "docs/tasks/TASK-0026.yaml"
+  - "docs/features/pbi-0009-followup.md"
   - "docs/product/prd/03-functional-requirements.md (FR-TUT-05)"
   - "docs/product/prd/04-business-rules.md (BR-LVL, BR-LMT)"
   - "docs/features/feat-002-tech-design.md"

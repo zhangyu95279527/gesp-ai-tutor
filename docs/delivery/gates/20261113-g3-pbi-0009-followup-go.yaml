@@ -1,0 +1,12 @@
+id: GATE-RECORD-0015
+gate: G3
+artifact: PBI-0009
+decision: go
+criteria_met: [ac-verifiable, design-ready, tech-design-ready, tasks-decomposed, dependencies-confirmed]
+criteria_failed: []
+decided_by: Codex
+role: product-owner-and-architect
+date: "2026-11-13"
+recycle_target: ""
+follow_up: ["仅放行TASK-0026独立编排/已保存问答与关闭发送面板；真实生成/安全/预算联调仍待后续"]
+notes: "沿用已定稿追问UI、现有PG操作/额度/检查控制流，仅确认本切片内部依赖；不把测试检查器视为真实内容验收，不产生G4。"

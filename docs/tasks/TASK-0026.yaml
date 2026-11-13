@@ -1,0 +1,19 @@
+id: TASK-0026
+pbi_id: PBI-0009
+status: in-verification
+owner_role: Developer
+objective: "实现追问持久受理/已检发布/计次与会话及历史追问面板"
+depends_on: [TASK-0022, TASK-0023, TASK-0025]
+inputs: ["AGENTS.md", "docs/features/PBI-0009.yaml", "docs/features/feat-002-tech-design.md", "docs/features/feat-002-ux-ui-design.md", "docs/features/pbi-0009-followup.md"]
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [core/session, tut, lmt, ops, web/followup]
+allowed_scope: ["gesp-tutor-api/src/**", "gesp-tutor-api/tests/**", "gesp-tutor-api/migrations/**", "gesp-tutor-api/AGENTS.md", "gesp-tutor-web/src/**", "gesp-tutor-web/tests/**", "gesp-tutor-web/AGENTS.md"]
+acceptance_criteria: ["PBI-0009 AC1", "PBI-0009 AC2", "PBI-0009 AC3", "PBI-0009 AC4"]
+verification: ["级别/阶梯冻结与不升级、共享活动互斥", "同键/并发/超限/故障/断线恢复不重复收费", "输入与候选检查前不发布、恢复与历史只回看已检内容", "PC草稿/已保存问答/关闭发送、规范/类型/测试/构建、Git同步"]
+scope_limits: "真实模型/正式安全/预算尚未装配，公开POST追问503不扣次；内部成功路径使用测试注入，不作真实内容/性能或完整G4。"
+executor: {mode: agent, adapter: codex}
+code_branch: "task-0026-session-followup"
+code_commits:
+  gesp-tutor-api: "4d5f979"
+  gesp-tutor-web: "128ae59"
+evidence: ["docs/verification/PBI-0009-followup.md"]
