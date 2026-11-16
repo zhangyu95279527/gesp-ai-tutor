@@ -120,3 +120,10 @@
 - API324项、mypy46源文件/ruff与Web183项/生产build通过；新增六分类/排序/依据合同、原文行号核对、安全与语义双检查及PC只读卡片。
 - PC开发协议占位明确非真实诊断，AI标识/静态分析/裁剪提示可见，引导修正禁用；临时生产3020实际404后已停止。Web3000已重启，API8000无新增装配无需重启。
 - 本轮不接入确认/计次/持久发布或真实模型，不把37项结构测试当20例模型一致性。续接见current-work.json与20261113-diagnosis-output检查点，三仓按workspace-sync同步任务及固定换机快照。
+
+## 诊断共享确认与持久回看 — 2026-11-16
+
+- API task-0029-diagnosis-persistence / 7771c44；Web同名分支 / e8fa8ef；迁移0011_diagnosis。
+- API346项/ruff/mypy50源文件、Web203项/lint/typecheck/build通过；诊断类型隔离、内部共享确认/1次额度事务、冻结revision/文本、检查后持久发布与本人只读已实现。
+- 0011→0010→head保留旧QA，加入合成诊断后降级保护拒绝；PC真实GET/重读/刷新保持，PG诊断消费1次、消息1/steps0。合成结果不代表真实模型质量，公开新建/确认/纠正仍503。
+- API8000/Web3000已重启，开发Redis/SMTP保留。current-work.json及20261116-diagnosis-persistence检查点记录接续；三仓按workspace-sync同步任务与固定换机快照。

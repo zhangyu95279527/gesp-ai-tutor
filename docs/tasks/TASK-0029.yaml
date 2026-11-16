@@ -1,0 +1,19 @@
+id: TASK-0029
+pbi_id: PBI-0015
+status: in-verification
+owner_role: Developer
+objective: "复用共享会话确认/额度事务，实现诊断材料冻结、检查后持久发布与本人PC只读结果"
+depends_on: [TASK-0024, TASK-0027, TASK-0028]
+inputs: ["AGENTS.md", "docs/features/PBI-0015.yaml", "docs/features/pbi-0015-persistence.md", "docs/features/pbi-0015-output.md", "docs/features/feat-003-ux-ui-design.md", "docs/architecture/architecture-baseline.md"]
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [core/session, dia, lmt, web/diagnosis]
+allowed_scope: ["gesp-tutor-api/src/**", "gesp-tutor-api/migrations/**", "gesp-tutor-api/tests/**", "gesp-tutor-api/AGENTS.md", "gesp-tutor-web/src/**", "gesp-tutor-web/tests/**", "gesp-tutor-web/AGENTS.md"]
+acceptance_criteria: ["PBI-0015 AC1", "PBI-0015 AC3", "PBI-0015 AC4", "PBI-0015 AC5"]
+verification: ["共享识别/纠正revision、评测快照与诊断类型隔离", "确认/冻结/诊断操作/1次额度原子提交与回滚/幂等/并发", "安全/语义通过后发布，失败/超时/陈旧revision无正文", "本人GET及PC刷新回看无新扣次", "迁移往返/全回归/三仓Git同步"]
+scope_limits: "仅内部编排与公开本人只读；真实OCR/输入安全/模型/资源预算未配置，新建/确认/纠正HTTP继续503。不将合成QA当真实质量或20例一致性验收。"
+executor: {mode: agent, adapter: codex}
+code_branch: task-0029-diagnosis-persistence
+code_commits:
+  gesp-tutor-api: 7771c44392edeb16645d55798dffa40be245359a
+  gesp-tutor-web: e8fa8eff630ea8e47765bc5c3be765072c62d36b
+evidence: ["docs/verification/PBI-0015-persistence.md", "docs/verification/TASK-0029-diagnosis-saved.jpg"]

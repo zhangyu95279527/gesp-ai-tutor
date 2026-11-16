@@ -2,7 +2,7 @@
 
 Derived from repository artifacts by `scripts/build-status.py`. Do not edit by hand; regenerate instead.
 
-Generated: 2026-11-13
+Generated: 2026-11-16
 
 ## Stage progress
 
@@ -81,7 +81,7 @@ Total: 26 — draft: 15, in-progress: 11
 | PBI-0012 | user-story | FEAT-001 | draft | — |
 | PBI-0013 | user-story | FEAT-001 | draft | — |
 | PBI-0014 | user-story | FEAT-003 | in-progress | go (2026-11-13) |
-| PBI-0015 | user-story | FEAT-003 | in-progress | go (2026-11-13) |
+| PBI-0015 | user-story | FEAT-003 | in-progress | go (2026-11-16) |
 | PBI-0016 | user-story | FEAT-003 | draft | — |
 | PBI-0019 | user-story | FEAT-006 | draft | — |
 | PBI-0020 | user-story | FEAT-006 | draft | — |
@@ -103,6 +103,7 @@ No sprints yet.
 
 | Date | Gate | Artifact | Decision | Record |
 |---|---|---|---|---|
+| 2026-11-16 | G3 | PBI-0015 | go | 20261116-g3-pbi-0015-persistence-go.yaml |
 | 2026-11-13 | G3 | PBI-0015 | go | 20261113-g3-pbi-0015-output-go.yaml |
 | 2026-11-13 | G3 | PBI-0014 | go | 20261113-g3-pbi-0014-input-go.yaml |
 | 2026-11-13 | G3 | PBI-0011 | go | 20261113-g3-pbi-0011-history-go.yaml |
@@ -112,4 +113,3 @@ No sprints yet.
 | 2026-11-12 | G3 | PBI-0008 | go | 20261112-g3-pbi-0008-persistence-go.yaml |
 | 2026-11-12 | G3 | PBI-0008 | go | 20261112-g3-pbi-0008-go.yaml |
 | 2026-11-12 | G3 | PBI-0007 | go | 20261112-g3-pbi-0007-go.yaml |
-| 2026-11-12 | G3 | PBI-0006 | go | 20261112-g3-pbi-0006-go.yaml |

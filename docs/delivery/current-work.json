@@ -1,36 +1,37 @@
 {
-  "updated": "2026-11-13",
-  "task": "TASK-0028",
-  "checkpoint": "docs/delivery/checkpoints/20261113-diagnosis-output.md",
+  "updated": "2026-11-16",
+  "task": "TASK-0029",
+  "checkpoint": "docs/delivery/checkpoints/20261116-diagnosis-persistence.md",
   "snapshot_branch": "chore-mac-mini-handoff",
   "repositories": {
     "gesp-ai-tutor": {
       "path": ".",
-      "branch": "task-0028-diagnosis-output",
+      "branch": "task-0029-diagnosis-persistence",
       "commit_source": "本文件所在的交付仓提交"
     },
     "gesp-tutor-api": {
       "path": "../gesp-tutor-api",
-      "branch": "task-0028-diagnosis-output",
-      "commit": "f07ffe34bfcf297ab1566f7d60086c2fc908e85d"
+      "branch": "task-0029-diagnosis-persistence",
+      "commit": "7771c44392edeb16645d55798dffa40be245359a"
     },
     "gesp-tutor-web": {
       "path": "../gesp-tutor-web",
-      "branch": "task-0028-diagnosis-output",
-      "commit": "19c19b08c33dad262190fa41806d03a57ed43e4f"
+      "branch": "task-0029-diagnosis-persistence",
+      "commit": "e8fa8eff630ea8e47765bc5c3be765072c62d36b"
     }
   },
-  "database_migration": "0010_followup",
+  "database_migration": "0011_diagnosis",
   "verification": {
-    "api_tests": 324,
-    "web_tests": 183,
-    "pc_diagnosis_result": "explicit protocol fixture, ordered causes, source quotes, AI badges, static-analysis notice and disabled guidance checked",
-    "production_diagnosis_demo": "404 with no fixture content; temporary server stopped"
+    "api_tests": 346,
+    "web_tests": 203,
+    "pc_diagnosis_saved": "owned PG result GET, reread and full reload preserved; synthetic QA only",
+    "diagnosis_qa_charges": 1,
+    "migration": "0011 to 0010 to head preserved records; downgrade with diagnosis data rejected"
   },
   "real_generation_configured": false,
   "remaining": [
-    "真实模型/输入输出安全/答案边界/资源预算装配",
-    "诊断确认/计次/持久发布与本人读取、三件套真实上传/OCR",
+    "真实模型/OCR/存储/输入输出安全/语义检查/资源预算装配",
+    "PC诊断创建/回显确认闭环、诊断历史列表、引导修正与解决状态",
     "真实诊断20例重复一致性与盲评、变式检验",
     "运行中SSE/供应商取消/用量刷新、更早追问分页与PC全链路/Mac验证"
   ]
