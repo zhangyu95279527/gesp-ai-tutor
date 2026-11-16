@@ -15,6 +15,8 @@ acceptance_criteria:
   - "历史会话中可继续追问，追问计入当日限额（证据：功能 + 计数测试）"
 dependencies: [PBI-0008]
 references:
+  - "docs/tasks/TASK-0031.yaml"
+  - "docs/features/pbi-0011-diagnosis-history.md"
   - "docs/tasks/TASK-0025.yaml"
   - "docs/features/pbi-0011-history.md"
   - "docs/product/prd/03-functional-requirements.md (FR-TUT-06, FR-TUT-08)"

@@ -134,3 +134,10 @@
 - API364项/ruff/mypy51源文件、Web223项/lint/typecheck/build通过；免费回填/改判、独立版本与幂等回执、最终态统计基础及PC卡片已实现。
 - PC未解决→改状态→已解决→刷新/重读保持，PG最终version2/回执2/事件2，原诊断消费1次、正文1/steps0保持。用户反馈不是重判，追问/变式和真实修正仍未开放。
 - 0012往返保留旧记录，有反馈后降级保护拒绝；8000/3000已重启。current-work.json与20261116-diagnosis-resolution检查点记录接续，三仓按workspace-sync持续同步。
+
+## 本人诊断历史列表 — 2026-11-16
+
+- API task-0031-diagnosis-history / 998f63f；Web同名分支 / 299d4c8；无新迁移，仍0012_resolution。
+- API385项/ruff/mypy52源文件、Web248项/lint/typecheck/build通过；新增本人已受理诊断分页、字面搜索、最终反馈筛选与已检类别摘要。
+- PC从导航进入列表，未解决/未回填空态、已解决搜索、列表到原诊断与刷新已查。原诊断消费1次、反馈solved/version2、正文1/steps0保持；分页由API/客户端测试覆盖。
+- 8000/3000已重启，生成/修正/诊断追问/变式仍未开放。current-work.json及20261116-diagnosis-history检查点记录接续，三仓按workspace-sync同步任务及固定快照。

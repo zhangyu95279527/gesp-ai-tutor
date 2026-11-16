@@ -1,38 +1,38 @@
 {
   "updated": "2026-11-16",
-  "task": "TASK-0030",
-  "checkpoint": "docs/delivery/checkpoints/20261116-diagnosis-resolution.md",
+  "task": "TASK-0031",
+  "checkpoint": "docs/delivery/checkpoints/20261116-diagnosis-history.md",
   "snapshot_branch": "chore-mac-mini-handoff",
   "repositories": {
     "gesp-ai-tutor": {
       "path": ".",
-      "branch": "task-0030-diagnosis-resolution",
+      "branch": "task-0031-diagnosis-history",
       "commit_source": "本文件所在的交付仓提交"
     },
     "gesp-tutor-api": {
       "path": "../gesp-tutor-api",
-      "branch": "task-0030-diagnosis-resolution",
-      "commit": "8f35a632081864b9ac45b310f4cd36a369687882"
+      "branch": "task-0031-diagnosis-history",
+      "commit": "998f63fc8197535e56e39f4a3d5ff7d215cf056a"
     },
     "gesp-tutor-web": {
       "path": "../gesp-tutor-web",
-      "branch": "task-0030-diagnosis-resolution",
-      "commit": "c5d6491f4566c1b37b663eff0426088d54d9e4b5"
+      "branch": "task-0031-diagnosis-history",
+      "commit": "299d4c8140349e71dcd49db012bd1e4c02984f4c"
     }
   },
   "database_migration": "0012_resolution",
   "verification": {
-    "api_tests": 364,
-    "web_tests": 223,
-    "pc_resolution": "unresolved -> change -> solved; reload/reread preserved; synthetic QA only",
-    "feedback_qa_version": 2,
+    "api_tests": 385,
+    "web_tests": 248,
+    "pc_diagnosis_history": "navigation, solved/unresolved/unreported filters, literal search, saved detail and reload checked; synthetic QA only",
     "diagnosis_qa_charges": 1,
-    "migration": "0012 to 0011 to head preserved records; downgrade with feedback rejected"
+    "feedback_qa_version": 2,
+    "pagination": "API equal-timestamp 5-record keyset test and client dedupe; single-record browser QA"
   },
   "real_generation_configured": false,
   "remaining": [
     "真实模型/OCR/存储/输入输出安全/语义检查/资源预算装配",
-    "PC诊断创建/回显确认闭环、诊断历史列表、修正阶梯与继续追问",
+    "PC诊断创建/回显确认闭环、输入材料回看、修正阶梯与诊断继续追问",
     "真实诊断20例重复一致性与盲评、变式检验",
     "运行中SSE/供应商取消/用量刷新、更早追问分页与PC全链路/Mac验证"
   ]

@@ -1,0 +1,19 @@
+id: TASK-0031
+pbi_id: PBI-0011
+status: in-verification
+owner_role: Developer
+objective: "提供本人诊断历史列表、解决状态筛选及PC列表到持久回看的导航"
+depends_on: [TASK-0025, TASK-0029, TASK-0030]
+inputs: ["AGENTS.md", "docs/features/PBI-0011.yaml", "docs/features/PBI-0016.yaml", "docs/features/pbi-0011-diagnosis-history.md", "docs/features/feat-003-ux-ui-design.md"]
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [dia/history, web/history, web/diagnosis]
+allowed_scope: ["gesp-tutor-api/src/gesp_api/dia/**", "gesp-tutor-api/tests/**", "gesp-tutor-api/AGENTS.md", "gesp-tutor-web/src/**", "gesp-tutor-web/tests/**", "gesp-tutor-web/AGENTS.md"]
+acceptance_criteria: ["PBI-0011 AC2", "PBI-0016 AC2"]
+verification: ["本人/类型隔离与已受理记录", "稳定倒序游标/筛选绑定/字面搜索", "完成结果校验与最新反馈，未回填不等于未解决", "PC列表→回看/搜索/筛选/刷新，无新额度或生成", "规范/类型/回归/构建及三仓同步"]
+scope_limits: "仅诊断历史入口与摘要；不开放真实新建/确认、修正阶梯、诊断追问或变式，不将合成QA当模型效果验收。"
+executor: {mode: agent, adapter: codex}
+code_branch: task-0031-diagnosis-history
+code_commits:
+  gesp-tutor-api: 998f63fc8197535e56e39f4a3d5ff7d215cf056a
+  gesp-tutor-web: 299d4c8140349e71dcd49db012bd1e4c02984f4c
+evidence: ["docs/verification/PBI-0011-diagnosis-history.md", "docs/verification/TASK-0031-diagnosis-history.jpg"]
