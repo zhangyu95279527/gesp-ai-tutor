@@ -11,8 +11,8 @@ Generated: 2026-11-16
 | Discovery (G1) | done | go (2026-10-22) |
 | PRD (G2) | done | go (2026-10-22) |
 | Architecture baseline (GA) | done | go (2026-10-23) |
-| Backlog & refinement (G3) | active | 26 PBIs (draft: 15, in-progress: 11); G3 passed: 11 |
-| Implementation & verification (G4) | active | executable: 11; done: 0; G4 passed: 0 |
+| Backlog & refinement (G3) | active | 26 PBIs (draft: 14, in-progress: 12); G3 passed: 12 |
+| Implementation & verification (G4) | active | executable: 12; done: 0; G4 passed: 0 |
 | Release (G5) | pending | no release yet |
 
 ## Next actions by role
@@ -22,7 +22,6 @@ Generated: 2026-11-16
 - PBI-0010 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0012 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0013 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
-- PBI-0016 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0019 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0020 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
 - PBI-0021 精炼中：补齐验收标准/设计/技术设计，备齐 G3 输入
@@ -45,6 +44,7 @@ Generated: 2026-11-16
 - PBI-0011 实现中（blocked by PBI-0008）
 - PBI-0014 实现中（blocked by PBI-0006）
 - PBI-0015 实现中（blocked by PBI-0014, PBI-0007）
+- PBI-0016 实现中（blocked by PBI-0015, PBI-0008）
 - PBI-0022 实现中
 
 ## Product
@@ -64,7 +64,7 @@ Generated: 2026-11-16
 
 ## PBIs
 
-Total: 26 — draft: 15, in-progress: 11
+Total: 26 — draft: 14, in-progress: 12
 
 | PBI | Type | Feature | Status | Latest gate decision |
 |---|---|---|---|---|
@@ -82,7 +82,7 @@ Total: 26 — draft: 15, in-progress: 11
 | PBI-0013 | user-story | FEAT-001 | draft | — |
 | PBI-0014 | user-story | FEAT-003 | in-progress | go (2026-11-13) |
 | PBI-0015 | user-story | FEAT-003 | in-progress | go (2026-11-16) |
-| PBI-0016 | user-story | FEAT-003 | draft | — |
+| PBI-0016 | user-story | FEAT-003 | in-progress | go (2026-11-16) |
 | PBI-0019 | user-story | FEAT-006 | draft | — |
 | PBI-0020 | user-story | FEAT-006 | draft | — |
 | PBI-0021 | user-story | FEAT-006 | draft | — |
@@ -103,6 +103,7 @@ No sprints yet.
 
 | Date | Gate | Artifact | Decision | Record |
 |---|---|---|---|---|
+| 2026-11-16 | G3 | PBI-0016 | go | 20261116-g3-pbi-0016-resolution-go.yaml |
 | 2026-11-16 | G3 | PBI-0015 | go | 20261116-g3-pbi-0015-persistence-go.yaml |
 | 2026-11-13 | G3 | PBI-0015 | go | 20261113-g3-pbi-0015-output-go.yaml |
 | 2026-11-13 | G3 | PBI-0014 | go | 20261113-g3-pbi-0014-input-go.yaml |
@@ -112,4 +113,3 @@ No sprints yet.
 | 2026-11-12 | G3 | PBI-0008 | go | 20261112-g3-pbi-0008-recovery-go.yaml |
 | 2026-11-12 | G3 | PBI-0008 | go | 20261112-g3-pbi-0008-persistence-go.yaml |
 | 2026-11-12 | G3 | PBI-0008 | go | 20261112-g3-pbi-0008-go.yaml |
-| 2026-11-12 | G3 | PBI-0007 | go | 20261112-g3-pbi-0007-go.yaml |

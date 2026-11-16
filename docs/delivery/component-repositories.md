@@ -127,3 +127,10 @@
 - API346项/ruff/mypy50源文件、Web203项/lint/typecheck/build通过；诊断类型隔离、内部共享确认/1次额度事务、冻结revision/文本、检查后持久发布与本人只读已实现。
 - 0011→0010→head保留旧QA，加入合成诊断后降级保护拒绝；PC真实GET/重读/刷新保持，PG诊断消费1次、消息1/steps0。合成结果不代表真实模型质量，公开新建/确认/纠正仍503。
 - API8000/Web3000已重启，开发Redis/SMTP保留。current-work.json及20261116-diagnosis-persistence检查点记录接续；三仓按workspace-sync同步任务与固定换机快照。
+
+## 诊断解决状态回填 — 2026-11-16
+
+- API task-0030-diagnosis-resolution / 8f35a63；Web同名分支 / c5d6491；迁移0012_resolution。
+- API364项/ruff/mypy51源文件、Web223项/lint/typecheck/build通过；免费回填/改判、独立版本与幂等回执、最终态统计基础及PC卡片已实现。
+- PC未解决→改状态→已解决→刷新/重读保持，PG最终version2/回执2/事件2，原诊断消费1次、正文1/steps0保持。用户反馈不是重判，追问/变式和真实修正仍未开放。
+- 0012往返保留旧记录，有反馈后降级保护拒绝；8000/3000已重启。current-work.json与20261116-diagnosis-resolution检查点记录接续，三仓按workspace-sync持续同步。

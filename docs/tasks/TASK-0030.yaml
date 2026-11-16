@@ -1,0 +1,19 @@
+id: TASK-0030
+pbi_id: PBI-0016
+status: in-verification
+owner_role: Developer
+objective: "实现本人已完成诊断的免费解决状态回填、幂等改判留痕与PC卡片"
+depends_on: [TASK-0029]
+inputs: ["AGENTS.md", "docs/features/PBI-0016.yaml", "docs/features/pbi-0016-resolution.md", "docs/features/feat-003-ux-ui-design.md"]
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [dia/resolution, ops/events, web/diagnosis]
+allowed_scope: ["gesp-tutor-api/src/**", "gesp-tutor-api/migrations/**", "gesp-tutor-api/tests/**", "gesp-tutor-api/AGENTS.md", "gesp-tutor-web/src/**", "gesp-tutor-web/tests/**", "gesp-tutor-web/AGENTS.md"]
+acceptance_criteria: ["PBI-0016 AC2"]
+verification: ["本人/已检完成/无活动操作才可回填", "幂等/变化冲突/版本竞争/原子回滚与最终态统计", "回填/改判/重读不扣次且不改诊断正文或阶梯", "PC未解决→改状态→已解决→刷新保持", "迁移保护/全回归与三仓同步"]
+scope_limits: "只覆盖AC2状态记录部分；真实修正阶梯、未解决继续追问计次及变式检验仍待接入，入口明确禁用，不将合成QA作为真实诊断效果。"
+executor: {mode: agent, adapter: codex}
+code_branch: task-0030-diagnosis-resolution
+code_commits:
+  gesp-tutor-api: 8f35a632081864b9ac45b310f4cd36a369687882
+  gesp-tutor-web: c5d6491f4566c1b37b663eff0426088d54d9e4b5
+evidence: ["docs/verification/PBI-0016-resolution.md", "docs/verification/TASK-0030-resolution-saved.jpg"]
