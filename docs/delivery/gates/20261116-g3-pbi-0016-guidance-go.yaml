@@ -1,0 +1,12 @@
+id: GATE-RECORD-0021
+gate: G3
+artifact: PBI-0016
+decision: go
+criteria_met: [ac-verifiable, design-ready, tech-design-ready, tasks-decomposed, dependencies-confirmed]
+criteria_failed: []
+decided_by: Codex
+role: product-owner-and-architect
+date: "2026-11-16"
+recycle_target: ""
+follow_up: ["仅放行TASK-0032内部修正阶梯和已保存回看；真实检查/质量/资源预算后才开放新生成"]
+notes: "复用稳定会话框架与定稿L1/L2/L3设计、现有额度规则；无新服务边界，不代替完整G4。"

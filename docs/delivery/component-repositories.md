@@ -141,3 +141,10 @@
 - API385项/ruff/mypy52源文件、Web248项/lint/typecheck/build通过；新增本人已受理诊断分页、字面搜索、最终反馈筛选与已检类别摘要。
 - PC从导航进入列表，未解决/未回填空态、已解决搜索、列表到原诊断与刷新已查。原诊断消费1次、反馈solved/version2、正文1/steps0保持；分页由API/客户端测试覆盖。
 - 8000/3000已重启，生成/修正/诊断追问/变式仍未开放。current-work.json及20261116-diagnosis-history检查点记录接续，三仓按workspace-sync同步任务及固定快照。
+
+## 诊断修正阶梯 — 2026-11-16
+
+- API 7c5fa29、Web 387772b，task-0032-diagnosis-guidance；0013_guidance。
+- API421项/ruff/mypy55源文件、Web271项/lint/typecheck/build通过，内部免费L1/付费相邻L2/L3与已检PC回看已实现。
+- PC刷新/重读不增扣次，原反馈solved/version2保留；开发占位不冒充真实修正质量。真实新生成/诊断追问/变式仍关闭。
+- 接续以current-work.json及20261116-diagnosis-guidance检查点为准，三仓按workspace-sync同步任务和固定快照。

@@ -15,6 +15,8 @@ acceptance_criteria:
   - "诊断会话完成后同样触发变式题检验（J2 第 6 步）（证据：会话流转测试）"
 dependencies: [PBI-0015, PBI-0008]
 references:
+  - "docs/tasks/TASK-0032.yaml"
+  - "docs/features/pbi-0016-guidance.md"
   - "docs/tasks/TASK-0031.yaml"
   - "docs/features/pbi-0011-diagnosis-history.md"
   - "docs/tasks/TASK-0030.yaml"

@@ -1,0 +1,18 @@
+id: TASK-0032
+pbi_id: PBI-0016
+status: in-verification
+owner_role: Developer
+objective: "复用共享阶梯实现诊断修正L1/L2/L3内部受理、边界检查、持久化及PC回看"
+depends_on: [TASK-0029, TASK-0030, TASK-0031]
+inputs: ["AGENTS.md", "docs/features/PBI-0016.yaml", "docs/features/pbi-0016-guidance.md", "docs/features/feat-003-ux-ui-design.md", "docs/product/prd/04-business-rules.md"]
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [core/session, dia/guidance, lmt, web/diagnosis]
+allowed_scope: ["gesp-tutor-api/src/**", "gesp-tutor-api/migrations/**", "gesp-tutor-api/tests/**", "gesp-tutor-api/AGENTS.md", "gesp-tutor-web/src/**", "gesp-tutor-web/tests/**", "gesp-tutor-web/AGENTS.md"]
+acceptance_criteria: ["PBI-0016 AC1"]
+verification: ["诊断与修正L1分离、L1不再收费、L2/L3相邻手动解锁各1次", "共享幂等/互斥/期限与事务回滚", "分层输出/原文行号/安全及边界检查后才发布", "未完成无正文、本人GET与PC刷新回看不生成/扣次", "迁移保护/全回归/三仓同步"]
+scope_limits: "内部编排与公开本人只读；真实模型/安全/边界检查/预算未配置，新生成POST仍503。未交付运行中SSE、L1付费重试、诊断追问与变式或真实输出质量验收。"
+executor: {mode: agent, adapter: codex}
+implementation:
+  api_commit: "7c5fa29803f8850b66d87d126ecccd6958f097df"
+  web_commit: "387772b1def66f808fbd22fa12062bd3f2d2e393"
+evidence: ["docs/verification/PBI-0016-guidance.md", "docs/verification/TASK-0032-guidance.png"]

@@ -1,39 +1,42 @@
 {
   "updated": "2026-11-16",
-  "task": "TASK-0031",
-  "checkpoint": "docs/delivery/checkpoints/20261116-diagnosis-history.md",
+  "task": "TASK-0032",
+  "checkpoint": "docs/delivery/checkpoints/20261116-diagnosis-guidance.md",
   "snapshot_branch": "chore-mac-mini-handoff",
   "repositories": {
     "gesp-ai-tutor": {
       "path": ".",
-      "branch": "task-0031-diagnosis-history",
+      "branch": "task-0032-diagnosis-guidance",
       "commit_source": "本文件所在的交付仓提交"
     },
     "gesp-tutor-api": {
       "path": "../gesp-tutor-api",
-      "branch": "task-0031-diagnosis-history",
-      "commit": "998f63fc8197535e56e39f4a3d5ff7d215cf056a"
+      "branch": "task-0032-diagnosis-guidance",
+      "commit": "7c5fa29803f8850b66d87d126ecccd6958f097df"
     },
     "gesp-tutor-web": {
       "path": "../gesp-tutor-web",
-      "branch": "task-0031-diagnosis-history",
-      "commit": "299d4c8140349e71dcd49db012bd1e4c02984f4c"
+      "branch": "task-0032-diagnosis-guidance",
+      "commit": "387772b1def66f808fbd22fa12062bd3f2d2e393"
     }
   },
-  "database_migration": "0012_resolution",
+  "database_migration": "0013_guidance",
   "verification": {
-    "api_tests": 385,
-    "web_tests": 248,
-    "pc_diagnosis_history": "navigation, solved/unresolved/unreported filters, literal search, saved detail and reload checked; synthetic QA only",
+    "api_tests": 421,
+    "web_tests": 271,
+    "api_mypy_source_files": 55,
+    "guidance_special_tests": 36,
+    "pc_diagnosis_guidance": "history to saved L1/L2/L3, code quotes, page reload and manual GET; synthetic QA only",
     "diagnosis_qa_charges": 1,
+    "guidance_qa_unlock_charges": 2,
     "feedback_qa_version": 2,
-    "pagination": "API equal-timestamp 5-record keyset test and client dedupe; single-record browser QA"
+    "migration": "0013 to 0012 to head preserved existing records; populated guidance downgrade guard passed"
   },
   "real_generation_configured": false,
   "remaining": [
     "真实模型/OCR/存储/输入输出安全/语义检查/资源预算装配",
-    "PC诊断创建/回显确认闭环、输入材料回看、修正阶梯与诊断继续追问",
-    "真实诊断20例重复一致性与盲评、变式检验",
+    "PC诊断创建/回显确认闭环、输入材料回看、L1付费重试与诊断继续追问",
+    "真实诊断20例重复一致性与盲评、修正分层盲评、变式检验",
     "运行中SSE/供应商取消/用量刷新、更早追问分页与PC全链路/Mac验证"
   ]
 }
