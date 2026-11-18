@@ -42,7 +42,11 @@
     "运行中SSE/供应商取消/用量刷新、更早追问分页与PC全链路/Mac验证"
   ],
   "sync": {
-    "reason": "自动审批拒绝GitHub私有代码/文档推送，待用户明确批准本次TASK-0033载荷与已登记目的地；推送未执行",
-    "status": "not-synced"
+    "status": "synced",
+    "approved": "2026-11-18 用户明确批准本次TASK-0033代码/测试/文档/合成截图推送至已登记GitHub仓库",
+    "remote_verified": true,
+    "verified_delivery_commit": "0156353e5cf0bc497ec27d1f1295b3f92072b6ec",
+    "command": "python scripts/workspace-sync.py --push --proxy http://127.0.0.1:7890",
+    "note": "三仓任务及换机快照SHA均已核验；本同步记录补充提交随收尾再次推送核验，不代表合main或发布"
   }
 }
