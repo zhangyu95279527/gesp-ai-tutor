@@ -1,0 +1,2 @@
+Synthetic PC QA: quota before=2 after=2; diagnosis=1 guidance_l1=1 followup_q=1 followup_a=1
+Synthetic browser QA records cleaned; original development database untouched

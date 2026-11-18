@@ -148,3 +148,10 @@
 - API421项/ruff/mypy55源文件、Web271项/lint/typecheck/build通过，内部免费L1/付费相邻L2/L3与已检PC回看已实现。
 - PC刷新/重读不增扣次，原反馈solved/version2保留；开发占位不冒充真实修正质量。真实新生成/诊断追问/变式仍关闭。
 - 接续以current-work.json及20261116-diagnosis-guidance检查点为准，三仓按workspace-sync同步任务和固定快照。
+
+## 诊断继续追问 — 2026-11-18
+
+- API 80caf24、Web 17dc0bb，task-0034-diagnosis-followup；API441项/ruff/mypy56源文件、Web287项/lint/typecheck/build通过。
+- 冻结已检诊断/修正/最终级别及历史的内部追问已实现，复用计次/幂等/互斥；本人GET与PC回看/草稿可用，真实新生成仍503。
+- 0014_diagnosis_followup仅应用独立验证库，原开发库启动失败且原目录未改；其他电脑需迁移head。迁移往返/已有记录保护、合成PC与额度2→2已验证，临时QA API已关闭。
+- 续接以current-work.json及20261118-diagnosis-followup检查点为准；未合main、未发布、完整G4仍未通过。

@@ -82,7 +82,7 @@ Total: 26 — draft: 14, in-progress: 12
 | PBI-0013 | user-story | FEAT-001 | draft | — |
 | PBI-0014 | user-story | FEAT-003 | in-progress | go (2026-11-13) |
 | PBI-0015 | user-story | FEAT-003 | in-progress | go (2026-11-16) |
-| PBI-0016 | user-story | FEAT-003 | in-progress | go (2026-11-16) |
+| PBI-0016 | user-story | FEAT-003 | in-progress | go (2026-11-18) |
 | PBI-0019 | user-story | FEAT-006 | draft | — |
 | PBI-0020 | user-story | FEAT-006 | draft | — |
 | PBI-0021 | user-story | FEAT-006 | draft | — |
@@ -103,6 +103,7 @@ No sprints yet.
 
 | Date | Gate | Artifact | Decision | Record |
 |---|---|---|---|---|
+| 2026-11-18 | G3 | PBI-0016 | go | 20261118-g3-pbi-0016-followup-go.yaml |
 | 2026-11-18 | G3 | PBI-0011 | go | 20261118-g3-pbi-0011-diagnosis-materials-go.yaml |
 | 2026-11-16 | G3 | PBI-0016 | go | 20261116-g3-pbi-0016-resolution-go.yaml |
 | 2026-11-16 | G3 | PBI-0016 | go | 20261116-g3-pbi-0016-guidance-go.yaml |
@@ -112,4 +113,3 @@ No sprints yet.
 | 2026-11-13 | G3 | PBI-0014 | go | 20261113-g3-pbi-0014-input-go.yaml |
 | 2026-11-13 | G3 | PBI-0011 | go | 20261113-g3-pbi-0011-history-go.yaml |
 | 2026-11-13 | G3 | PBI-0009 | go | 20261113-g3-pbi-0009-followup-go.yaml |
-| 2026-11-13 | G3 | PBI-0008 | go | 20261113-g3-pbi-0008-admission-go.yaml |

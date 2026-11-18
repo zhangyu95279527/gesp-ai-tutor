@@ -1,0 +1,3 @@
+migration 0013_guidance: pre-existing tutor session preserved
+migration head: pre-existing tutor session preserved
+migration roundtrip passed; head=0014_diagnosis_followup

@@ -1,0 +1,19 @@
+id: TASK-0034
+pbi_id: PBI-0016
+status: in-verification
+owner_role: Developer
+objective: "实现诊断继续追问内部计次/冻结上下文与本人PC持久回看"
+depends_on: [TASK-0026, TASK-0032]
+inputs: ["AGENTS.md", "docs/features/PBI-0016.yaml", "docs/features/pbi-0016-followup.md", "docs/features/pbi-0009-followup.md", "docs/features/feat-003-ux-ui-design.md"]
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [core/session/followup, dia/followup, web/diagnosis]
+allowed_scope: ["gesp-tutor-api/src/gesp_api/core/session/followup*.py", "gesp-tutor-api/src/gesp_api/dia/**", "gesp-tutor-api/migrations/env.py", "gesp-tutor-api/migrations/versions/0014_diagnosis_followup.py", "gesp-tutor-api/tests/test_diagnosis_followup.py", "gesp-tutor-api/AGENTS.md", "gesp-tutor-web/src/components/tutor/Diagnosis*.tsx", "gesp-tutor-web/src/lib/tutor/diagnosis-followup-client.ts", "gesp-tutor-web/tests/diagnosis-followup.test.tsx", "gesp-tutor-web/AGENTS.md"]
+acceptance_criteria: ["PBI-0016 AC2"]
+verification: ["L1/L2/L3冻结上下文与会话最终级别", "共享计次/幂等/互斥/事务回滚/过期与校验", "本人隔离、已检问答回看及关闭的新生成入口", "API/Web完整回归与三仓同步"]
+scope_limits: "内部编排及公开本人只读；迁移env仅修复失败后释放连接。真实模型/输入输出安全/预算未装配，公开生成仍503；不交付运行中SSE、诊断追问盲评或完整G4。"
+executor: {mode: agent, adapter: codex}
+code_branch: task-0034-diagnosis-followup
+code_commits:
+  gesp-tutor-api: 80caf24d84e207acaf49ebdae3a6fe22cf9468d9
+  gesp-tutor-web: 17dc0bbe686464f339581913358ce27dd82f8fee
+evidence: ["docs/verification/PBI-0016-followup.md", "docs/verification/TASK-0034-api-tests.txt", "docs/verification/TASK-0034-api-static.txt", "docs/verification/TASK-0034-web-check.txt", "docs/verification/TASK-0034-migration.txt", "docs/verification/TASK-0034-browser-quota.txt", "docs/verification/TASK-0034-followup.png"]
