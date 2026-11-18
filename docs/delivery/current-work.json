@@ -45,10 +45,12 @@
     "运行中SSE/供应商取消/用量刷新、更早追问分页与PC全链路/Mac验证"
   ],
   "sync": {
-    "status": "not-synced",
-    "reason": "自动审批拒绝TASK-0034推送：此前具体批准被认定仅覆盖TASK-0033；需要用户明确批准TASK-0034新代码/测试/文档/合成截图向已登记GitHub仓库推送",
-    "push_executed": false,
-    "command": "python scripts/workspace-sync.py --push --proxy http://127.0.0.1:7890"
+    "status": "synced",
+    "approved": "2026-11-18 用户明确批准TASK-0034代码/测试/文档/合成截图推送至已登记GitHub三仓任务及换机快照",
+    "remote_verified": true,
+    "verified_delivery_commit": "2bd441fdd7f0d55d9f39e230fb5357a0e1dfdb7a",
+    "command": "python scripts/workspace-sync.py --push --proxy http://127.0.0.1:7890",
+    "note": "三仓任务与换机快照SHA均已核验；本同步记录补充提交随收尾再次推送核验；未合main/发布"
   },
   "migration_scope": "本轮仅独立TASK-0034验证库；原开发库未修改，其他电脑需迁移head"
 }

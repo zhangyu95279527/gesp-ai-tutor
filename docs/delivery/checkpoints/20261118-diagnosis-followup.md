@@ -15,7 +15,7 @@
 
 - 三仓 task-0034-diagnosis-followup；API 80caf24d84e207acaf49ebdae3a6fe22cf9468d9、Web 17dc0bbe686464f339581913358ce27dd82f8fee。
 - TASK-0034 in-verification，完整G4仍0；未合main/发布。组件代码与交付证据已本地提交，current-work.json记录组件SHA与检查点。
-- 未同步：自动审批拒绝TASK-0034的GitHub推送，理由为此前具体推送批准只覆盖TASK-0033，当前“完成后可以提交Git”不足以授权本次新代码/文档/截图向GitHub外传；推送未执行，待用户明确批准TASK-0034载荷及已登记三仓任务/快照目的地。不得据本地提交宣称换机已同步。
+- 2026-11-18用户明确批准TASK-0034代码/测试/文档/合成截图推送。执行 `python scripts/workspace-sync.py --push --proxy http://127.0.0.1:7890` 成功，三仓任务分支与chore-mac-mini-handoff快照均remote_verified=true；首次同步交付仓2bd441fdd7f0d55d9f39e230fb5357a0e1dfdb7a，组件SHA见上。本同步记录补充提交随收尾再次推送核验。
 - 原开发数据库启动失败，本轮未改/覆盖原目录。0014仅应用本任务独立5432/5442验证库；其他电脑及原库需迁移head。Web3000保留，临时QA API8000已关闭。
 
 ## Next actions
@@ -26,7 +26,7 @@
 
 ## Blockers
 
-真实服务/安全/预算未配置；变式ADR待GB；原本机开发数据库需排查启动失败，原数据未动。独立验证环境完成本轮测试。TASK-0034推送受自动审批阻止，需用户明确批准本次载荷和GitHub目的地。
+真实服务/安全/预算未配置；变式ADR待GB；原本机开发数据库需排查启动失败，原数据未动。独立验证环境完成本轮测试。TASK-0034推送授权与同步已完成。
 
 ## Open questions
 
