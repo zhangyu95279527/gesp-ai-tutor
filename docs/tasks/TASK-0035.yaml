@@ -1,0 +1,19 @@
+id: TASK-0035
+pbi_id: PBI-0016
+status: in-verification
+owner_role: Developer
+objective: "诊断修正 L1 失败或中断后，可以显式重试并准确计次"
+depends_on: [TASK-0032]
+inputs: ["docs/features/PBI-0016.yaml", "docs/features/pbi-0016-guidance.md"]
+affected_repositories: [gesp-tutor-api, gesp-tutor-web]
+affected_components: [core/session/ladder_recovery, dia/guidance, web/diagnosis]
+allowed_scope: ["共享阶梯及重试恢复", "诊断修正受理及路由", "PC 修正回看", "组件任务指引和相关测试"]
+acceptance_criteria: ["PBI-0016 AC1"]
+verification: ["首次 L1 包含在诊断额度，重试受理计 1 次", "幂等、会话归属、并发、旧页面、限额与事务回滚", "PC 区分首次、处理中、重试状态", "API/Web 回归"]
+scope_limits: "内部编排和关闭状态的公开契约；真实生成与完整 G4 另行验证。"
+executor: {mode: agent, adapter: codex}
+code_branch: task-0035-guidance-retry
+code_commits:
+  gesp-tutor-api: f5d11e3a8e905824152d70220e11e5788af89f89
+  gesp-tutor-web: d6a8a45c83bb51842d052a4d3f560af1bbcd8632
+evidence: ["docs/verification/TASK-0035-guidance-retry.md"]

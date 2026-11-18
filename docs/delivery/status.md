@@ -103,6 +103,7 @@ No sprints yet.
 
 | Date | Gate | Artifact | Decision | Record |
 |---|---|---|---|---|
+| 2026-11-18 | G3 | PBI-0016 | go | 20261118-g3-pbi-0016-retry-go.yaml |
 | 2026-11-18 | G3 | PBI-0016 | go | 20261118-g3-pbi-0016-followup-go.yaml |
 | 2026-11-18 | G3 | PBI-0011 | go | 20261118-g3-pbi-0011-diagnosis-materials-go.yaml |
 | 2026-11-16 | G3 | PBI-0016 | go | 20261116-g3-pbi-0016-resolution-go.yaml |
@@ -112,4 +113,3 @@ No sprints yet.
 | 2026-11-13 | G3 | PBI-0015 | go | 20261113-g3-pbi-0015-output-go.yaml |
 | 2026-11-13 | G3 | PBI-0014 | go | 20261113-g3-pbi-0014-input-go.yaml |
 | 2026-11-13 | G3 | PBI-0011 | go | 20261113-g3-pbi-0011-history-go.yaml |
-| 2026-11-13 | G3 | PBI-0009 | go | 20261113-g3-pbi-0009-followup-go.yaml |

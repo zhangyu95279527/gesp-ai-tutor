@@ -1,29 +1,29 @@
 {
   "updated": "2026-11-18",
-  "task": "TASK-0034",
-  "checkpoint": "docs/delivery/checkpoints/20261118-diagnosis-followup.md",
+  "task": "TASK-0035",
+  "checkpoint": "docs/delivery/checkpoints/20261118-guidance-retry.md",
   "snapshot_branch": "chore-mac-mini-handoff",
   "repositories": {
     "gesp-ai-tutor": {
       "path": ".",
-      "branch": "task-0034-diagnosis-followup",
+      "branch": "task-0035-guidance-retry",
       "commit_source": "本文件所在的交付仓提交"
     },
     "gesp-tutor-api": {
       "path": "../gesp-tutor-api",
-      "branch": "task-0034-diagnosis-followup",
-      "commit": "80caf24d84e207acaf49ebdae3a6fe22cf9468d9"
+      "branch": "task-0035-guidance-retry",
+      "commit": "f5d11e3a8e905824152d70220e11e5788af89f89"
     },
     "gesp-tutor-web": {
       "path": "../gesp-tutor-web",
-      "branch": "task-0034-diagnosis-followup",
-      "commit": "17dc0bbe686464f339581913358ce27dd82f8fee"
+      "branch": "task-0035-guidance-retry",
+      "commit": "d6a8a45c83bb51842d052a4d3f560af1bbcd8632"
     }
   },
   "database_migration": "0014_diagnosis_followup",
   "verification": {
-    "api_tests": 441,
-    "web_tests": 287,
+    "api_tests": 444,
+    "web_tests": 292,
     "api_mypy_source_files": 56,
     "guidance_special_tests": 36,
     "pc_diagnosis_guidance": "history to saved L1/L2/L3, code quotes, page reload and manual GET; synthetic QA only",
@@ -35,22 +35,21 @@
     "materials_browser": "synthetic dev fixture: default collapsed, click and Enter expand/collapse; no real account or mobile verification",
     "diagnosis_followup_special_tests": 20,
     "diagnosis_followup_web_special_tests": 10,
-    "diagnosis_followup_browser": "synthetic QA: saved question/answer, draft kept on reread, 1001 characters preserved, reload restores saved thread; quota2 to2; QA records cleaned"
+    "diagnosis_followup_browser": "synthetic QA: saved question/answer, draft kept on reread, 1001 characters preserved, reload restores saved thread; quota2 to2; QA records cleaned",
+    "guidance_retry_api_tests": 3,
+    "guidance_retry_web_tests": 5
   },
   "real_generation_configured": false,
   "remaining": [
     "真实模型/OCR/存储/输入输出安全/语义检查/资源预算装配",
-    "PC诊断真实创建/回显确认闭环、原图回看、L1付费重试与诊断追问真实生成装配",
+    "PC诊断真实创建/回显确认闭环、原图回看、L1重试与追问的生产生成接入",
     "真实诊断20例重复一致性与盲评、修正分层盲评、变式检验",
     "运行中SSE/供应商取消/用量刷新、更早追问分页与PC全链路/Mac验证"
   ],
   "sync": {
-    "status": "synced",
-    "approved": "2026-11-18 用户明确批准TASK-0034代码/测试/文档/合成截图推送至已登记GitHub三仓任务及换机快照",
-    "remote_verified": true,
-    "verified_delivery_commit": "2bd441fdd7f0d55d9f39e230fb5357a0e1dfdb7a",
-    "command": "python scripts/workspace-sync.py --push --proxy http://127.0.0.1:7890",
-    "note": "三仓任务与换机快照SHA均已核验；本同步记录补充提交随收尾再次推送核验；未合main/发布"
+    "status": "local-committed",
+    "remote_verified": false,
+    "command": "python scripts/workspace-sync.py --push --proxy http://127.0.0.1:7890"
   },
-  "migration_scope": "本轮仅独立TASK-0034验证库；原开发库未修改，其他电脑需迁移head"
+  "migration_scope": "TASK-0035 只在独立内存测试库执行现有 head，无新迁移。"
 }

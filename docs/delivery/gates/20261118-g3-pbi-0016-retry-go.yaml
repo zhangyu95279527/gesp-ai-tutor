@@ -1,0 +1,12 @@
+id: GATE-RECORD-0025
+gate: G3
+artifact: PBI-0016
+decision: go
+criteria_met: [ac-verifiable, design-ready, tech-design-ready, tasks-decomposed, dependencies-confirmed]
+criteria_failed: []
+decided_by: Codex
+role: product-owner-and-architect
+date: "2026-11-18"
+recycle_target: ""
+follow_up: ["TASK-0035 限于内部受理、关闭的公开生成入口和 PC 状态说明"]
+notes: "沿用已有会话锁、计次事务、重试关联和修正分层检查，无需数据库迁移。"
