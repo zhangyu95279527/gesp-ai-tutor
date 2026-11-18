@@ -1,0 +1,17 @@
+id: TASK-0033
+pbi_id: PBI-0011
+status: in-verification
+owner_role: Developer
+objective: "在已完成诊断中回看冻结的题目、评测文字与提交代码"
+depends_on: [TASK-0029, TASK-0031]
+inputs: ["AGENTS.md", "docs/features/PBI-0011.yaml", "docs/features/pbi-0011-diagnosis-materials.md", "docs/features/feat-003-ux-ui-design.md"]
+affected_repositories: [gesp-tutor-web]
+affected_components: [web/diagnosis]
+allowed_scope: ["gesp-tutor-web/src/components/tutor/DiagnosisResult.tsx", "gesp-tutor-web/src/components/tutor/DiagnosisMaterials.tsx", "gesp-tutor-web/src/components/tutor/diagnosis-materials.css", "gesp-tutor-web/tests/diagnosis-materials.test.tsx", "gesp-tutor-web/AGENTS.md"]
+acceptance_criteria: ["PBI-0011 AC2"]
+verification: ["本人已检结果回看完整冻结文字与代码", "默认折叠、文本转义、换行与片段声明", "无效/未完成结果不展示材料，无新增请求", "Web规范/类型/完整回归/构建与同步"]
+scope_limits: "仅已完成诊断的文字快照。无新API/迁移，不取原图，不开放生成/追问/变式，不构成完整AC2或G4。"
+executor: {mode: agent, adapter: codex}
+code_branch: task-0033-diagnosis-materials
+code_commits: {gesp-tutor-web: "12929142b38a071c09699b33b9a42f6f298ec849"}
+evidence: ["docs/verification/PBI-0011-diagnosis-materials.md", "docs/verification/TASK-0033-web-check.txt", "docs/verification/TASK-0033-materials.png"]

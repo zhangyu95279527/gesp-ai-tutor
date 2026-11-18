@@ -1,0 +1,12 @@
+id: GATE-RECORD-0023
+gate: G3
+artifact: PBI-0011
+decision: go
+criteria_met: [ac-verifiable, design-ready, tech-design-ready, tasks-decomposed, dependencies-confirmed]
+criteria_failed: []
+decided_by: Codex
+role: product-owner-and-architect
+date: "2026-11-18"
+recycle_target: ""
+follow_up: ["仅放行TASK-0033已完成诊断文字材料回看，完整AC2和G4待后续"]
+notes: "复用已实现的本人已检结果及冻结上下文，纯前端折叠呈现，无新架构或外部依赖；设计与证据计划见pbi-0011-diagnosis-materials.md。"

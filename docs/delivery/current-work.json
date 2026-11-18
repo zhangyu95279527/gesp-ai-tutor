@@ -1,12 +1,12 @@
 {
-  "updated": "2026-11-16",
-  "task": "TASK-0032",
-  "checkpoint": "docs/delivery/checkpoints/20261116-diagnosis-guidance.md",
+  "updated": "2026-11-18",
+  "task": "TASK-0033",
+  "checkpoint": "docs/delivery/checkpoints/20261118-diagnosis-materials.md",
   "snapshot_branch": "chore-mac-mini-handoff",
   "repositories": {
     "gesp-ai-tutor": {
       "path": ".",
-      "branch": "task-0032-diagnosis-guidance",
+      "branch": "task-0033-diagnosis-materials",
       "commit_source": "本文件所在的交付仓提交"
     },
     "gesp-tutor-api": {
@@ -16,26 +16,28 @@
     },
     "gesp-tutor-web": {
       "path": "../gesp-tutor-web",
-      "branch": "task-0032-diagnosis-guidance",
-      "commit": "387772b1def66f808fbd22fa12062bd3f2d2e393"
+      "branch": "task-0033-diagnosis-materials",
+      "commit": "12929142b38a071c09699b33b9a42f6f298ec849"
     }
   },
   "database_migration": "0013_guidance",
   "verification": {
     "api_tests": 421,
-    "web_tests": 271,
+    "web_tests": 277,
     "api_mypy_source_files": 55,
     "guidance_special_tests": 36,
     "pc_diagnosis_guidance": "history to saved L1/L2/L3, code quotes, page reload and manual GET; synthetic QA only",
     "diagnosis_qa_charges": 1,
     "guidance_qa_unlock_charges": 2,
     "feedback_qa_version": 2,
-    "migration": "0013 to 0012 to head preserved existing records; populated guidance downgrade guard passed"
+    "migration": "0013 to 0012 to head preserved existing records; populated guidance downgrade guard passed",
+    "materials_special_tests": 6,
+    "materials_browser": "synthetic dev fixture: default collapsed, click and Enter expand/collapse; no real account or mobile verification"
   },
   "real_generation_configured": false,
   "remaining": [
     "真实模型/OCR/存储/输入输出安全/语义检查/资源预算装配",
-    "PC诊断创建/回显确认闭环、输入材料回看、L1付费重试与诊断继续追问",
+    "PC诊断创建/回显确认闭环、原图回看、L1付费重试与诊断继续追问",
     "真实诊断20例重复一致性与盲评、修正分层盲评、变式检验",
     "运行中SSE/供应商取消/用量刷新、更早追问分页与PC全链路/Mac验证"
   ]

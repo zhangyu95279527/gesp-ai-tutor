@@ -1,0 +1,67 @@
+
+> gesp-tutor-web@0.1.0 check
+> npm run lint && npm run typecheck && npm test && npm run build
+
+
+> gesp-tutor-web@0.1.0 lint
+> eslint .
+
+
+> gesp-tutor-web@0.1.0 typecheck
+> next typegen && tsc --noEmit
+
+Generating route types...
+✓ Types generated successfully
+
+> gesp-tutor-web@0.1.0 test
+> vitest run
+
+
+ RUN  v5.1.0 E:/AIworkspacke/gesp-tutor-web
+
+
+ Test Files  22 passed (22)
+      Tests  277 passed (277)
+   Start at  15:35:55
+   Duration  4.27s (import 50%, tests 45%, transform 4%, worker 2%)
+
+    Isolate  22 workers spawned · ~294ms startup each (spawn + environment, per file)
+             at least ~630ms faster with isolate: false — reuses workers across files instead of one per file
+
+
+> gesp-tutor-web@0.1.0 build
+> next build
+
+▲ Next.js 16.4.6 (Turbopack)
+✓ Running next.config.ts took 42ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 354ms
+  Running TypeScript ...
+  Finished TypeScript in 2.2s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/13) ...
+  Generating static pages using 7 workers (3/13) 
+  Generating static pages using 7 workers (6/13) 
+  Generating static pages using 7 workers (9/13) 
+✓ Generating static pages using 7 workers (13/13) in 381ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /dev/components
+├ ○ /dev/diagnosis-result
+├ ○ /dev/ladder
+├ ○ /dev/session-review
+├ ƒ /diagnosis
+├ ○ /history
+├ ○ /login
+├ ○ /onboarding
+├ ƒ /session
+└ ○ /settings
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
