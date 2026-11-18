@@ -6,7 +6,9 @@
 
 ## 当前状态
 
-三仓任务分支为 `task-0035-guidance-retry`。API `f5d11e3a8e905824152d70220e11e5788af89f89`，Web `d6a8a45c83bb51842d052a4d3f560af1bbcd8632`。任务处于 in-verification，PBI-0016 完整 G4 待验。交付仓包含任务、设计补充、G3 记录、验证和续接清单。远端同步应按三仓实际 SHA 核对。
+三仓任务分支为 `task-0035-guidance-retry`。API `f5d11e3a8e905824152d70220e11e5788af89f89`，Web `d6a8a45c83bb51842d052a4d3f560af1bbcd8632`。任务处于 in-verification，PBI-0016 完整 G4 待验。交付仓包含任务、设计补充、G3 记录、验证和续接清单。
+
+用户批准后已同步 GitHub 三仓任务分支和换机快照 `chore-mac-mini-handoff`。同步脚本核验了各远端分支 SHA，交付内容核验提交为 `12a7ee66d05eb8148c05b5584f16d57abcc31c99`，本条同步记录另行随交付分支更新。
 
 ## 下一步
 

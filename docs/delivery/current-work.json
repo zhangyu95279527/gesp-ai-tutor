@@ -47,8 +47,9 @@
     "运行中SSE/供应商取消/用量刷新、更早追问分页与PC全链路/Mac验证"
   ],
   "sync": {
-    "status": "local-committed",
-    "remote_verified": false,
+    "status": "synced",
+    "remote_verified": true,
+    "verified_delivery_commit": "12a7ee66d05eb8148c05b5584f16d57abcc31c99",
     "command": "python scripts/workspace-sync.py --push --proxy http://127.0.0.1:7890"
   },
   "migration_scope": "TASK-0035 只在独立内存测试库执行现有 head，无新迁移。"
