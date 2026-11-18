@@ -15,7 +15,7 @@
 - 交付仓/Web：task-0033-diagnosis-materials；Web 12929142b38a071c09699b33b9a42f6f298ec849。
 - API 保持 task-0032-diagnosis-guidance / 7c5fa29803f8850b66d87d126ecccd6958f097df，未改代码/数据库、未重跑 API 测试。
 - Web3000 已启动，API/数据库运行状态本轮未验证。TASK-0033 in-verification，完整 G4 仍 0；未合 main、未发布。
-- 同步采用 workspace-sync.py --push，最终成功与否以命令输出和远端 SHA 核验为准。
+- 本轮未同步：workspace-sync.py --push 两次被自动审批拒绝，未执行推送。理由为项目文件约定不能替代本次私有代码/文档外传的可信授权；待用户明确批准推送到已登记的三个 GitHub 远端。不可据本地提交宣称可换机。
 
 ## Next actions
 
@@ -24,7 +24,7 @@
 
 ## Blockers
 
-真实模型/OCR/存储/安全/预算未配置，变式 ADR 待 GB；不阻塞本次只读材料呈现。
+真实模型/OCR/存储/安全/预算未配置，变式 ADR 待 GB；不阻塞本次只读材料呈现。GitHub 推送被自动审批阻止，需用户批准本次具体载荷与目的地。
 
 ## Open questions
 
